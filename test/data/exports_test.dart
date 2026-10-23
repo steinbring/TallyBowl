@@ -81,4 +81,20 @@ void main() {
     expect(csv.split('\r\n').length, 13);
     expect(csv, contains('"g","s","10","3","X","10","300"'));
   });
+  test('CSV treats whitespace-prefixed formulas and leading control characters as text', () {
+    for (final text in [
+      '  =1+1',
+      '\n=1+1',
+      '\tDanger',
+      '\uFEFF+SUM(1,2)',
+      '\u0000@SUM(1,2)',
+    ]) {
+      final original = exportData();
+      final data = original.copyWith(
+        alleys: [BowlingAlley(id: 'a', name: text)],
+      );
+      expect(BowlExports.gameCsv(data), contains('"\'$text"'));
+    }
+    expect(BowlExports.deliveryCsv(exportData()), isNot(contains('"\'-"')));
+  });
 }

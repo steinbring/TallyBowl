@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:crypto/crypto.dart';
 import 'package:file_selector/file_selector.dart';
@@ -10,18 +11,35 @@ import 'package:path_provider/path_provider.dart';
 import 'score_parser.dart';
 
 abstract final class PhotoService {
+  static const maxPhotoBytes = 40 * 1024 * 1024;
   static const channel = MethodChannel('app.jws.tallybowl/vision');
   static Future<Directory> _imports() async => Directory(
     p.join((await getApplicationSupportDirectory()).path, 'imports'),
   ).create(recursive: true);
   static Future<String> retain(Uint8List bytes) async {
-    if (bytes.length > 40 * 1024 * 1024) {
+    if (bytes.length > maxPhotoBytes) {
       throw const FormatException('Choose a photo smaller than 40 MB.');
     }
     final digest = sha256.convert(bytes).toString();
     final file = File(p.join((await _imports()).path, '$digest.image'));
     await file.writeAsBytes(bytes, flush: true);
     return file.path;
+  }
+
+  /// Check before allocating, and cap the stream too in case a file changes
+  /// after its size was checked. macOS files are not resized by image_picker.
+  static Future<Uint8List> readPhoto(XFile file) async {
+    if (await file.length() > maxPhotoBytes) {
+      throw const FormatException('Choose a photo smaller than 40 MB.');
+    }
+    final bytes = BytesBuilder(copy: false);
+    await for (final chunk in file.openRead()) {
+      if (bytes.length + chunk.length > maxPhotoBytes) {
+        throw const FormatException('Choose a photo smaller than 40 MB.');
+      }
+      bytes.add(chunk);
+    }
+    return bytes.takeBytes();
   }
 
   static Future<String?> pick({required bool camera}) async {
@@ -36,7 +54,7 @@ abstract final class PhotoService {
         uniformTypeIdentifiers: ['public.image'],
       );
       final file = await openFile(acceptedTypeGroups: [type]);
-      return file == null ? null : retain(await file.readAsBytes());
+      return file == null ? null : retain(await readPhoto(file));
     }
     final image = await ImagePicker().pickImage(
       source: camera ? ImageSource.camera : ImageSource.gallery,
@@ -44,11 +62,11 @@ abstract final class PhotoService {
       maxHeight: 4096,
       requestFullMetadata: false,
     );
-    return image == null ? null : retain(await image.readAsBytes());
+    return image == null ? null : retain(await readPhoto(image));
   }
 
   static Future<List<RecognizedLine>> recognize(String path) async {
-    final bytes = await File(path).readAsBytes();
+    final bytes = await readPhoto(XFile(path));
     final output = await channel.invokeMethod<List<dynamic>>('recognizeText', {
       'bytes': bytes,
     });
@@ -62,7 +80,7 @@ abstract final class PhotoService {
     final response = await ImagePicker().retrieveLostData();
     if (response.exception != null) throw response.exception!;
     final file = response.files?.firstOrNull;
-    return file == null ? null : retain(await file.readAsBytes());
+    return file == null ? null : retain(await readPhoto(file));
   }
 
   static Future<void> remove(String? source) async {
