@@ -26,6 +26,14 @@ class _AlleyMapPageState extends State<AlleyMapPage> {
   LatLng? _selected;
   bool _failed = false;
   int _tileGeneration = 0;
+  Future<void> _edit([BowlingAlley? alley]) async {
+    final before = widget.controller.data;
+    await editAlley(context, widget.controller, alley);
+    if (mounted && !identical(before, widget.controller.data)) {
+      Navigator.pop(context);
+    }
+  }
+
   @override
   void dispose() {
     _map.dispose();
@@ -74,9 +82,9 @@ class _AlleyMapPageState extends State<AlleyMapPage> {
                   style: TextStyle(fontWeight: FontWeight.w600),
                 ),
                 OutlinedButton.icon(
-                  onPressed: () => editAlley(context, widget.controller),
-                  icon: const Icon(Icons.edit_location_alt_outlined),
-                  label: const Text('Enter alley manually'),
+                  onPressed: () => _edit(),
+                  icon: const Icon(Icons.search),
+                  label: const Text('Search by name or enter manually'),
                 ),
               ],
             ),
@@ -121,12 +129,7 @@ class _AlleyMapPageState extends State<AlleyMapPage> {
                             child: Tooltip(
                               message: alley.name,
                               child: IconButton(
-                                onPressed: () => setState(
-                                  () => _selected = LatLng(
-                                    alley.latitude!,
-                                    alley.longitude!,
-                                  ),
-                                ),
+                                onPressed: () => _edit(alley),
                                 icon: const Icon(
                                   Icons.location_on,
                                   size: 36,

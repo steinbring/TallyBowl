@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../app_controller.dart';
 import '../domain/models.dart';
 import 'common.dart';
+import 'alley_dialog.dart';
 
 Future<void> editProfile(
   BuildContext context,
@@ -197,95 +198,11 @@ Future<void> editAlley(
   BuildContext context,
   BowlController controller, [
   BowlingAlley? alley,
-]) async {
-  final exists =
-      alley != null && controller.data.alleys.any((a) => a.id == alley.id);
-  final name = TextEditingController(text: alley?.name);
-  final address = TextEditingController(text: alley?.address);
-  final notes = TextEditingController(text: alley?.notes);
-  var retired = alley?.retired ?? false;
-  final key = GlobalKey<FormState>();
-  final result = await showDialog<BowlingAlley>(
-    context: context,
-    builder: (c) => StatefulBuilder(
-      builder: (c, setState) => AlertDialog(
-        title: Text(!exists ? 'Add your bowling alley' : 'Edit bowling alley'),
-        content: SizedBox(
-          width: 460,
-          child: Form(
-            key: key,
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextFormField(
-                    controller: name,
-                    autofocus: true,
-                    decoration: const InputDecoration(labelText: 'Alley name'),
-                    validator: requiredText,
-                  ),
-                  const SizedBox(height: 16),
-                  TextField(
-                    controller: address,
-                    decoration: const InputDecoration(labelText: 'Address'),
-                  ),
-                  const SizedBox(height: 16),
-                  TextField(
-                    controller: notes,
-                    maxLines: 2,
-                    decoration: const InputDecoration(labelText: 'Notes'),
-                  ),
-                  if (exists)
-                    SwitchListTile(
-                      contentPadding: EdgeInsets.zero,
-                      title: const Text('Archive alley'),
-                      subtitle: const Text(
-                        'Keep past visits, hide from new sessions.',
-                      ),
-                      value: retired,
-                      onChanged: (v) => setState(() => retired = v),
-                    ),
-                ],
-              ),
-            ),
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(c),
-            child: const Text('Cancel'),
-          ),
-          FilledButton(
-            onPressed: () {
-              if (key.currentState!.validate()) {
-                Navigator.pop(
-                  c,
-                  BowlingAlley(
-                    id: alley?.id ?? controller.newId(),
-                    name: name.text.trim(),
-                    address: address.text.trim(),
-                    notes: notes.text.trim(),
-                    retired: retired,
-                    latitude: alley?.latitude,
-                    longitude: alley?.longitude,
-                    osmId: alley?.osmId,
-                  ),
-                );
-              }
-            },
-            child: const Text('Save alley'),
-          ),
-        ],
-      ),
-    ),
-  );
-  if (result != null && context.mounted) {
-    await safely(context, () => controller.saveAlley(result));
-  }
-  for (final c in [name, address, notes]) {
-    c.dispose();
-  }
-}
+]) => showDialog<void>(
+  context: context,
+  barrierDismissible: false,
+  builder: (_) => AlleyDialog(controller: controller, alley: alley),
+);
 
 Future<void> startSession(
   BuildContext context,
