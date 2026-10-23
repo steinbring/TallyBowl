@@ -154,11 +154,9 @@ class _AlleyMapPageState extends State<AlleyMapPage> {
                     RichAttributionWidget(
                       attributions: [
                         TextSourceAttribution(
-                          'OpenStreetMap contributors',
+                          AppConfig.tileAttribution,
                           onTap: () => launchUrl(
-                            Uri.parse(
-                              'https://www.openstreetmap.org/copyright',
-                            ),
+                            Uri.parse(AppConfig.tileAttributionUrl),
                           ),
                         ),
                       ],

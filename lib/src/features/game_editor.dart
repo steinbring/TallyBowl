@@ -205,12 +205,15 @@ class _GameEditorState extends State<GameEditor> {
         /* Retried by orphan cleanup on the next launch. */
       }
       if (mounted) {
+        final messenger = ScaffoldMessenger.of(context);
         setState(() {
           _allowExit = true;
           _saving = false;
         });
         Navigator.pop(context);
-        message(context, 'Game saved · ${result.total}');
+        messenger.showSnackBar(
+          SnackBar(content: Text('Game saved · ${result.total}')),
+        );
       }
     } catch (e) {
       if (mounted) {
@@ -441,7 +444,6 @@ class _GameEditorState extends State<GameEditor> {
                       const SizedBox(height: 16),
                       DropdownButtonFormField<String>(
                         isExpanded: true,
-                        key: ValueKey(_primary),
                         initialValue: _primary ?? '',
                         decoration: const InputDecoration(
                           labelText: 'Primary ball',

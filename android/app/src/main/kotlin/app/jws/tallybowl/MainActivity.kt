@@ -27,7 +27,10 @@ class MainActivity : FlutterActivity() {
             imageExecutor.execute {
                 var file: File? = null
                 try {
-                    // ML Kit's file loader handles EXIF rotation. No network service
+                    // This URI stays inside this process; it is never exposed in
+                    // an Intent to another app. ML Kit's documented file loader
+                    // handles EXIF rotation. ByteBuffer expects raw YUV, not the
+                    // compressed photo bytes received here. No network service
                     // receives the image; the Latin model is bundled in the APK.
                     val source = File.createTempFile("tallybowl-ocr-", ".jpg", cacheDir)
                     file = source

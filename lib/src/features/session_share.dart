@@ -152,7 +152,7 @@ class _SessionSharePageState extends State<SessionSharePage> {
                     builder: (c) => OutlinedButton.icon(
                       onPressed: _busy ? null : () => _export(c, share: false),
                       icon: const Icon(Icons.download_outlined),
-                      label: const Text('Save image'),
+                      label: const Text('Export image'),
                     ),
                   ),
                 ],

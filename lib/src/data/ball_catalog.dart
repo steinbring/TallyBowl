@@ -9,19 +9,12 @@ class BallModelSuggestion {
 /// Small, manually maintained name-only starter list. See DATA_SOURCES.md for
 /// first-party references. No prices, product claims, images or scraped feed.
 abstract final class BallCatalog {
-  static const brands = [
-    '900 Global',
-    'Brunswick',
-    'Columbia 300',
-    'DV8',
-    'Ebonite',
-    'Hammer',
-    'MOTIV',
-    'Radical',
-    'Roto Grip',
-    'Storm',
-    'Track',
-  ];
+  // Brands represented by models are derived, so the two lists cannot drift.
+  static const additionalBrands = ['Columbia 300', 'Radical'];
+  static final List<String> brands = List.unmodifiable(
+    {...starter.map((model) => model.brand), ...additionalBrands}.toList()
+      ..sort(),
+  );
   static const starter = [
     BallModelSuggestion('900 Global', 'Sublime Focus'),
     BallModelSuggestion('Brunswick', 'Mesmerize'),

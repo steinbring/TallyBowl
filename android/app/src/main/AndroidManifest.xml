@@ -1,5 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- image_picker delegates still capture to the system camera app. Do not
+         request CAMERA unless we implement direct camera access and its runtime
+         permission flow; no camera/storage permission is needed for this path. -->
     <application
         android:label="TallyBowl!"
         android:name="${applicationName}"
