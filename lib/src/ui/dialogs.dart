@@ -121,6 +121,7 @@ Future<void> startSession(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 DropdownButtonFormField<String>(
+                  isExpanded: true,
                   initialValue: alleyId,
                   decoration: const InputDecoration(labelText: 'Bowling alley'),
                   items: [

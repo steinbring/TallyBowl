@@ -50,6 +50,7 @@ class CatalogAutocomplete<T extends Object> extends StatelessWidget {
           alignment: Alignment.topLeft,
           child: Material(
             elevation: 6,
+            color: Colors.white,
             borderRadius: BorderRadius.circular(12),
             clipBehavior: Clip.antiAlias,
             child: SizedBox(

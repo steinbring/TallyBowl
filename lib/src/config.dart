@@ -8,7 +8,7 @@ abstract final class AppConfig {
     'TALLYBOWL_TILE_URL',
     defaultValue: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
   );
-  static const userAgent = 'TallyBowl/0.1 (+https://tallybowl.jws.app)';
+  static const userAgent = 'TallyBowl/0.1.1 (+https://tallybowl.jws.app)';
   static const placeSearchUrl = String.fromEnvironment(
     'TALLYBOWL_PHOTON_URL',
     defaultValue: 'https://photon.komoot.io/api/',

@@ -440,6 +440,7 @@ class _GameEditorState extends State<GameEditor> {
                     if (_balls.isNotEmpty) ...[
                       const SizedBox(height: 16),
                       DropdownButtonFormField<String>(
+                        isExpanded: true,
                         key: ValueKey(_primary),
                         initialValue: _primary ?? '',
                         decoration: const InputDecoration(
@@ -453,7 +454,13 @@ class _GameEditorState extends State<GameEditor> {
                           for (final b in availableBalls.where(
                             (b) => _balls.contains(b.id),
                           ))
-                            DropdownMenuItem(value: b.id, child: Text(b.name)),
+                            DropdownMenuItem(
+                              value: b.id,
+                              child: Text(
+                                b.name,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
                         ],
                         onChanged: (value) {
                           _primary = value == '' ? null : value;
