@@ -79,7 +79,7 @@ class BowlingAlley {
 }
 
 class BowlingSession {
-  const BowlingSession({
+  BowlingSession({
     required this.id,
     required this.alleyId,
     required this.startedAt,
@@ -88,10 +88,13 @@ class BowlingSession {
     this.leagueName = '',
     this.notes = '',
     this.finishedAt,
-  });
+    int? utcOffsetMinutes,
+  }) : utcOffsetMinutes =
+           utcOffsetMinutes ?? startedAt.timeZoneOffset.inMinutes;
   final String id, alleyId, lane, leagueName, notes;
   final DateTime startedAt;
   final DateTime? finishedAt;
+  final int utcOffsetMinutes;
   final bool league;
   bool get finished => finishedAt != null;
   BowlingSession finish() => BowlingSession(
@@ -103,12 +106,13 @@ class BowlingSession {
     leagueName: leagueName,
     notes: notes,
     finishedAt: DateTime.now(),
+    utcOffsetMinutes: utcOffsetMinutes,
   );
   Map<String, dynamic> toJson() => {
     'id': id,
     'alleyId': alleyId,
     'startedAt': startedAt.toIso8601String(),
-    'utcOffsetMinutes': startedAt.timeZoneOffset.inMinutes,
+    'utcOffsetMinutes': utcOffsetMinutes,
     'lane': lane,
     'league': league,
     'leagueName': leagueName,
@@ -119,6 +123,7 @@ class BowlingSession {
     id: j['id'] as String,
     alleyId: j['alleyId'] as String,
     startedAt: DateTime.parse(j['startedAt'] as String),
+    utcOffsetMinutes: j['utcOffsetMinutes'] as int?,
     lane: j['lane'] as String,
     league: j['league'] as bool,
     leagueName: j['leagueName'] as String,
@@ -251,6 +256,9 @@ class BowlData {
     ids(alleys.map((v) => v.id));
     ids(sessions.map((v) => v.id));
     ids(games.map((v) => v.id));
+    if (sessions.where((s) => !s.finished).length > 1) {
+      throw const FormatException('Only one session can be in progress.');
+    }
     for (final b in balls) {
       if (b.name.trim().isEmpty ||
           !b.weight.isFinite ||
@@ -287,11 +295,27 @@ class BowlData {
       }
     }
     if (draft != null) {
-      if (!sessions.any((s) => s.id == draft!['sessionId']) ||
+      if (!sessions.any((s) => s.id == draft!['sessionId'] && !s.finished) ||
           draft!['frames'] is! List ||
           (draft!['frames'] as List).length != 10 ||
-          (draft!['frames'] as List).any((v) => v is! String)) {
+          (draft!['frames'] as List).any((v) => v is! String || v.length > 3)) {
         throw const FormatException('Invalid game draft.');
+      }
+      final d = draft!;
+      final tags = d['ballIds'] ?? <String>[];
+      if ((d['lane'] != null && d['lane'] is! String) ||
+          (d['notes'] != null && d['notes'] is! String) ||
+          (d['sourceLabel'] != null && d['sourceLabel'] is! String) ||
+          (d['sourcePath'] != null && d['sourcePath'] is! String) ||
+          tags is! List ||
+          tags.any((v) => v is! String || ball(v) == null) ||
+          tags.toSet().length != tags.length ||
+          (d['primaryBallId'] != null && !tags.contains(d['primaryBallId'])) ||
+          (d['displayedTotal'] != null &&
+              (d['displayedTotal'] is! int ||
+                  (d['displayedTotal'] as int) < 0 ||
+                  (d['displayedTotal'] as int) > 300))) {
+        throw const FormatException('Invalid game draft details.');
       }
     }
   }

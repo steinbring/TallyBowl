@@ -132,6 +132,9 @@ abstract final class ScoreSheetParser {
     if (runs.isNotEmpty &&
         runs.every((r) => RegExp(r'^X+$').hasMatch(r)) &&
         runs.join().length == 12) {
+      if (runTotal != null && (runTotal < 0 || runTotal > 300)) {
+        return (null, null);
+      }
       return ([...List.filled(9, 'X'), 'XXX'], runTotal);
     }
     final tokens = RegExp(r'(?<![A-Z0-9])[XF0-9/\-]{1,3}(?![A-Z0-9])')

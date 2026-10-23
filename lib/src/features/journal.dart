@@ -7,6 +7,7 @@ import '../ui/common.dart';
 import '../ui/dialogs.dart';
 import 'game_editor.dart';
 import 'photo_capture.dart';
+import 'session_share.dart';
 import '../recognition/photo_service.dart';
 
 class TonightPage extends StatelessWidget {
@@ -198,10 +199,12 @@ class TonightPage extends StatelessWidget {
                         action: 'Finish session',
                       ) &&
                       context.mounted) {
-                    await safely(
-                      context,
-                      () => controller.finishSession(session.id),
-                    );
+                    await safely(context, () async {
+                      await controller.finishSession(session.id);
+                      if (context.mounted && games.isNotEmpty) {
+                        await openSessionShare(context, controller, session);
+                      }
+                    });
                   }
                 },
                 icon: const Icon(Icons.flag_outlined),
@@ -429,6 +432,15 @@ Future<void> showSession(
         return Scaffold(
           appBar: AppBar(
             title: Text(controller.data.alley(session.alleyId)!.name),
+            actions: [
+              if (games.isNotEmpty)
+                IconButton(
+                  tooltip: 'Share session',
+                  onPressed: () =>
+                      openSessionShare(context, controller, session),
+                  icon: const Icon(Icons.ios_share_rounded),
+                ),
+            ],
           ),
           body: SingleChildScrollView(
             padding: const EdgeInsets.all(24),

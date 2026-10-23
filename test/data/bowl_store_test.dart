@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
@@ -38,6 +39,28 @@ void main() {
       ),
     ],
     draft: {'sessionId': 's1', 'frames': List.filled(10, '')},
+  );
+  test(
+    'a new database connection recovers the journal after restart',
+    () async {
+      final folder = await Directory.systemTemp.createTemp(
+        'tallybowl-db-test-',
+      );
+      final path = '${folder.path}/journal.db';
+      try {
+        var disk = await BowlStore.open(
+          factory: databaseFactoryFfi,
+          path: path,
+        );
+        await disk.save(sample());
+        await disk.close();
+        disk = await BowlStore.open(factory: databaseFactoryFfi, path: path);
+        expect((await disk.load()).toJson(), sample().toJson());
+        await disk.close();
+      } finally {
+        await folder.delete(recursive: true);
+      }
+    },
   );
   test(
     'database and backup preserve frame records, references and drafts',

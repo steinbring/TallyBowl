@@ -115,21 +115,33 @@ class BowlStore {
     });
   }
 
-  String backup(BowlData data) => const JsonEncoder.withIndent('  ').convert({
-    'format': 'tallybowl',
-    'version': 1,
-    'exportedAt': DateTime.now().toUtc().toIso8601String(),
-    'data': data.toJson(),
-  });
+  String backup(BowlData data) => encodeBackup(data);
+  static String encodeBackup(BowlData data) {
+    final document = data.toJson();
+    if (data.draft != null) {
+      document['draft'] = Map<String, dynamic>.from(data.draft!)
+        ..remove('sourcePath');
+    }
+    return const JsonEncoder.withIndent('  ').convert({
+      'format': 'tallybowl',
+      'version': 1,
+      'exportedAt': DateTime.now().toUtc().toIso8601String(),
+      'data': document,
+    });
+  }
+
   static BowlData readBackup(String source) {
     try {
       final envelope = jsonDecode(source) as Map<String, dynamic>;
       if (envelope['format'] != 'tallybowl' || envelope['version'] != 1) {
         throw const FormatException('Unsupported TallyBowl backup format.');
       }
-      return BowlData.fromJson(
-        Map<String, dynamic>.from(envelope['data'] as Map),
-      );
+      final document = Map<String, dynamic>.from(envelope['data'] as Map);
+      if (document['draft'] is Map) {
+        document['draft'] = Map<String, dynamic>.from(document['draft'] as Map)
+          ..remove('sourcePath');
+      }
+      return BowlData.fromJson(document);
     } on FormatException {
       rethrow;
     } catch (_) {

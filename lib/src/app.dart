@@ -7,7 +7,7 @@ import 'features/inventory.dart';
 import 'features/journal.dart';
 import 'theme.dart';
 import 'ui/common.dart';
-import 'ui/dialogs.dart';
+import 'features/settings.dart';
 import 'recognition/photo_service.dart';
 import 'features/photo_capture.dart';
 
@@ -338,92 +338,6 @@ class _BowlShellState extends State<BowlShell> {
                 ),
         );
       },
-    ),
-  );
-}
-
-class ProfileSettings extends StatelessWidget {
-  const ProfileSettings({super.key, required this.controller});
-  final BowlController controller;
-  @override
-  Widget build(BuildContext context) => ListenableBuilder(
-    listenable: controller,
-    builder: (context, _) => Scaffold(
-      appBar: AppBar(title: const Text('Settings')),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
-        child: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 800),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const PageHeading(
-                  'Make it yours.',
-                  'Your profile and personal bowling journal.',
-                ),
-                Card(
-                  child: ListTile(
-                    leading: const Icon(Icons.person_outline_rounded),
-                    title: Text(
-                      controller.data.profile.name.isEmpty
-                          ? 'Set up your bowler profile'
-                          : controller.data.profile.name,
-                    ),
-                    subtitle: Text(
-                      controller.data.profile.aliases.isEmpty
-                          ? 'Add your scoreboard names and nicknames.'
-                          : controller.data.profile.aliases.join(', '),
-                    ),
-                    trailing: const Icon(Icons.edit_outlined),
-                    onTap: () => editProfile(context, controller),
-                  ),
-                ),
-                const SizedBox(height: 24),
-                const Card(
-                  child: Padding(
-                    padding: EdgeInsets.all(24),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Your game stays yours.',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w800,
-                          ),
-                        ),
-                        SizedBox(height: 12),
-                        Text(
-                          'Your bowling records are stored locally on this device. Image recognition runs on the device. Map tiles and place searches use your configured map services.',
-                          style: TextStyle(
-                            height: 1.7,
-                            color: BowlColors.muted,
-                          ),
-                        ),
-                        SizedBox(height: 20),
-                        Text(
-                          AppConfig.name,
-                          style: TextStyle(
-                            fontWeight: FontWeight.w900,
-                            fontSize: 24,
-                          ),
-                        ),
-                        Text(AppConfig.tagline),
-                        SizedBox(height: 8),
-                        SelectableText(
-                          AppConfig.website,
-                          style: TextStyle(color: BowlColors.orange),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
     ),
   );
 }
