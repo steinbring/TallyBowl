@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import '../domain/models.dart';
 import '../domain/scoring.dart';
 import '../theme.dart';
+import 'layout.dart';
 
 String dateLabel(DateTime date) => DateFormat('EEE, MMM d, y').format(date);
 String averageLabel(Iterable<BowlingGame> games) {
@@ -80,7 +81,12 @@ class PageHeading extends StatelessWidget {
                   ?.copyWith(fontWeight: FontWeight.w800, letterSpacing: -1.2),
             ),
             const SizedBox(height: 6),
-            Text(subtitle, style: const TextStyle(color: BowlColors.muted)),
+            Text(
+              subtitle,
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+            ),
           ],
         ),
         ?action,
@@ -110,8 +116,12 @@ class EmptyCard extends StatelessWidget {
           children: [
             CircleAvatar(
               radius: 30,
-              backgroundColor: BowlColors.mint,
-              child: Icon(icon, size: 28, color: BowlColors.ink),
+              backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+              child: Icon(
+                icon,
+                size: 28,
+                color: Theme.of(context).colorScheme.onPrimaryContainer,
+              ),
             ),
             const SizedBox(height: 18),
             Text(
@@ -126,7 +136,10 @@ class EmptyCard extends StatelessWidget {
               child: Text(
                 body,
                 textAlign: TextAlign.center,
-                style: const TextStyle(color: BowlColors.muted, height: 1.6),
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  height: 1.6,
+                ),
               ),
             ),
             if (action != null) ...[const SizedBox(height: 20), action!],
@@ -149,7 +162,7 @@ class MetricCard extends StatelessWidget {
   final bool accent;
   @override
   Widget build(BuildContext context) => Card(
-    color: accent ? BowlColors.mint : null,
+    color: accent ? Theme.of(context).colorScheme.primaryContainer : null,
     child: Padding(
       padding: const EdgeInsets.all(22),
       child: Column(
@@ -157,8 +170,8 @@ class MetricCard extends StatelessWidget {
         children: [
           Text(
             label,
-            style: const TextStyle(
-              color: BowlColors.muted,
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -174,7 +187,10 @@ class MetricCard extends StatelessWidget {
           const SizedBox(height: 4),
           Text(
             detail,
-            style: const TextStyle(fontSize: 12, color: BowlColors.muted),
+            style: TextStyle(
+              fontSize: 12,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
           ),
         ],
       ),
@@ -188,9 +204,12 @@ class MetricRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) => LayoutBuilder(
     builder: (context, c) {
-      final count = c.maxWidth > 800
-          ? children.length
-          : (c.maxWidth > 420 ? 2 : 1);
+      final count = BowlLayout.columns(
+        context,
+        c.maxWidth,
+        minimumWidth: 220,
+        maximum: children.length,
+      );
       final width = (c.maxWidth - (count - 1) * 16) / count;
       return Wrap(
         spacing: 16,
@@ -210,7 +229,7 @@ class BallArt extends StatelessWidget {
   @override
   Widget build(BuildContext context) => SizedBox.square(
     dimension: size,
-    child: CustomPaint(painter: _BallPainter(color)),
+    child: ExcludeSemantics(child: CustomPaint(painter: _BallPainter(color))),
   );
 }
 
@@ -272,54 +291,81 @@ class ScoreStrip extends StatelessWidget {
       child: Row(
         children: [
           for (var i = 0; i < 10; i++)
-            Container(
-              width: i == 9 ? 90 : 72,
-              decoration: BoxDecoration(
-                border: Border.all(color: BowlColors.line),
-                color: result.frames[i].error != null
-                    ? const Color(0xFFFFE4DE)
-                    : Colors.white,
-              ),
-              child: Column(
-                children: [
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(6),
-                    color: BowlColors.canvas,
-                    child: Text(
-                      '${i + 1}',
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        fontSize: 11,
-                        color: BowlColors.muted,
+            Semantics(
+              container: true,
+              excludeSemantics: true,
+              label: _frameDescription(result, i),
+              child: Container(
+                width:
+                    (i == 9 ? 90 : 72) *
+                    (MediaQuery.textScalerOf(context).scale(16) / 16),
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: Theme.of(context).colorScheme.outlineVariant,
+                  ),
+                  color: result.frames[i].error != null
+                      ? Theme.of(context).colorScheme.errorContainer
+                      : Theme.of(context).colorScheme.surface,
+                ),
+                child: Column(
+                  children: [
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(6),
+                      color: Theme.of(context).scaffoldBackgroundColor,
+                      child: Text(
+                        '${i + 1}',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
                       ),
                     ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(9),
-                    child: Text(
-                      result.frames[i].notation.isEmpty
-                          ? '·'
-                          : result.frames[i].notation,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: 3,
+                    Padding(
+                      padding: const EdgeInsets.all(9),
+                      child: Text(
+                        result.frames[i].notation.isEmpty
+                            ? '·'
+                            : result.frames[i].notation,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 3,
+                        ),
                       ),
                     ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 10),
-                    child: Text(
-                      '${result.cumulative[i] ?? '—'}',
-                      style: const TextStyle(fontWeight: FontWeight.w800),
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 10),
+                      child: Text(
+                        '${result.cumulative[i] ?? '—'}',
+                        style: const TextStyle(fontWeight: FontWeight.w800),
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
         ],
       ),
     );
+  }
+
+  String _frameDescription(ScoreResult result, int index) {
+    final frame = result.frames[index];
+    final marks = frame.marks
+        .map(
+          (mark) => switch (mark) {
+            'X' => 'strike',
+            '/' => 'spare',
+            '-' => 'miss',
+            'F' => 'foul',
+            _ => '$mark pins',
+          },
+        )
+        .join(', ');
+    return 'Frame ${index + 1}. ${marks.isEmpty ? 'No deliveries entered' : marks}. '
+        '${frame.error == null ? '' : '${frame.error} '}'
+        'Cumulative score: ${result.cumulative[index]?.toString() ?? 'not yet calculated'}.';
   }
 }
 
@@ -336,7 +382,11 @@ class LabelPill extends StatelessWidget {
     ),
     child: Text(
       text,
-      style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700),
+      style: const TextStyle(
+        fontSize: 12,
+        fontWeight: FontWeight.w700,
+        color: BowlColors.ink,
+      ),
     ),
   );
 }

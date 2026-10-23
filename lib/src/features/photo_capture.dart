@@ -1,10 +1,11 @@
+import '../ui/layout.dart';
+
 import 'package:flutter/material.dart';
 
 import '../app_controller.dart';
 import '../domain/models.dart';
 import '../recognition/photo_service.dart';
 import '../recognition/score_parser.dart';
-import '../theme.dart';
 import '../ui/common.dart';
 import 'game_editor.dart';
 import '../ui/score_photo_preview.dart';
@@ -152,7 +153,10 @@ class _PhotoReviewPageState extends State<PhotoReviewPage> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: const Text('Find your row')),
+    appBar: AppBar(
+      toolbarHeight: BowlLayout.toolbarHeight(context),
+      title: const Text('Find your row'),
+    ),
     body: SingleChildScrollView(
       padding: const EdgeInsets.all(24),
       child: Center(
@@ -208,7 +212,7 @@ class _PhotoReviewPageState extends State<PhotoReviewPage> {
                           padding: const EdgeInsets.only(bottom: 10),
                           child: Card(
                             color: identical(row, _selected)
-                                ? BowlColors.mint
+                                ? Theme.of(context).colorScheme.primaryContainer
                                 : null,
                             child: ListTile(
                               contentPadding: const EdgeInsets.all(16),
@@ -250,10 +254,10 @@ class _PhotoReviewPageState extends State<PhotoReviewPage> {
                         ),
                       ),
                       const SizedBox(height: 16),
-                      const Text(
+                      Text(
                         'Name matches are suggestions. Only your confirmed frames are saved. The source photo is deleted after you save or discard its draft.',
                         style: TextStyle(
-                          color: BowlColors.muted,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
                           fontSize: 12,
                           height: 1.6,
                         ),

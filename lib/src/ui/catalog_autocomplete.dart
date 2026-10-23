@@ -30,7 +30,7 @@ class CatalogAutocomplete<T extends Object> extends StatelessWidget {
       focusNode: focusNode,
       displayStringForOption: display,
       optionsBuilder: (value) =>
-          enabled ? options(value.text) : const Iterable.empty(),
+          enabled ? options(value.text) : Iterable.empty(),
       onSelected: onSelected,
       fieldViewBuilder: (context, text, focus, submitted) => TextFormField(
         controller: text,
@@ -46,16 +46,20 @@ class CatalogAutocomplete<T extends Object> extends StatelessWidget {
       ),
       optionsViewBuilder: (context, selected, options) {
         final values = options.toList();
+        final itemHeight = math.max(
+          56.0,
+          MediaQuery.textScalerOf(context).scale(16) * 2.6 + 24,
+        );
         return Align(
           alignment: Alignment.topLeft,
           child: Material(
             elevation: 6,
-            color: Colors.white,
+            color: Theme.of(context).colorScheme.surfaceContainerHigh,
             borderRadius: BorderRadius.circular(12),
             clipBehavior: Clip.antiAlias,
             child: SizedBox(
               width: constraints.maxWidth,
-              height: math.min(224, values.length * 56),
+              height: math.min(320, values.length * itemHeight),
               child: ListView.builder(
                 padding: EdgeInsets.zero,
                 itemCount: values.length,
@@ -65,7 +69,7 @@ class CatalogAutocomplete<T extends Object> extends StatelessWidget {
                     color: AutocompleteHighlightedOption.of(context) == index
                         ? Theme.of(context).colorScheme.primaryContainer
                         : null,
-                    height: 56,
+                    height: itemHeight,
                     alignment: Alignment.centerLeft,
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: Text(

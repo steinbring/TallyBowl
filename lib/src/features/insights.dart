@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../app_controller.dart';
 import '../domain/models.dart';
-import '../theme.dart';
 import '../ui/common.dart';
 
 class InsightsPage extends StatefulWidget {
@@ -118,9 +117,12 @@ class _InsightsPageState extends State<InsightsPage> {
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800),
                   ),
                   const SizedBox(height: 4),
-                  const Text(
+                  Text(
                     'Scratch scores · scale 0–300 · latest 12 saved games',
-                    style: TextStyle(color: BowlColors.muted, fontSize: 12),
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      fontSize: 12,
+                    ),
                   ),
                   const SizedBox(height: 24),
                   SingleChildScrollView(
@@ -130,10 +132,14 @@ class _InsightsPageState extends State<InsightsPage> {
                       children: [
                         for (var i = 0; i < recent.length; i++)
                           Semantics(
+                            excludeSemantics: true,
                             label:
                                 'Game ${games.length - recent.length + i + 1}, score ${recent[i].score}',
                             child: SizedBox(
-                              width: 64,
+                              width:
+                                  64 *
+                                  (MediaQuery.textScalerOf(context).scale(16) /
+                                      16),
                               child: Column(
                                 children: [
                                   Text(
@@ -153,8 +159,12 @@ class _InsightsPageState extends State<InsightsPage> {
                                             .clamp(2, 140),
                                         decoration: BoxDecoration(
                                           color: i == recent.length - 1
-                                              ? BowlColors.orange
-                                              : BowlColors.mint,
+                                              ? Theme.of(context)
+                                                    .colorScheme
+                                                    .secondary
+                                              : Theme.of(context)
+                                                    .colorScheme
+                                                    .primary,
                                           borderRadius: BorderRadius.circular(
                                             6,
                                           ),
@@ -165,9 +175,11 @@ class _InsightsPageState extends State<InsightsPage> {
                                   const SizedBox(height: 8),
                                   Text(
                                     'G${games.length - recent.length + i + 1}',
-                                    style: const TextStyle(
-                                      fontSize: 11,
-                                      color: BowlColors.muted,
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurfaceVariant,
                                     ),
                                   ),
                                 ],
@@ -222,11 +234,11 @@ class _InsightsPageState extends State<InsightsPage> {
             ],
           ),
           const SizedBox(height: 16),
-          const Text(
+          Text(
             'Frame strike rate and spare opportunities use frames 1–10, excluding bonus deliveries. These comparisons show associations; lane conditions, practice, and ball selection also affect scores.',
             style: TextStyle(
               fontSize: 12,
-              color: BowlColors.muted,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
               height: 1.6,
             ),
           ),
@@ -258,9 +270,9 @@ class _Comparison extends StatelessWidget {
           const SizedBox(height: 8),
           Text(
             subtitle,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 12,
-              color: BowlColors.muted,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
               height: 1.5,
             ),
           ),
@@ -281,9 +293,11 @@ class _Comparison extends StatelessWidget {
                         ),
                         Text(
                           '${row.$3.length} games · ${row.$2}',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 12,
-                            color: BowlColors.muted,
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSurfaceVariant,
                           ),
                         ),
                       ],

@@ -9,6 +9,7 @@ import 'package:http/testing.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:tallybowl/src/app_controller.dart';
+import 'package:tallybowl/src/app.dart';
 import 'package:tallybowl/src/data/place_search.dart';
 import 'package:tallybowl/src/domain/models.dart';
 import 'package:tallybowl/src/theme.dart';
@@ -113,6 +114,31 @@ void main() {
       expect(controller.data.alleys.single.osmId, 'N/12168828291');
     },
   );
+  testWidgets('renders the adaptive dashboard in dark mode with large text', (
+    tester,
+  ) async {
+    tester.platformDispatcher.platformBrightnessTestValue = Brightness.dark;
+    tester.platformDispatcher.textScaleFactorTestValue = 1.5;
+    final key = GlobalKey();
+    final controller = BowlController(
+      null,
+      const BowlData(
+        profile: BowlerProfile(name: 'Sample bowler'),
+        balls: [BowlingBall(id: 'b', name: 'Phaze II', brand: 'Storm')],
+        alleys: [BowlingAlley(id: 'a', name: 'Sample lanes')],
+      ),
+    );
+    await tester.pumpWidget(
+      RepaintBoundary(
+        key: key,
+        child: TallyBowlApp(controller: controller),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await savePreview(key, 'dark-dashboard');
+    tester.platformDispatcher.clearPlatformBrightnessTestValue();
+    tester.platformDispatcher.clearTextScaleFactorTestValue();
+  });
   testWidgets('renders source launcher artwork using the in-app bowling ball', (
     tester,
   ) async {

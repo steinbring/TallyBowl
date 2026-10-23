@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 
 import 'app_controller.dart';
 import 'config.dart';
@@ -7,6 +8,8 @@ import 'features/inventory.dart';
 import 'features/journal.dart';
 import 'theme.dart';
 import 'ui/common.dart';
+import 'ui/layout.dart';
+import 'ui/app_navigation.dart';
 import 'features/settings.dart';
 import 'recognition/photo_service.dart';
 import 'features/photo_capture.dart';
@@ -33,6 +36,8 @@ class _TallyBowlAppState extends State<TallyBowlApp> {
     title: AppConfig.name,
     debugShowCheckedModeBanner: false,
     theme: tallyBowlTheme,
+    darkTheme: tallyBowlDarkTheme,
+    themeMode: ThemeMode.system,
     home: FutureBuilder<BowlController>(
       future: _controller,
       builder: (context, snapshot) {
@@ -106,13 +111,6 @@ class _BowlShellState extends State<BowlShell> {
     }
   }
 
-  static const destinations = <(String, IconData)>[
-    ('Tonight', Icons.nights_stay_outlined),
-    ('History', Icons.history_rounded),
-    ('Insights', Icons.insights_rounded),
-    ('My Bag', Icons.sports_baseball_outlined),
-    ('Alleys', Icons.location_on_outlined),
-  ];
   void _settings() => Navigator.of(context).push<void>(
     MaterialPageRoute(
       builder: (_) => ProfileSettings(controller: widget.controller),
@@ -123,7 +121,9 @@ class _BowlShellState extends State<BowlShell> {
     listenable: widget.controller,
     builder: (context, _) => LayoutBuilder(
       builder: (context, constraints) {
-        final wide = constraints.maxWidth >= 850;
+        final wide = constraints.maxWidth >= BowlLayout.navigationWidth;
+        final desktop =
+            !kIsWeb && defaultTargetPlatform == TargetPlatform.macOS;
         final c = widget.controller;
         final page = switch (_index) {
           0 => TonightPage(
@@ -139,6 +139,7 @@ class _BowlShellState extends State<BowlShell> {
           appBar: wide
               ? null
               : AppBar(
+                  toolbarHeight: BowlLayout.toolbarHeight(context),
                   title: const Text(
                     'TallyBowl!',
                     style: TextStyle(
@@ -158,118 +159,17 @@ class _BowlShellState extends State<BowlShell> {
             child: Row(
               children: [
                 if (wide)
-                  Container(
-                    width: 224,
-                    decoration: const BoxDecoration(
-                      border: Border(right: BorderSide(color: BowlColors.line)),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Padding(
-                          padding: EdgeInsets.fromLTRB(24, 32, 16, 8),
-                          child: Row(
-                            children: [
-                              BallArt(size: 30),
-                              SizedBox(width: 10),
-                              Expanded(
-                                child: FittedBox(
-                                  fit: BoxFit.scaleDown,
-                                  alignment: Alignment.centerLeft,
-                                  child: Text(
-                                    'TallyBowl!',
-                                    style: TextStyle(
-                                      fontSize: 24,
-                                      fontWeight: FontWeight.w900,
-                                      letterSpacing: -1,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const Padding(
-                          padding: EdgeInsets.only(left: 24, bottom: 42),
-                          child: Text(
-                            'A LITTLE HISTORY. EVERY NIGHT.',
-                            style: TextStyle(
-                              color: BowlColors.muted,
-                              fontSize: 8,
-                              fontWeight: FontWeight.w700,
-                              letterSpacing: 1,
-                            ),
-                          ),
-                        ),
-                        for (var i = 0; i < destinations.length; i++)
-                          Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 14,
-                              vertical: 4,
-                            ),
-                            child: ListTile(
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              selected: _index == i,
-                              selectedTileColor: BowlColors.mint,
-                              selectedColor: BowlColors.ink,
-                              leading: Icon(destinations[i].$2, size: 22),
-                              title: Text(
-                                destinations[i].$1,
-                                style: TextStyle(
-                                  fontWeight: _index == i
-                                      ? FontWeight.w800
-                                      : FontWeight.w500,
-                                  fontSize: 14,
-                                ),
-                              ),
-                              onTap: () => setState(() => _index = i),
-                            ),
-                          ),
-                        const Spacer(),
-                        const Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 24),
-                          child: Divider(),
-                        ),
-                        ListTile(
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 24,
-                            vertical: 12,
-                          ),
-                          leading: CircleAvatar(
-                            radius: 17,
-                            backgroundColor: BowlColors.canvas,
-                            child: Text(
-                              c.data.profile.name.isEmpty
-                                  ? 'Y'
-                                  : c.data.profile.name.characters.first
-                                        .toUpperCase(),
-                              style: const TextStyle(
-                                fontWeight: FontWeight.w800,
-                                color: BowlColors.ink,
-                              ),
-                            ),
-                          ),
-                          title: Text(
-                            c.data.profile.name.isEmpty
-                                ? 'Your profile'
-                                : c.data.profile.name,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                          subtitle: const Text(
-                            'Settings & backup',
-                            style: TextStyle(fontSize: 10),
-                          ),
-                          onTap: _settings,
-                        ),
-                      ],
-                    ),
+                  BowlSidebar(
+                    selected: _index,
+                    onSelected: (i) => setState(() => _index = i),
+                    onSettings: _settings,
+                    profile: c.data.profile,
+                  )
+                else if (desktop)
+                  DesktopBowlRail(
+                    selected: _index,
+                    onSelected: (i) => setState(() => _index = i),
+                    onSettings: _settings,
                   ),
                 Expanded(
                   child: Column(
@@ -277,29 +177,29 @@ class _BowlShellState extends State<BowlShell> {
                       if (wide)
                         Padding(
                           padding: const EdgeInsets.fromLTRB(36, 24, 36, 0),
-                          child: Row(
+                          child: Wrap(
+                            spacing: 24,
+                            runSpacing: 8,
+                            alignment: WrapAlignment.spaceBetween,
                             children: [
-                              const Text(
+                              Text(
                                 'YOUR PERSONAL BOWLING JOURNAL',
                                 style: TextStyle(
-                                  fontSize: 10,
+                                  fontSize: 12,
                                   fontWeight: FontWeight.w600,
-                                  color: BowlColors.muted,
-                                  letterSpacing: 1.8,
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onSurfaceVariant,
+                                  letterSpacing: 1,
                                 ),
                               ),
-                              const Spacer(),
-                              const Icon(
-                                Icons.lock_outline_rounded,
-                                size: 13,
-                                color: BowlColors.muted,
-                              ),
-                              const SizedBox(width: 6),
-                              const Text(
+                              Text(
                                 'Saved on this device',
                                 style: TextStyle(
-                                  fontSize: 11,
-                                  color: BowlColors.muted,
+                                  fontSize: 12,
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onSurfaceVariant,
                                 ),
                               ),
                             ],
@@ -312,7 +212,9 @@ class _BowlShellState extends State<BowlShell> {
                           child: Align(
                             alignment: Alignment.topCenter,
                             child: ConstrainedBox(
-                              constraints: const BoxConstraints(maxWidth: 1200),
+                              constraints: const BoxConstraints(
+                                maxWidth: BowlLayout.dashboardWidth,
+                              ),
                               child: page,
                             ),
                           ),
@@ -324,7 +226,7 @@ class _BowlShellState extends State<BowlShell> {
               ],
             ),
           ),
-          bottomNavigationBar: wide
+          bottomNavigationBar: wide || desktop
               ? null
               : NavigationBar(
                   selectedIndex: _index,
@@ -332,7 +234,7 @@ class _BowlShellState extends State<BowlShell> {
                       NavigationDestinationLabelBehavior.onlyShowSelected,
                   onDestinationSelected: (i) => setState(() => _index = i),
                   destinations: [
-                    for (final d in destinations)
+                    for (final d in bowlDestinations)
                       NavigationDestination(icon: Icon(d.$2), label: d.$1),
                   ],
                 ),
