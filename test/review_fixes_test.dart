@@ -8,6 +8,7 @@ import 'package:tallybowl/src/app_controller.dart';
 import 'package:tallybowl/src/domain/models.dart';
 import 'package:tallybowl/src/features/game_editor.dart';
 import 'package:tallybowl/src/recognition/photo_service.dart';
+import 'package:tallybowl/src/ui/dialogs.dart';
 
 class GrowingPhoto extends XFile {
   GrowingPhoto() : super('growing-photo');
@@ -127,6 +128,57 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Edit'), findsOneWidget);
     expect(controller.data.games.single.score, 90);
+    expect(tester.takeException(), isNull);
+  });
+  testWidgets('phone forms accommodate long venue and primary ball labels', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    final name = List.filled(8, 'Long bowling name').join(' ');
+    final controller = BowlController(
+      null,
+      BowlData(
+        alleys: [BowlingAlley(id: 'a', name: name)],
+        balls: [BowlingBall(id: 'b', name: name)],
+      ),
+    );
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Builder(
+          builder: (context) => Scaffold(
+            body: TextButton(
+              onPressed: () => startSession(context, controller),
+              child: const Text('Start'),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.tap(find.text('Start'));
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
+    await tester.tap(find.text('Start session'));
+    await tester.pumpAndSettle();
+    final session = controller.activeSession!;
+    final game = BowlingGame(
+      id: 'g',
+      sessionId: session.id,
+      createdAt: session.startedAt,
+      frames: List.filled(10, '9-'),
+      ballIds: const ['b'],
+      primaryBallId: 'b',
+    );
+    await tester.pumpWidget(
+      MaterialApp(
+        home: GameEditor(controller: controller, session: session, game: game),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.byType(DropdownButtonFormField<String>));
+    await tester.pumpAndSettle();
     expect(tester.takeException(), isNull);
   });
 }

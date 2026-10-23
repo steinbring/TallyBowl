@@ -15,6 +15,8 @@ final tallyBowlTheme = ThemeData(
   colorScheme: ColorScheme.fromSeed(
     seedColor: BowlColors.ink,
     primary: BowlColors.ink,
+    primaryContainer: BowlColors.mint,
+    onPrimaryContainer: BowlColors.ink,
     secondary: BowlColors.orange,
     surface: Colors.white,
   ),
@@ -27,6 +29,10 @@ final tallyBowlTheme = ThemeData(
     foregroundColor: BowlColors.ink,
     elevation: 0,
     scrolledUnderElevation: 0,
+  ),
+  dialogTheme: const DialogThemeData(
+    backgroundColor: Colors.white,
+    surfaceTintColor: Colors.transparent,
   ),
   cardTheme: CardThemeData(
     elevation: 0,
