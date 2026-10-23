@@ -19,3 +19,18 @@ Map tiles are a separate service, configured by `TALLYBOWL_TILE_URL`. Public OSM
 Research did not identify a documented, maintained public bowling-ball catalog API with both no authentication key and permission for this use. This is a research result, not a claim that no such service can exist. [Channel3's bowling-ball API](https://trychannel3.com/product-data/sporting-goods-indoor-games-bowling-bowling-balls) requires an API key. The [USBC equipment pages](https://bowl.com/equipment-specifications) and [PBA certified ball list](https://www.pba.com/pba-league-bowler-certification/certified-bowling-balls) are references, not documented public catalog API contracts.
 
 Do not turn retail pages, undocumented store endpoints, or a PDF approval list into a scraping dependency. A future public JSON catalog at tallybowl.jws.app could provide key-free updates, once its data source and redistribution rights are settled. Ball suggestions must allow custom, old, and regional models and must not be presented as tournament eligibility or purchasing advice.
+
+The initial implementation bundles a deliberately small, manually selected set of 11 manufacturer/brand names and 22 model names. Suggestions also include the owner's previously entered brands and models, including retired equipment. Choosing a model fills its manufacturer; both fields remain editable. No catalog request leaves the device. The list is incomplete and not a current-stock or eligibility list; surface, weight, color, and custom notes remain the owner's entries.
+
+Name-only starter references checked October 23, 2026 (no automated collection or copied descriptions/images/specifications):
+
+- [Storm/SPI buyer's guide](https://www.stormbowling.com/bowling-ball-buyers-guide): selected Storm, Roto Grip, and 900 Global names.
+- [Hammer Black Widow 3.0](https://hammerbowling.com/products/black-widow-3-0): Black Widow 3.0 and the referenced 2.0 Hybrid.
+- [Ebonite Game Breaker 4](https://ebonite.com/products/game-breaker-4).
+- [MOTIV exclusive lineup](https://www.motivbowling.com/products/balls/exclusives/): Jackal Ghost V2 and Venom Shock.
+- [Brunswick ball lineup](https://brunswickbowling.com/products/balls/p2?sort=newest) and [Brunswick's registered products](https://www.pba.com/registered-products/brunswick): Rhino and Mesmerize.
+- [DV8 Trouble Maker](https://dv8bowling.com/products/balls/retired/trouble-maker).
+- [Track Cypher](https://trackbowling.com/products/cypher) and [Cyborg](https://trackbowling.com/products/cyborg).
+- [Radical](https://radicalbowling.com/) and [Columbia 300](https://columbia300.com/): brand suggestions; no bundled models yet.
+
+Keep this reference list and `BallCatalog.starter` in sync when adding manually verified names. Do not imply endorsement or manufacturer affiliation.
