@@ -1,6 +1,7 @@
 import Cocoa
 import FlutterMacOS
 import Vision
+import ImageIO
 import AVFoundation
 
 class MainFlutterWindow: NSWindow {
@@ -52,7 +53,15 @@ private func recognizeScoreText(_ data: Data, result: @escaping FlutterResult) {
       request.recognitionLevel = .accurate
       request.usesLanguageCorrection = false
       request.recognitionLanguages = ["en-US"]
-      try VNImageRequestHandler(data: data, options: [:]).perform([request])
+      guard let source = CGImageSourceCreateWithData(data as CFData, nil),
+                let image = CGImageSourceCreateThumbnailAtIndex(source, 0, [
+                  kCGImageSourceCreateThumbnailFromImageAlways: true,
+                  kCGImageSourceCreateThumbnailWithTransform: true,
+                  kCGImageSourceThumbnailMaxPixelSize: 4096
+                ] as CFDictionary) else {
+            throw NSError(domain: "TallyBowl", code: 1)
+          }
+          try VNImageRequestHandler(cgImage: image, orientation: .up, options: [:]).perform([request])
       let lines: [[String: Any]] = (request.results ?? []).compactMap { observation in
         guard let text = observation.topCandidates(1).first else { return nil }
         let box = observation.boundingBox
@@ -76,6 +85,7 @@ private class ScoreCameraWindow: NSWindowController, NSWindowDelegate, AVCapture
     self.completion = completion
     let window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 800, height: 620), styleMask: [.titled, .closable, .resizable], backing: .buffered, defer: false)
     window.title = "TallyBowl! · Scoreboard camera"
+    window.minSize = NSSize(width: 640, height: 480)
     super.init(window: window)
     window.delegate = self
     window.center()
@@ -85,6 +95,7 @@ private class ScoreCameraWindow: NSWindowController, NSWindowDelegate, AVCapture
     content.addSubview(preview)
     shutter.frame = NSRect(x: 320, y: 20, width: 160, height: 36)
     shutter.bezelStyle = .rounded
+    shutter.autoresizingMask = [.minXMargin, .maxXMargin, .maxYMargin]
     shutter.target = self
     shutter.action = #selector(takePhoto)
     shutter.isEnabled = false

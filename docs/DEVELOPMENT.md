@@ -15,6 +15,7 @@ Work is committed as a stack of feature branches; each later branch includes the
 | `codex/on-device-score-capture` | Native camera/import, Apple Vision, bundled Android ML Kit, row/frame review |
 | `codex/alley-map-selection` | OpenStreetMap pin selection and saved alley locations |
 | `codex/sharing-backup` | Branded PNG recaps, native sharing, backup/restore, recovery copy, CSV exports |
+| `codex/recognition-validation` | Bounded Apple image decoding with EXIF normalization, native integration checks, camera window resizing |
 
 The completed stack is integrated into local `main` after verification. Feature branches are retained. All work is local until explicitly pushed to the remote repository.
 

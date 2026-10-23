@@ -1,6 +1,7 @@
 import Flutter
 import UIKit
 import Vision
+import ImageIO
 
 @main
 @objc class AppDelegate: FlutterAppDelegate, FlutterImplicitEngineDelegate {
@@ -27,7 +28,15 @@ import Vision
           request.recognitionLevel = .accurate
           request.usesLanguageCorrection = false
           request.recognitionLanguages = ["en-US"]
-          try VNImageRequestHandler(data: bytes.data, options: [:]).perform([request])
+          guard let source = CGImageSourceCreateWithData(bytes.data as CFData, nil),
+                let image = CGImageSourceCreateThumbnailAtIndex(source, 0, [
+                  kCGImageSourceCreateThumbnailFromImageAlways: true,
+                  kCGImageSourceCreateThumbnailWithTransform: true,
+                  kCGImageSourceThumbnailMaxPixelSize: 4096
+                ] as CFDictionary) else {
+            throw NSError(domain: "TallyBowl", code: 1)
+          }
+          try VNImageRequestHandler(cgImage: image, orientation: .up, options: [:]).perform([request])
           let lines: [[String: Any]] = (request.results ?? []).compactMap { observation in
             guard let text = observation.topCandidates(1).first else { return nil }
             let box = observation.boundingBox
