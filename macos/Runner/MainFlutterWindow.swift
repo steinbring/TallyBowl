@@ -76,6 +76,7 @@ private func recognizeScoreText(_ data: Data, result: @escaping FlutterResult) {
 
 private class ScoreCameraWindow: NSWindowController, NSWindowDelegate, AVCapturePhotoCaptureDelegate {
   private let session = AVCaptureSession()
+  private let sessionQueue = DispatchQueue(label: "app.jws.tallybowl.camera")
   private let output = AVCapturePhotoOutput()
   private let preview = NSView()
   private let shutter = NSButton(title: "Take photo", target: nil, action: nil)
@@ -104,6 +105,7 @@ private class ScoreCameraWindow: NSWindowController, NSWindowDelegate, AVCapture
   }
   required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
   private func prepare() {
+    guard !completed else { return }
     do {
       guard let device = AVCaptureDevice.default(for: .video) else { finish(nil, "No camera is available. Select an existing photo instead."); return }
       let input = try AVCaptureDeviceInput(device: device)
@@ -119,10 +121,10 @@ private class ScoreCameraWindow: NSWindowController, NSWindowDelegate, AVCapture
       layer.frame = preview.bounds
       layer.autoresizingMask = [.layerWidthSizable, .layerHeightSizable]
       preview.layer?.addSublayer(layer)
-      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+      sessionQueue.async { [weak self] in
         guard let self = self else { return }
         self.session.startRunning()
-        DispatchQueue.main.async { self.shutter.isEnabled = true }
+        DispatchQueue.main.async { if !self.completed { self.shutter.isEnabled = true } }
       }
     } catch { finish(nil, "The camera could not be opened. Try selecting a photo instead.") }
   }
@@ -137,7 +139,7 @@ private class ScoreCameraWindow: NSWindowController, NSWindowDelegate, AVCapture
   private func finish(_ data: Data?, _ error: String?) {
     guard !completed else { return }
     completed = true
-    DispatchQueue.global(qos: .userInitiated).async { [session] in session.stopRunning() }
+    sessionQueue.async { [session] in session.stopRunning() }
     window?.close()
     completion(data, error)
   }

@@ -59,12 +59,16 @@ Future<void> importScorePhoto(
     if (context.mounted) message(context, 'Could not open this photo. $e');
   } finally {
     if (path != null && controller.data.draft?['sourcePath'] != path) {
-      await PhotoService.remove(path);
+      try {
+        await PhotoService.remove(path);
+      } catch (_) {
+        // Orphan cleanup retries on the next launch.
+      }
     }
   }
 }
 
-class PhotoCaptureActions extends StatelessWidget {
+class PhotoCaptureActions extends StatefulWidget {
   const PhotoCaptureActions({
     super.key,
     required this.controller,
@@ -73,18 +77,38 @@ class PhotoCaptureActions extends StatelessWidget {
   final BowlController controller;
   final BowlingSession session;
   @override
+  State<PhotoCaptureActions> createState() => _PhotoCaptureActionsState();
+}
+
+class _PhotoCaptureActionsState extends State<PhotoCaptureActions> {
+  bool _busy = false;
+  Future<void> _open({bool camera = false}) async {
+    if (_busy) return;
+    setState(() => _busy = true);
+    try {
+      await importScorePhoto(
+        context,
+        widget.controller,
+        widget.session,
+        camera: camera,
+      );
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) => Wrap(
     spacing: 12,
     runSpacing: 12,
     children: [
       FilledButton.icon(
-        onPressed: () =>
-            importScorePhoto(context, controller, session, camera: true),
+        onPressed: _busy ? null : () => _open(camera: true),
         icon: const Icon(Icons.photo_camera_outlined),
         label: const Text('Scan scoreboard'),
       ),
       OutlinedButton.icon(
-        onPressed: () => importScorePhoto(context, controller, session),
+        onPressed: _busy ? null : _open,
         icon: const Icon(Icons.photo_library_outlined),
         label: const Text('Import photo'),
       ),

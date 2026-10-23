@@ -7,7 +7,7 @@ import '../domain/models.dart';
 import '../domain/scoring.dart';
 import '../theme.dart';
 
-String dateLabel(DateTime date) => DateFormat('EEE, MMM d').format(date);
+String dateLabel(DateTime date) => DateFormat('EEE, MMM d, y').format(date);
 String averageLabel(Iterable<BowlingGame> games) {
   final list = games.toList();
   return list.isEmpty

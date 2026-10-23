@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 
 import '../app_controller.dart';
 import '../domain/models.dart';
@@ -6,6 +7,7 @@ import '../domain/scoring.dart';
 import '../theme.dart';
 import '../ui/common.dart';
 import '../ui/score_photo_preview.dart';
+import '../ui/dialogs.dart';
 import '../recognition/photo_service.dart';
 
 Future<void> openGameEditor(
@@ -57,6 +59,9 @@ class _GameEditorState extends State<GameEditor> {
   bool _mismatchAcknowledged = false;
   bool _saving = false;
   bool _draftError = false;
+  bool _allowExit = false, _leaving = false;
+  int _draftVersion = 0;
+  Future<void> _pendingDraft = Future.value();
   List<String> get frames => _frames.map((c) => c.text).toList();
   @override
   void initState() {
@@ -106,8 +111,9 @@ class _GameEditorState extends State<GameEditor> {
 
   Future<void> _persistDraft() async {
     if (widget.game != null || _saving) return;
+    final version = ++_draftVersion;
     try {
-      await widget.controller.saveDraft({
+      _pendingDraft = widget.controller.saveDraft({
         'sessionId': widget.session.id,
         'frames': frames,
         'lane': _lane.text,
@@ -118,9 +124,54 @@ class _GameEditorState extends State<GameEditor> {
         'sourceLabel': _sourceLabel,
         'displayedTotal': _displayedTotal,
       });
-      if (_draftError && mounted) setState(() => _draftError = false);
+      await _pendingDraft;
+      if (_draftError && mounted && version == _draftVersion) {
+        setState(() => _draftError = false);
+      }
     } catch (_) {
-      if (mounted) setState(() => _draftError = true);
+      if (mounted && version == _draftVersion) {
+        setState(() => _draftError = true);
+      }
+    }
+  }
+
+  bool get _hasEdits {
+    final game = widget.game;
+    return game != null &&
+        (!listEquals(frames, game.frames) ||
+            _lane.text.trim() != game.lane ||
+            _notes.text.trim() != game.notes ||
+            !setEquals(_balls, game.ballIds.toSet()) ||
+            _primary != game.primaryBallId);
+  }
+
+  Future<void> _leave() async {
+    if (_saving || _leaving) return;
+    _leaving = true;
+    try {
+      try {
+        await _pendingDraft;
+      } catch (_) {
+        /* The draft error is shown below. */
+      }
+      if (!mounted) return;
+      if ((_hasEdits || _draftError) &&
+          !await confirm(
+            context,
+            'Leave without saving?',
+            _draftError
+                ? 'The latest draft changes could not be saved. Leaving will lose those changes.'
+                : 'Your changes to this saved game will be discarded.',
+            action: 'Discard changes',
+          )) {
+        return;
+      }
+      if (mounted) {
+        setState(() => _allowExit = true);
+        Navigator.pop(context);
+      }
+    } finally {
+      _leaving = false;
     }
   }
 
@@ -133,6 +184,7 @@ class _GameEditorState extends State<GameEditor> {
             !_mismatchAcknowledged)) {
       return;
     }
+    FocusScope.of(context).unfocus();
     setState(() => _saving = true);
     try {
       await widget.controller.saveGame(
@@ -153,6 +205,10 @@ class _GameEditorState extends State<GameEditor> {
         /* Retried by orphan cleanup on the next launch. */
       }
       if (mounted) {
+        setState(() {
+          _allowExit = true;
+          _saving = false;
+        });
         Navigator.pop(context);
         message(context, 'Game saved · ${result.total}');
       }
@@ -174,248 +230,270 @@ class _GameEditorState extends State<GameEditor> {
     final availableBalls = data.balls
         .where((b) => !b.retired || _balls.contains(b.id))
         .toList();
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.game == null ? 'Record a game' : 'Edit game'),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 16),
-            child: FilledButton.icon(
-              onPressed:
-                  result.complete &&
-                      !_saving &&
-                      (_displayedTotal == null ||
-                          _displayedTotal == result.total ||
-                          _mismatchAcknowledged)
-                  ? _save
-                  : null,
-              icon: const Icon(Icons.check_rounded),
-              label: Text(_saving ? 'Saving…' : 'Save game'),
-            ),
-          ),
-        ],
-      ),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.all(
-          MediaQuery.sizeOf(context).width > 700 ? 32 : 16,
-        ),
-        child: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 1000),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                PageHeading(
-                  data.alley(widget.session.alleyId)?.name ?? 'Your session',
-                  '${dateLabel(widget.session.startedAt)} · ${widget.session.league ? 'League' : 'Practice'}',
-                  action: LabelPill('$completeCount / 10 frames'),
-                ),
-                if (_sourcePath != null) ...[
-                  ScorePhotoPreview(path: _sourcePath!),
-                  if (_sourceLabel != null)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 10),
-                      child: Text(
-                        'Your selected row: $_sourceLabel',
-                        style: const TextStyle(
-                          color: BowlColors.muted,
-                          fontSize: 12,
-                        ),
-                      ),
-                    ),
-                  const SizedBox(height: 20),
-                ],
-                if (_displayedTotal != null &&
+    return PopScope(
+      canPop: _allowExit,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) _leave();
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(widget.game == null ? 'Record a game' : 'Edit game'),
+          actions: [
+            Padding(
+              padding: const EdgeInsets.only(right: 16),
+              child: FilledButton.icon(
+                onPressed:
                     result.complete &&
-                    _displayedTotal != result.total) ...[
-                  Card(
-                    color: const Color(0xFFFFE4DE),
-                    child: CheckboxListTile(
-                      value: _mismatchAcknowledged,
-                      onChanged: (v) =>
-                          setState(() => _mismatchAcknowledged = v ?? false),
-                      title: Text(
-                        'The photo shows $_displayedTotal; these frames score ${result.total}.',
-                      ),
-                      subtitle: const Text(
-                        'Check the row, scratch score, and deliveries. Confirm only after reviewing the difference.',
-                      ),
+                        !_saving &&
+                        (_displayedTotal == null ||
+                            _displayedTotal == result.total ||
+                            _mismatchAcknowledged)
+                    ? _save
+                    : null,
+                icon: const Icon(Icons.check_rounded),
+                label: Text(_saving ? 'Saving…' : 'Save game'),
+              ),
+            ),
+          ],
+        ),
+        body: IgnorePointer(
+          ignoring: _saving,
+          child: SingleChildScrollView(
+            padding: EdgeInsets.all(
+              MediaQuery.sizeOf(context).width > 700 ? 32 : 16,
+            ),
+            child: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 1000),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    PageHeading(
+                      data.alley(widget.session.alleyId)?.name ??
+                          'Your session',
+                      '${dateLabel(widget.session.startedAt)} · ${widget.session.league ? 'League' : 'Practice'}',
+                      action: LabelPill('$completeCount / 10 frames'),
                     ),
-                  ),
-                  const SizedBox(height: 16),
-                ],
-                Card(
-                  color: BowlColors.mint,
-                  child: Padding(
-                    padding: const EdgeInsets.all(22),
-                    child: Row(
-                      children: [
-                        const Icon(Icons.scoreboard_outlined, size: 34),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                result.complete
-                                    ? 'Ready to save'
-                                    : 'Every delivery counts',
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.w800,
-                                  fontSize: 18,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              const Text(
-                                'X strike · / spare · - miss · F foul. Examples: X, 9/, 81, X7/.',
-                                style: TextStyle(height: 1.5),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Text(
-                          '${result.total ?? result.runningTotal}',
-                          style: const TextStyle(
-                            fontSize: 38,
-                            fontWeight: FontWeight.w900,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 24),
-                ScoreStrip(frames: frames),
-                const SizedBox(height: 24),
-                LayoutBuilder(
-                  builder: (context, c) {
-                    final count = c.maxWidth > 750
-                        ? 5
-                        : (c.maxWidth > 430 ? 3 : 2);
-                    return Wrap(
-                      spacing: 12,
-                      runSpacing: 16,
-                      children: [
-                        for (var i = 0; i < 10; i++)
-                          SizedBox(
-                            width: (c.maxWidth - (count - 1) * 12) / count,
-                            child: TextField(
-                              key: ValueKey('frame-$i'),
-                              controller: _frames[i],
-                              textCapitalization: TextCapitalization.characters,
-                              autocorrect: false,
-                              enableSuggestions: false,
-                              maxLength: i == 9 ? 3 : 2,
-                              textInputAction: i == 9
-                                  ? TextInputAction.done
-                                  : TextInputAction.next,
-                              decoration: InputDecoration(
-                                labelText: 'Frame ${i + 1}',
-                                hintText: i == 9 ? 'X7/' : '9/',
-                                counterText: '',
-                                errorText: result.frames[i].error,
-                                errorMaxLines: 3,
-                              ),
-                              onChanged: (_) => _changed(),
+                    if (_sourcePath != null) ...[
+                      ScorePhotoPreview(path: _sourcePath!),
+                      if (_sourceLabel != null)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 10),
+                          child: Text(
+                            'Your selected row: $_sourceLabel',
+                            style: const TextStyle(
+                              color: BowlColors.muted,
+                              fontSize: 12,
                             ),
                           ),
-                      ],
-                    );
-                  },
-                ),
-                const SizedBox(height: 32),
-                Text(
-                  'What were you rolling?',
-                  style: Theme.of(context).textTheme.titleLarge
-                      ?.copyWith(fontWeight: FontWeight.w700),
-                ),
-                const SizedBox(height: 8),
-                const Text(
-                  'Tag every ball used. Choose a primary ball if you wish.',
-                  style: TextStyle(color: BowlColors.muted),
-                ),
-                const SizedBox(height: 16),
-                if (availableBalls.isEmpty)
-                  const Text(
-                    'No balls in your bag yet. You can save without a ball tag.',
-                  )
-                else
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: [
-                      for (final b in availableBalls)
-                        FilterChip(
-                          label: Text(b.name),
-                          selected: _balls.contains(b.id),
-                          onSelected: (selected) {
-                            if (selected) {
-                              _balls.add(b.id);
-                            } else {
-                              _balls.remove(b.id);
-                              if (_primary == b.id) _primary = null;
-                            }
-                            _changed();
-                          },
                         ),
+                      const SizedBox(height: 20),
                     ],
-                  ),
-                if (_balls.isNotEmpty) ...[
-                  const SizedBox(height: 16),
-                  DropdownButtonFormField<String>(
-                    key: ValueKey(_primary),
-                    initialValue: _primary ?? '',
-                    decoration: const InputDecoration(
-                      labelText: 'Primary ball',
-                    ),
-                    items: [
-                      const DropdownMenuItem(
-                        value: '',
-                        child: Text('No primary ball'),
+                    if (_displayedTotal != null &&
+                        result.complete &&
+                        _displayedTotal != result.total) ...[
+                      Card(
+                        color: const Color(0xFFFFE4DE),
+                        child: CheckboxListTile(
+                          value: _mismatchAcknowledged,
+                          onChanged: (v) => setState(
+                            () => _mismatchAcknowledged = v ?? false,
+                          ),
+                          title: Text(
+                            'The photo shows $_displayedTotal; these frames score ${result.total}.',
+                          ),
+                          subtitle: const Text(
+                            'Check the row, scratch score, and deliveries. Confirm only after reviewing the difference.',
+                          ),
+                        ),
                       ),
-                      for (final b in availableBalls.where(
-                        (b) => _balls.contains(b.id),
-                      ))
-                        DropdownMenuItem(value: b.id, child: Text(b.name)),
+                      const SizedBox(height: 16),
                     ],
-                    onChanged: (value) {
-                      _primary = value == '' ? null : value;
-                      _changed();
-                    },
-                  ),
-                ],
-                const SizedBox(height: 24),
-                TextField(
-                  controller: _lane,
-                  decoration: const InputDecoration(
-                    labelText: 'Lane or lane pair for this game',
-                  ),
-                  onChanged: (_) => _changed(),
+                    Card(
+                      color: BowlColors.mint,
+                      child: Padding(
+                        padding: const EdgeInsets.all(22),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.scoreboard_outlined, size: 34),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    result.complete
+                                        ? 'Ready to save'
+                                        : 'Every delivery counts',
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.w800,
+                                      fontSize: 18,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  const Text(
+                                    'X strike · / spare · - miss · F foul. Examples: X, 9/, 81, X7/.',
+                                    style: TextStyle(height: 1.5),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Text(
+                              '${result.total ?? result.runningTotal}',
+                              style: const TextStyle(
+                                fontSize: 38,
+                                fontWeight: FontWeight.w900,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    ScoreStrip(frames: frames),
+                    const SizedBox(height: 24),
+                    LayoutBuilder(
+                      builder: (context, c) {
+                        final count = c.maxWidth > 750
+                            ? 5
+                            : (c.maxWidth > 430 ? 3 : 2);
+                        return Wrap(
+                          spacing: 12,
+                          runSpacing: 16,
+                          children: [
+                            for (var i = 0; i < 10; i++)
+                              SizedBox(
+                                width: (c.maxWidth - (count - 1) * 12) / count,
+                                child: TextField(
+                                  key: ValueKey('frame-$i'),
+                                  controller: _frames[i],
+                                  textCapitalization:
+                                      TextCapitalization.characters,
+                                  autocorrect: false,
+                                  enableSuggestions: false,
+                                  maxLength: i == 9 ? 3 : 2,
+                                  textInputAction: i == 9
+                                      ? TextInputAction.done
+                                      : TextInputAction.next,
+                                  decoration: InputDecoration(
+                                    labelText: 'Frame ${i + 1}',
+                                    hintText: i == 9 ? 'X7/' : '9/',
+                                    counterText: '',
+                                    errorText: result.frames[i].error,
+                                    errorMaxLines: 3,
+                                  ),
+                                  onChanged: (_) => _changed(),
+                                ),
+                              ),
+                          ],
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 32),
+                    Text(
+                      'What were you rolling?',
+                      style: Theme.of(context).textTheme.titleLarge
+                          ?.copyWith(fontWeight: FontWeight.w700),
+                    ),
+                    const SizedBox(height: 8),
+                    const Text(
+                      'Tag every ball used. Choose a primary ball if you wish.',
+                      style: TextStyle(color: BowlColors.muted),
+                    ),
+                    const SizedBox(height: 16),
+                    TextButton.icon(
+                      onPressed: _saving
+                          ? null
+                          : () async {
+                              await editBall(context, widget.controller);
+                              if (mounted) setState(() {});
+                            },
+                      icon: const Icon(Icons.add),
+                      label: const Text('Add a ball to your bag'),
+                    ),
+                    if (availableBalls.isEmpty)
+                      const Text(
+                        'No balls in your bag yet. You can save without a ball tag.',
+                      )
+                    else
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: [
+                          for (final b in availableBalls)
+                            FilterChip(
+                              label: Text(b.name),
+                              selected: _balls.contains(b.id),
+                              onSelected: (selected) {
+                                if (selected) {
+                                  _balls.add(b.id);
+                                } else {
+                                  _balls.remove(b.id);
+                                  if (_primary == b.id) _primary = null;
+                                }
+                                _changed();
+                              },
+                            ),
+                        ],
+                      ),
+                    if (_balls.isNotEmpty) ...[
+                      const SizedBox(height: 16),
+                      DropdownButtonFormField<String>(
+                        key: ValueKey(_primary),
+                        initialValue: _primary ?? '',
+                        decoration: const InputDecoration(
+                          labelText: 'Primary ball',
+                        ),
+                        items: [
+                          const DropdownMenuItem(
+                            value: '',
+                            child: Text('No primary ball'),
+                          ),
+                          for (final b in availableBalls.where(
+                            (b) => _balls.contains(b.id),
+                          ))
+                            DropdownMenuItem(value: b.id, child: Text(b.name)),
+                        ],
+                        onChanged: (value) {
+                          _primary = value == '' ? null : value;
+                          _changed();
+                        },
+                      ),
+                    ],
+                    const SizedBox(height: 24),
+                    TextField(
+                      controller: _lane,
+                      decoration: const InputDecoration(
+                        labelText: 'Lane or lane pair for this game',
+                      ),
+                      onChanged: (_) => _changed(),
+                    ),
+                    const SizedBox(height: 16),
+                    TextField(
+                      controller: _notes,
+                      maxLines: 2,
+                      decoration: const InputDecoration(
+                        labelText: 'Game notes',
+                        hintText: 'How did it feel? Any adjustments?',
+                      ),
+                      onChanged: (_) => _changed(),
+                    ),
+                    const SizedBox(height: 20),
+                    if (_draftError)
+                      const Text(
+                        'Draft could not be saved. Keep this screen open and try again.',
+                        style: TextStyle(color: Colors.red),
+                      )
+                    else if (widget.game == null)
+                      const Text(
+                        'Your unfinished game stays on this device when you leave this screen.',
+                        style: TextStyle(fontSize: 12, color: BowlColors.muted),
+                      ),
+                    const SizedBox(height: 40),
+                  ],
                 ),
-                const SizedBox(height: 16),
-                TextField(
-                  controller: _notes,
-                  maxLines: 2,
-                  decoration: const InputDecoration(
-                    labelText: 'Game notes',
-                    hintText: 'How did it feel? Any adjustments?',
-                  ),
-                  onChanged: (_) => _changed(),
-                ),
-                const SizedBox(height: 20),
-                if (_draftError)
-                  const Text(
-                    'Draft could not be saved. Keep this screen open and try again.',
-                    style: TextStyle(color: Colors.red),
-                  )
-                else if (widget.game == null)
-                  const Text(
-                    'Your unfinished game stays on this device when you leave this screen.',
-                    style: TextStyle(fontSize: 12, color: BowlColors.muted),
-                  ),
-                const SizedBox(height: 40),
-              ],
+              ),
             ),
           ),
         ),

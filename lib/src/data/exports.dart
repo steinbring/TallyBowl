@@ -170,7 +170,9 @@ abstract final class BowlExports {
               // Treat user-entered names/notes as text when opened in a spreadsheet.
               if (value is String &&
                   cell != '-' &&
-                  RegExp(r'^[=+@\-\t\r]').hasMatch(cell)) {
+                  (RegExp(r'^[=+@\-]').hasMatch(cell.trimLeft()) ||
+                      RegExp(r'^[\x00-\x20\uFEFF]*[=+@\-]').hasMatch(cell) ||
+                      RegExp(r'^[\t\r\n]').hasMatch(cell))) {
                 cell = "'$cell";
               }
               return '"${cell.replaceAll('"', '""')}"';

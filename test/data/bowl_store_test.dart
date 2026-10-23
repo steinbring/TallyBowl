@@ -101,4 +101,150 @@ void main() {
       expect(() => BowlStore.readBackup('not a backup'), throwsFormatException);
     },
   );
+  test('draft autosave leaves every history row untouched', () async {
+    final data = sample();
+    await store.save(data);
+    await store.database.execute('CREATE TABLE audit (event TEXT)');
+    for (final table in ['balls', 'alleys', 'sessions', 'games']) {
+      for (final event in ['INSERT', 'UPDATE', 'DELETE']) {
+        await store.database.execute(
+          "CREATE TRIGGER audit_${table}_$event AFTER $event ON $table BEGIN INSERT INTO audit VALUES ('$table $event'); END",
+        );
+      }
+    }
+    await store.save(
+      data.copyWith(
+        draft: {
+          'sessionId': 's1',
+          'frames': ['X', ...List.filled(9, '')],
+        },
+      ),
+    );
+    expect(await store.database.query('audit'), isEmpty);
+    expect((await store.load()).draft!['frames'][0], 'X');
+  });
+  test(
+    'failed database transaction rolls back and remains retryable',
+    () async {
+      final data = sample();
+      await store.save(data);
+      await store.database.execute(
+        "CREATE TRIGGER fail_game BEFORE UPDATE ON games BEGIN SELECT RAISE(ABORT, 'test failure'); END",
+      );
+      final replacement = data.copyWith(
+        profile: const BowlerProfile(name: 'Changed'),
+        games: [
+          BowlingGame(
+            id: 'g1',
+            sessionId: 's1',
+            frames: [...List.filled(9, 'X'), 'XXX'],
+            createdAt: data.games.single.createdAt,
+          ),
+        ],
+      );
+      await expectLater(
+        store.save(replacement),
+        throwsA(isA<DatabaseException>()),
+      );
+      expect((await store.load()).toJson(), data.toJson());
+      await store.database.execute('DROP TRIGGER fail_game');
+      await store.save(replacement);
+      expect((await store.load()).games.single.score, 300);
+    },
+  );
+  test('restore can reorder records and replace foreign-key parents', () async {
+    final data = sample().copyWith(
+      balls: const [
+        BowlingBall(id: 'b1', name: 'First'),
+        BowlingBall(id: 'b2', name: 'Second'),
+      ],
+    );
+    await store.save(data);
+    final replacement = data.copyWith(
+      balls: data.balls.reversed.toList(),
+      alleys: const [BowlingAlley(id: 'new', name: 'New lanes')],
+      sessions: [
+        BowlingSession(
+          id: 's1',
+          alleyId: 'new',
+          startedAt: data.sessions.single.startedAt,
+        ),
+      ],
+    );
+    await store.save(replacement);
+    expect((await store.load()).toJson(), replacement.toJson());
+    expect(await store.database.rawQuery('PRAGMA foreign_key_check'), isEmpty);
+  });
+  test(
+    'upgrades a first-build database without losing record order or drafts',
+    () async {
+      final folder = await Directory.systemTemp.createTemp('tallybowl-v1-');
+      final path = '${folder.path}/journal.db';
+      try {
+        final legacy = await databaseFactoryFfi.openDatabase(
+          path,
+          options: OpenDatabaseOptions(
+            version: 1,
+            onCreate: (db, _) async {
+              await db.execute(
+                'CREATE TABLE settings (key TEXT PRIMARY KEY, value TEXT NOT NULL)',
+              );
+              await db.execute(
+                'CREATE TABLE balls (id TEXT PRIMARY KEY, document TEXT NOT NULL)',
+              );
+              await db.execute(
+                'CREATE TABLE alleys (id TEXT PRIMARY KEY, document TEXT NOT NULL)',
+              );
+              await db.execute(
+                'CREATE TABLE sessions (id TEXT PRIMARY KEY, alley_id TEXT NOT NULL REFERENCES alleys(id), document TEXT NOT NULL)',
+              );
+              await db.execute(
+                'CREATE TABLE games (id TEXT PRIMARY KEY, session_id TEXT NOT NULL REFERENCES sessions(id), document TEXT NOT NULL)',
+              );
+            },
+          ),
+        );
+        final data = sample();
+        await legacy.insert('settings', {
+          'key': 'profile',
+          'value': jsonEncode(data.profile.toJson()),
+        });
+        await legacy.insert('settings', {
+          'key': 'draft',
+          'value': jsonEncode(data.draft),
+        });
+        for (final table in ['balls', 'alleys', 'sessions', 'games']) {
+          for (final document in data.toJson()[table] as List) {
+            await legacy.insert(table, {
+              'id': document['id'],
+              'document': jsonEncode(document),
+              if (table == 'sessions') 'alley_id': document['alleyId'],
+              if (table == 'games') 'session_id': document['sessionId'],
+            });
+          }
+        }
+        await legacy.close();
+        final upgraded = await BowlStore.open(
+          factory: databaseFactoryFfi,
+          path: path,
+        );
+        try {
+          expect((await upgraded.load()).toJson(), data.toJson());
+          await upgraded.save(
+            data.copyWith(
+              balls: [
+                ...data.balls,
+                const BowlingBall(id: 'b2', name: 'Second'),
+              ],
+            ),
+          );
+          expect((await upgraded.load()).balls.map((b) => b.id), ['b1', 'b2']);
+        } finally {
+          await upgraded.close();
+        }
+      } finally {
+        await folder.delete(recursive: true);
+      }
+    },
+  );
 }

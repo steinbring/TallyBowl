@@ -5,6 +5,7 @@ import '../domain/models.dart';
 import 'common.dart';
 import 'alley_dialog.dart';
 import 'ball_dialog.dart';
+import 'saving_dialog.dart';
 
 Future<void> editProfile(
   BuildContext context,
@@ -15,10 +16,11 @@ Future<void> editProfile(
     text: controller.data.profile.aliases.join(', '),
   );
   final key = GlobalKey<FormState>();
-  final result = await showDialog<BowlerProfile>(
+  await showDialog<void>(
     context: context,
-    builder: (c) => AlertDialog(
-      title: const Text('Your bowler profile'),
+    barrierDismissible: false,
+    builder: (c) => SavingDialog(
+      title: 'Your bowler profile',
       content: SizedBox(
         width: 440,
         child: Form(
@@ -46,36 +48,24 @@ Future<void> editProfile(
           ),
         ),
       ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(c),
-          child: const Text('Cancel'),
-        ),
-        FilledButton(
-          onPressed: () {
-            if (key.currentState!.validate()) {
-              Navigator.pop(
-                c,
-                BowlerProfile(
-                  name: name.text.trim(),
-                  aliases: aliases.text
-                      .split(',')
-                      .map((a) => a.trim())
-                      .where((a) => a.isNotEmpty)
-                      .toSet()
-                      .toList(),
-                ),
-              );
-            }
-          },
-          child: const Text('Save profile'),
-        ),
-      ],
+      saveLabel: 'Save profile',
+      onSave: () async {
+        if (!key.currentState!.validate()) return false;
+        await controller.saveProfile(
+          BowlerProfile(
+            name: name.text.trim(),
+            aliases: aliases.text
+                .split(',')
+                .map((a) => a.trim())
+                .where((a) => a.isNotEmpty)
+                .toSet()
+                .toList(),
+          ),
+        );
+        return true;
+      },
     ),
   );
-  if (result != null && context.mounted) {
-    await safely(context, () => controller.saveProfile(result));
-  }
   name.dispose();
   aliases.dispose();
 }
@@ -89,9 +79,6 @@ Future<void> editBall(
   barrierDismissible: false,
   builder: (_) => BallDialog(controller: controller, ball: ball),
 );
-
-String? requiredText(String? value) =>
-    value == null || value.trim().isEmpty ? 'This field is required.' : null;
 
 Future<void> editAlley(
   BuildContext context,
@@ -119,11 +106,13 @@ Future<void> startSession(
   var date = DateTime.now();
   final lane = TextEditingController();
   final leagueName = TextEditingController();
-  final result = await showDialog<BowlingSession>(
+  final sessionId = controller.newId();
+  await showDialog<void>(
     context: context,
+    barrierDismissible: false,
     builder: (c) => StatefulBuilder(
-      builder: (c, setState) => AlertDialog(
-        title: const Text('Let’s bowl.'),
+      builder: (c, setState) => SavingDialog(
+        title: 'Let’s bowl.',
         content: SizedBox(
           width: 460,
           child: SingleChildScrollView(
@@ -195,32 +184,23 @@ Future<void> startSession(
             ),
           ),
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(c),
-            child: const Text('Cancel'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(
-              c,
-              BowlingSession(
-                id: controller.newId(),
-                alleyId: alleyId,
-                startedAt: date,
-                lane: lane.text.trim(),
-                league: league,
-                leagueName: leagueName.text.trim(),
-              ),
+        saveLabel: 'Start session',
+        onSave: () async {
+          await controller.startSession(
+            BowlingSession(
+              id: sessionId,
+              alleyId: alleyId,
+              startedAt: date,
+              lane: lane.text.trim(),
+              league: league,
+              leagueName: leagueName.text.trim(),
             ),
-            child: const Text('Start session'),
-          ),
-        ],
+          );
+          return true;
+        },
       ),
     ),
   );
-  if (result != null && context.mounted) {
-    await safely(context, () => controller.startSession(result));
-  }
   lane.dispose();
   leagueName.dispose();
 }

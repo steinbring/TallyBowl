@@ -13,7 +13,12 @@ class BowlController extends ChangeNotifier {
   String newId() => _uuid.v4();
   static Future<BowlController> open() async {
     final store = await BowlStore.open();
-    return BowlController(store, await store.load());
+    try {
+      return BowlController(store, await store.load());
+    } catch (_) {
+      await store.close();
+      rethrow;
+    }
   }
 
   BowlingSession? get activeSession =>
@@ -34,11 +39,18 @@ class BowlController extends ChangeNotifier {
   Future<void> saveProfile(BowlerProfile profile) =>
       update((d) => d.copyWith(profile: profile));
   Future<void> saveBall(BowlingBall ball) => update(
-    (d) => d.copyWith(balls: [...d.balls.where((b) => b.id != ball.id), ball]),
+    (d) => d.copyWith(
+      balls: d.balls.any((b) => b.id == ball.id)
+          ? [for (final b in d.balls) b.id == ball.id ? ball : b]
+          : [...d.balls, ball],
+    ),
   );
   Future<void> saveAlley(BowlingAlley alley) => update(
-    (d) =>
-        d.copyWith(alleys: [...d.alleys.where((a) => a.id != alley.id), alley]),
+    (d) => d.copyWith(
+      alleys: d.alleys.any((a) => a.id == alley.id)
+          ? [for (final a in d.alleys) a.id == alley.id ? alley : a]
+          : [...d.alleys, alley],
+    ),
   );
   Future<void> startSession(BowlingSession session) => update((d) {
     if (d.sessions.any((s) => !s.finished)) {
