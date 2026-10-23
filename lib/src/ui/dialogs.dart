@@ -4,6 +4,7 @@ import '../app_controller.dart';
 import '../domain/models.dart';
 import 'common.dart';
 import 'alley_dialog.dart';
+import 'ball_dialog.dart';
 
 Future<void> editProfile(
   BuildContext context,
@@ -83,113 +84,11 @@ Future<void> editBall(
   BuildContext context,
   BowlController controller, [
   BowlingBall? ball,
-]) async {
-  final name = TextEditingController(text: ball?.name);
-  final brand = TextEditingController(text: ball?.brand);
-  final weight = TextEditingController(text: (ball?.weight ?? 15).toString());
-  final notes = TextEditingController(text: ball?.notes);
-  var retired = ball?.retired ?? false;
-  final key = GlobalKey<FormState>();
-  final result = await showDialog<BowlingBall>(
-    context: context,
-    builder: (c) => StatefulBuilder(
-      builder: (c, setState) => AlertDialog(
-        title: Text(ball == null ? 'Add a ball to your bag' : 'Edit your ball'),
-        content: SizedBox(
-          width: 460,
-          child: Form(
-            key: key,
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextFormField(
-                    controller: name,
-                    autofocus: true,
-                    decoration: const InputDecoration(
-                      labelText: 'Ball name / model',
-                    ),
-                    validator: requiredText,
-                  ),
-                  const SizedBox(height: 16),
-                  TextField(
-                    controller: brand,
-                    decoration: const InputDecoration(
-                      labelText: 'Manufacturer',
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  TextFormField(
-                    controller: weight,
-                    keyboardType: const TextInputType.numberWithOptions(
-                      decimal: true,
-                    ),
-                    decoration: const InputDecoration(labelText: 'Weight (lb)'),
-                    validator: (v) {
-                      final n = double.tryParse(v ?? '');
-                      return n == null || !n.isFinite || n <= 0 || n > 16
-                          ? 'Use a weight greater than 0 and up to 16 lb.'
-                          : null;
-                    },
-                  ),
-                  const SizedBox(height: 16),
-                  TextField(
-                    controller: notes,
-                    maxLines: 2,
-                    decoration: const InputDecoration(
-                      labelText: 'Notes',
-                      hintText: 'Coverstock, surface, favorite conditions…',
-                    ),
-                  ),
-                  if (ball != null)
-                    SwitchListTile(
-                      contentPadding: EdgeInsets.zero,
-                      title: const Text('Retired'),
-                      subtitle: const Text(
-                        'Keep its history, hide from new games.',
-                      ),
-                      value: retired,
-                      onChanged: (v) => setState(() => retired = v),
-                    ),
-                ],
-              ),
-            ),
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(c),
-            child: const Text('Cancel'),
-          ),
-          FilledButton(
-            onPressed: () {
-              if (key.currentState!.validate()) {
-                Navigator.pop(
-                  c,
-                  BowlingBall(
-                    id: ball?.id ?? controller.newId(),
-                    name: name.text.trim(),
-                    brand: brand.text.trim(),
-                    weight: double.parse(weight.text),
-                    notes: notes.text.trim(),
-                    retired: retired,
-                  ),
-                );
-              }
-            },
-            child: const Text('Save ball'),
-          ),
-        ],
-      ),
-    ),
-  );
-  if (result != null && context.mounted) {
-    await safely(context, () => controller.saveBall(result));
-  }
-  for (final c in [name, brand, weight, notes]) {
-    c.dispose();
-  }
-}
+]) => showDialog<void>(
+  context: context,
+  barrierDismissible: false,
+  builder: (_) => BallDialog(controller: controller, ball: ball),
+);
 
 String? requiredText(String? value) =>
     value == null || value.trim().isEmpty ? 'This field is required.' : null;
