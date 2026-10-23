@@ -28,12 +28,19 @@ class PlaceSearchException implements Exception {
 /// device location, journal, or photo is sent. Keep this shared across screens
 /// so repeat requests share the bounded cache and server cooldown.
 class PlaceSearch {
-  PlaceSearch({http.Client Function()? clientFactory, Uri? endpoint})
-    : _clientFactory = clientFactory ?? http.Client.new,
-      _endpoint = endpoint ?? Uri.parse(AppConfig.placeSearchUrl);
+  PlaceSearch({
+    http.Client Function()? clientFactory,
+    Uri? endpoint,
+    DateTime Function()? clock,
+  }) : _clientFactory = clientFactory ?? http.Client.new,
+       _clock = clock ?? DateTime.now,
+       _endpoint = endpoint ?? Uri.parse(AppConfig.placeSearchUrl);
   static final shared = PlaceSearch();
   final http.Client Function() _clientFactory;
   final Uri _endpoint;
+  final DateTime Function() _clock;
+  // Explicit insertion order implements LRU: hits move to the end; TTL remains
+  // measured from the original fetch, so repeated reads never extend freshness.
   final _cache = <String, ({DateTime saved, List<PlaceSuggestion> places})>{};
   DateTime _nextRequest = DateTime.fromMillisecondsSinceEpoch(0);
   bool _busy = false;
@@ -46,10 +53,11 @@ class PlaceSearch {
       );
     }
     final key = q.toLowerCase();
-    final now = DateTime.now();
-    final cached = _cache[key];
+    final now = _clock();
+    final cached = _cache.remove(key);
     if (cached != null &&
         now.difference(cached.saved) < const Duration(minutes: 10)) {
+      _cache[key] = cached;
       return cached.places;
     }
     if (_busy || now.isBefore(_nextRequest)) {
@@ -73,7 +81,7 @@ class PlaceSearch {
         q,
       ).timeout(const Duration(seconds: 12));
       if (_cache.length >= 30) _cache.remove(_cache.keys.first);
-      _cache[key] = (saved: DateTime.now(), places: places);
+      _cache[key] = (saved: _clock(), places: places);
       return places;
     } on PlaceSearchException {
       rethrow;
@@ -101,9 +109,7 @@ class PlaceSearch {
     final response = await client.send(request);
     if (response.statusCode == 429 || response.statusCode == 503) {
       final seconds = int.tryParse(response.headers['retry-after'] ?? '') ?? 60;
-      _nextRequest = DateTime.now().add(
-        Duration(seconds: seconds.clamp(1, 3600)),
-      );
+      _nextRequest = _clock().add(Duration(seconds: seconds.clamp(1, 3600)));
       throw const PlaceSearchException(
         'The place service is busy. Please try later or enter your alley manually.',
       );
