@@ -196,10 +196,21 @@ class AlleysPage extends StatelessWidget {
         PageHeading(
           'Know your lanes.',
           'Favorite places. Familiar faces. A little home-lane advantage.',
-          action: FilledButton.icon(
-            onPressed: () => pickAlleyOnMap(context, controller),
-            icon: const Icon(Icons.add_location_alt_outlined),
-            label: const Text('Add an alley'),
+          action: Wrap(
+            spacing: 12,
+            runSpacing: 12,
+            children: [
+              OutlinedButton.icon(
+                onPressed: () => pickAlleyOnMap(context, controller),
+                icon: const Icon(Icons.map_outlined),
+                label: const Text('Pick on map'),
+              ),
+              FilledButton.icon(
+                onPressed: () => editAlley(context, controller),
+                icon: const Icon(Icons.add_location_alt_outlined),
+                label: const Text('Add an alley'),
+              ),
+            ],
           ),
         ),
         if (data.alleys.isEmpty)
@@ -208,7 +219,7 @@ class AlleysPage extends StatelessWidget {
             title: 'Where do you roll?',
             body: 'Save your favorite bowling alleys. Each session adds to their visit history and scoring averages.',
             action: OutlinedButton(
-              onPressed: () => pickAlleyOnMap(context, controller),
+              onPressed: () => editAlley(context, controller),
               child: const Text('Add your first alley'),
             ),
           ),
