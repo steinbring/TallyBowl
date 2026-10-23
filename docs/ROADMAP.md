@@ -2,6 +2,10 @@
 
 Updated: October 23, 2026
 
+Implementation has begun. See [development status](DEVELOPMENT.md) for the first increment and remaining release work.
+
+Website: https://tallybowl.jws.app
+
 ## Product goal
 
 **TallyBowl! — How you bowled, tonight.**
