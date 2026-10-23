@@ -4,6 +4,7 @@ import '../app_controller.dart';
 import '../theme.dart';
 import '../ui/common.dart';
 import '../ui/dialogs.dart';
+import 'alley_map.dart';
 
 class BagPage extends StatelessWidget {
   const BagPage({super.key, required this.controller});
@@ -196,7 +197,7 @@ class AlleysPage extends StatelessWidget {
           'Know your lanes.',
           'Favorite places. Familiar faces. A little home-lane advantage.',
           action: FilledButton.icon(
-            onPressed: () => editAlley(context, controller),
+            onPressed: () => pickAlleyOnMap(context, controller),
             icon: const Icon(Icons.add_location_alt_outlined),
             label: const Text('Add an alley'),
           ),
@@ -207,7 +208,7 @@ class AlleysPage extends StatelessWidget {
             title: 'Where do you roll?',
             body: 'Save your favorite bowling alleys. Each session adds to their visit history and scoring averages.',
             action: OutlinedButton(
-              onPressed: () => editAlley(context, controller),
+              onPressed: () => pickAlleyOnMap(context, controller),
               child: const Text('Add your first alley'),
             ),
           ),

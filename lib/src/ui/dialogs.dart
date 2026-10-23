@@ -198,6 +198,8 @@ Future<void> editAlley(
   BowlController controller, [
   BowlingAlley? alley,
 ]) async {
+  final exists =
+      alley != null && controller.data.alleys.any((a) => a.id == alley.id);
   final name = TextEditingController(text: alley?.name);
   final address = TextEditingController(text: alley?.address);
   final notes = TextEditingController(text: alley?.notes);
@@ -207,9 +209,7 @@ Future<void> editAlley(
     context: context,
     builder: (c) => StatefulBuilder(
       builder: (c, setState) => AlertDialog(
-        title: Text(
-          alley == null ? 'Add your bowling alley' : 'Edit bowling alley',
-        ),
+        title: Text(!exists ? 'Add your bowling alley' : 'Edit bowling alley'),
         content: SizedBox(
           width: 460,
           child: Form(
@@ -235,7 +235,7 @@ Future<void> editAlley(
                     maxLines: 2,
                     decoration: const InputDecoration(labelText: 'Notes'),
                   ),
-                  if (alley != null)
+                  if (exists)
                     SwitchListTile(
                       contentPadding: EdgeInsets.zero,
                       title: const Text('Archive alley'),
