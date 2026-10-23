@@ -256,6 +256,11 @@ class BowlData {
     ids(alleys.map((v) => v.id));
     ids(sessions.map((v) => v.id));
     ids(games.map((v) => v.id));
+    // Index references once. A large history must not scan every session/ball
+    // again for each game during validation and each draft autosave.
+    final knownBallIds = balls.map((b) => b.id).toSet();
+    final knownAlleyIds = alleys.map((a) => a.id).toSet();
+    final sessionsById = {for (final session in sessions) session.id: session};
     if (sessions.where((s) => !s.finished).length > 1) {
       throw const FormatException('Only one session can be in progress.');
     }
@@ -279,15 +284,15 @@ class BowlData {
       }
     }
     for (final s in sessions) {
-      if (alley(s.alleyId) == null) {
+      if (!knownAlleyIds.contains(s.alleyId)) {
         throw const FormatException('A session references a missing alley.');
       }
     }
     for (final g in games) {
-      if (!sessions.any((s) => s.id == g.sessionId) ||
+      if (!sessionsById.containsKey(g.sessionId) ||
           !g.result.complete ||
           g.ballIds.toSet().length != g.ballIds.length ||
-          g.ballIds.any((id) => ball(id) == null) ||
+          g.ballIds.any((id) => !knownBallIds.contains(id)) ||
           (g.primaryBallId != null && !g.ballIds.contains(g.primaryBallId))) {
         throw const FormatException(
           'Invalid game frames or record references.',
@@ -295,7 +300,7 @@ class BowlData {
       }
     }
     if (draft != null) {
-      if (!sessions.any((s) => s.id == draft!['sessionId'] && !s.finished) ||
+      if ((sessionsById[draft!['sessionId']]?.finished ?? true) ||
           draft!['frames'] is! List ||
           (draft!['frames'] as List).length != 10 ||
           (draft!['frames'] as List).any((v) => v is! String || v.length > 3)) {
@@ -308,7 +313,7 @@ class BowlData {
           (d['sourceLabel'] != null && d['sourceLabel'] is! String) ||
           (d['sourcePath'] != null && d['sourcePath'] is! String) ||
           tags is! List ||
-          tags.any((v) => v is! String || ball(v) == null) ||
+          tags.any((v) => v is! String || !knownBallIds.contains(v)) ||
           tags.toSet().length != tags.length ||
           (d['primaryBallId'] != null && !tags.contains(d['primaryBallId'])) ||
           (d['displayedTotal'] != null &&
