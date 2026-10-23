@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../app_controller.dart';
 import '../theme.dart';
 import '../ui/common.dart';
+import '../ui/layout.dart';
 import '../ui/dialogs.dart';
 import 'alley_map.dart';
 
@@ -36,7 +37,12 @@ class BagPage extends StatelessWidget {
           ),
         LayoutBuilder(
           builder: (context, c) {
-            final count = c.maxWidth > 1000 ? 3 : (c.maxWidth > 580 ? 2 : 1);
+            final count = BowlLayout.columns(
+              context,
+              c.maxWidth,
+              minimumWidth: 280,
+              maximum: 3,
+            );
             return Wrap(
               spacing: 16,
               runSpacing: 16,
@@ -76,10 +82,12 @@ class BagPage extends StatelessWidget {
                                       if (ball.retired)
                                         const LabelPill('RETIRED'),
                                       const SizedBox(width: 6),
-                                      const Icon(
+                                      Icon(
                                         Icons.edit_outlined,
                                         size: 18,
-                                        color: BowlColors.muted,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSurfaceVariant,
                                       ),
                                     ],
                                   ),
@@ -94,8 +102,10 @@ class BagPage extends StatelessWidget {
                                   const SizedBox(height: 6),
                                   Text(
                                     '${ball.brand.isEmpty ? 'Your ball' : ball.brand} · ${ball.weight.toStringAsFixed(ball.weight % 1 == 0 ? 0 : 1)} lb',
-                                    style: const TextStyle(
-                                      color: BowlColors.muted,
+                                    style: TextStyle(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurfaceVariant,
                                     ),
                                   ),
                                   const Padding(
@@ -116,10 +126,12 @@ class BagPage extends StatelessWidget {
                                                 fontWeight: FontWeight.w800,
                                               ),
                                             ),
-                                            const Text(
+                                            Text(
                                               'games tagged',
                                               style: TextStyle(
-                                                color: BowlColors.muted,
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .onSurfaceVariant,
                                                 fontSize: 12,
                                               ),
                                             ),
@@ -138,10 +150,12 @@ class BagPage extends StatelessWidget {
                                                 fontWeight: FontWeight.w800,
                                               ),
                                             ),
-                                            const Text(
+                                            Text(
                                               'game average',
                                               style: TextStyle(
-                                                color: BowlColors.muted,
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .onSurfaceVariant,
                                                 fontSize: 12,
                                               ),
                                             ),
@@ -153,8 +167,10 @@ class BagPage extends StatelessWidget {
                                   const SizedBox(height: 12),
                                   Text(
                                     '$primary games as primary ball',
-                                    style: const TextStyle(
-                                      color: BowlColors.muted,
+                                    style: TextStyle(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurfaceVariant,
                                       fontSize: 12,
                                     ),
                                   ),
@@ -269,8 +285,10 @@ class AlleysPage extends StatelessWidget {
                                   if (alley.address.isNotEmpty)
                                     Text(
                                       alley.address,
-                                      style: const TextStyle(
-                                        color: BowlColors.muted,
+                                      style: TextStyle(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSurfaceVariant,
                                       ),
                                     ),
                                 ],

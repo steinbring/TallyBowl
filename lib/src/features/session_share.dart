@@ -10,6 +10,7 @@ import '../data/exports.dart';
 import '../domain/models.dart';
 import '../theme.dart';
 import '../ui/common.dart';
+import '../ui/layout.dart';
 
 Future<void> openSessionShare(
   BuildContext context,
@@ -78,14 +79,40 @@ class _SessionSharePageState extends State<SessionSharePage> {
     }
   }
 
+  String get _scoreSummary {
+    final games = widget.data.sessionGames(widget.session.id);
+    final total = games.fold<int>(0, (sum, game) => sum + game.score);
+    return '${[for (var i = 0; i < games.length; i++) 'Game ${i + 1}: ${games[i].score}'].join(' · ')}. '
+        'Total: $total. Average: ${averageLabel(games)}.';
+  }
+
+  String get _detailsSummary => [
+    'Branded recap image',
+    if (_showName && widget.data.profile.name.isNotEmpty)
+      widget.data.profile.name,
+    if (_showAlley) widget.data.alley(widget.session.alleyId)!.name,
+    if (_showAlley && widget.session.lane.isNotEmpty)
+      'Lane ${widget.session.lane}',
+    if (_showDate) dateLabel(widget.session.startedAt),
+    if (_showBalls)
+      ...widget.data
+          .sessionGames(widget.session.id)
+          .expand((g) => g.ballIds)
+          .toSet()
+          .map((id) => widget.data.ball(id)!.name),
+  ].join('. ');
+
   @override
   Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: const Text('Share your night')),
+    appBar: AppBar(
+      toolbarHeight: BowlLayout.toolbarHeight(context),
+      title: const Text('Share your night'),
+    ),
     body: SingleChildScrollView(
       padding: const EdgeInsets.all(24),
       child: Center(
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 900),
+          constraints: const BoxConstraints(maxWidth: BowlLayout.recapWidth),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -120,18 +147,28 @@ class _SessionSharePageState extends State<SessionSharePage> {
                 ],
               ),
               const SizedBox(height: 24),
-              Center(
-                child: FittedBox(
-                  fit: BoxFit.scaleDown,
-                  child: RepaintBoundary(
-                    key: _imageKey,
-                    child: RecapCard(
-                      data: widget.data,
-                      session: widget.session,
-                      showName: _showName,
-                      showAlley: _showAlley,
-                      showBalls: _showBalls,
-                      showDate: _showDate,
+              Text(
+                _scoreSummary,
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              const SizedBox(height: 16),
+              Semantics(
+                label: _detailsSummary,
+                image: true,
+                excludeSemantics: true,
+                child: Center(
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: RepaintBoundary(
+                      key: _imageKey,
+                      child: RecapCard(
+                        data: widget.data,
+                        session: widget.session,
+                        showName: _showName,
+                        showAlley: _showAlley,
+                        showBalls: _showBalls,
+                        showDate: _showDate,
+                      ),
                     ),
                   ),
                 ),
@@ -158,9 +195,12 @@ class _SessionSharePageState extends State<SessionSharePage> {
                 ],
               ),
               const SizedBox(height: 16),
-              const Text(
+              Text(
                 'Only this recap is shared. Your original photo and other bowlers are never included.',
-                style: TextStyle(color: BowlColors.muted, fontSize: 12),
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  fontSize: 12,
+                ),
               ),
             ],
           ),
@@ -184,7 +224,12 @@ class RecapCard extends StatelessWidget {
   final BowlingSession session;
   final bool showName, showAlley, showBalls, showDate;
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) =>
+      MediaQuery.withNoTextScaling(child: _card(context));
+
+  // A shareable image has a fixed print layout; the surrounding page supplies
+  // scalable text and complete semantics for the same scores and chosen details.
+  Widget _card(BuildContext context) {
     final games = data.sessionGames(session.id);
     final total = games.fold<int>(0, (n, g) => n + g.score);
     final ballIds = games.expand((g) => g.ballIds).toSet();

@@ -1,9 +1,12 @@
+import '../ui/layout.dart';
+
 import 'package:flutter/material.dart';
 
 import '../app_controller.dart';
 import '../domain/models.dart';
 import '../theme.dart';
 import '../ui/common.dart';
+import '../ui/journal_cards.dart';
 import '../ui/dialogs.dart';
 import 'game_editor.dart';
 import 'photo_capture.dart';
@@ -55,7 +58,7 @@ class TonightPage extends StatelessWidget {
                         'MAKE EVERY FRAME A MEMORY',
                         style: TextStyle(
                           color: Color(0xFFC5DDCC),
-                          fontSize: 11,
+                          fontSize: 12,
                           fontWeight: FontWeight.w700,
                           letterSpacing: 2,
                         ),
@@ -293,132 +296,6 @@ class TonightPage extends StatelessWidget {
   }
 }
 
-class GameCard extends StatelessWidget {
-  const GameCard({
-    super.key,
-    required this.game,
-    required this.number,
-    required this.data,
-    required this.onTap,
-  });
-  final BowlingGame game;
-  final int number;
-  final BowlData data;
-  final VoidCallback onTap;
-  @override
-  Widget build(BuildContext context) => Card(
-    child: InkWell(
-      borderRadius: BorderRadius.circular(20),
-      onTap: onTap,
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Row(
-          children: [
-            CircleAvatar(
-              backgroundColor: BowlColors.canvas,
-              child: Text(
-                '$number',
-                style: const TextStyle(fontWeight: FontWeight.w800),
-              ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Game $number${game.lane.isEmpty ? '' : ' · Lane ${game.lane}'}',
-                    style: const TextStyle(fontWeight: FontWeight.w700),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    game.ballIds.isEmpty
-                        ? 'No ball tags'
-                        : game.ballIds
-                              .map((id) => data.ball(id)!.name)
-                              .join(' · '),
-                    style: const TextStyle(
-                      fontSize: 12,
-                      color: BowlColors.muted,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    '${game.result.strikes} strikes · ${game.result.spares} spares',
-                    style: const TextStyle(
-                      fontSize: 12,
-                      color: BowlColors.muted,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(width: 12),
-            Text(
-              '${game.score}',
-              style: const TextStyle(fontSize: 32, fontWeight: FontWeight.w800),
-            ),
-            const SizedBox(width: 12),
-            const Icon(Icons.chevron_right_rounded),
-          ],
-        ),
-      ),
-    ),
-  );
-}
-
-class SessionCard extends StatelessWidget {
-  const SessionCard({
-    super.key,
-    required this.session,
-    required this.data,
-    required this.onTap,
-  });
-  final BowlingSession session;
-  final BowlData data;
-  final VoidCallback onTap;
-  @override
-  Widget build(BuildContext context) {
-    final games = data.sessionGames(session.id);
-    return Card(
-      child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 22,
-          vertical: 12,
-        ),
-        leading: CircleAvatar(
-          backgroundColor: BowlColors.mint,
-          child: Icon(
-            session.league ? Icons.emoji_events_outlined : Icons.sports_rounded,
-            color: BowlColors.ink,
-          ),
-        ),
-        title: Text(
-          data.alley(session.alleyId)!.name,
-          style: const TextStyle(fontWeight: FontWeight.w700),
-        ),
-        subtitle: Text(
-          '${dateLabel(session.startedAt)} · ${session.league ? 'League' : 'Practice'} · ${games.length} games${session.finished ? '' : ' · In progress'}',
-        ),
-        trailing: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              averageLabel(games),
-              style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 22),
-            ),
-            const Text(
-              'AVG',
-              style: TextStyle(fontSize: 10, color: BowlColors.muted),
-            ),
-          ],
-        ),
-        onTap: onTap,
-      ),
-    );
-  }
-}
-
 Future<void> showSession(
   BuildContext context,
   BowlController controller,
@@ -431,6 +308,7 @@ Future<void> showSession(
         final games = controller.data.sessionGames(session.id);
         return Scaffold(
           appBar: AppBar(
+            toolbarHeight: BowlLayout.toolbarHeight(context),
             title: Text(controller.data.alley(session.alleyId)!.name),
             actions: [
               if (games.isNotEmpty)

@@ -4,8 +4,9 @@ import 'package:flutter/foundation.dart';
 import '../app_controller.dart';
 import '../domain/models.dart';
 import '../domain/scoring.dart';
-import '../theme.dart';
 import '../ui/common.dart';
+import '../ui/layout.dart';
+import '../ui/frame_grid.dart';
 import '../ui/score_photo_preview.dart';
 import '../ui/dialogs.dart';
 import '../recognition/photo_service.dart';
@@ -233,6 +234,20 @@ class _GameEditorState extends State<GameEditor> {
     final availableBalls = data.balls
         .where((b) => !b.retired || _balls.contains(b.id))
         .toList();
+    final compactActions =
+        MediaQuery.sizeOf(context).width < BowlLayout.spaciousWidth;
+    final saveButton = FilledButton.icon(
+      onPressed:
+          result.complete &&
+              !_saving &&
+              (_displayedTotal == null ||
+                  _displayedTotal == result.total ||
+                  _mismatchAcknowledged)
+          ? _save
+          : null,
+      icon: const Icon(Icons.check_rounded),
+      label: Text(_saving ? 'Saving…' : 'Save game'),
+    );
     return PopScope(
       canPop: _allowExit,
       onPopInvokedWithResult: (didPop, _) {
@@ -240,34 +255,37 @@ class _GameEditorState extends State<GameEditor> {
       },
       child: Scaffold(
         appBar: AppBar(
+          toolbarHeight: BowlLayout.toolbarHeight(context),
           title: Text(widget.game == null ? 'Record a game' : 'Edit game'),
           actions: [
-            Padding(
-              padding: const EdgeInsets.only(right: 16),
-              child: FilledButton.icon(
-                onPressed:
-                    result.complete &&
-                        !_saving &&
-                        (_displayedTotal == null ||
-                            _displayedTotal == result.total ||
-                            _mismatchAcknowledged)
-                    ? _save
-                    : null,
-                icon: const Icon(Icons.check_rounded),
-                label: Text(_saving ? 'Saving…' : 'Save game'),
+            if (!compactActions)
+              Padding(
+                padding: const EdgeInsets.only(right: 16),
+                child: saveButton,
               ),
-            ),
           ],
         ),
+        bottomNavigationBar: compactActions
+            ? SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: saveButton,
+                ),
+              )
+            : null,
         body: IgnorePointer(
           ignoring: _saving,
           child: SingleChildScrollView(
             padding: EdgeInsets.all(
-              MediaQuery.sizeOf(context).width > 700 ? 32 : 16,
+              MediaQuery.sizeOf(context).width > BowlLayout.spaciousWidth
+                  ? 32
+                  : 16,
             ),
             child: Center(
               child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 1000),
+                constraints: const BoxConstraints(
+                  maxWidth: BowlLayout.editorWidth,
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -284,8 +302,10 @@ class _GameEditorState extends State<GameEditor> {
                           padding: const EdgeInsets.only(top: 10),
                           child: Text(
                             'Your selected row: $_sourceLabel',
-                            style: const TextStyle(
-                              color: BowlColors.muted,
+                            style: TextStyle(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurfaceVariant,
                               fontSize: 12,
                             ),
                           ),
@@ -296,7 +316,7 @@ class _GameEditorState extends State<GameEditor> {
                         result.complete &&
                         _displayedTotal != result.total) ...[
                       Card(
-                        color: const Color(0xFFFFE4DE),
+                        color: Theme.of(context).colorScheme.errorContainer,
                         child: CheckboxListTile(
                           value: _mismatchAcknowledged,
                           onChanged: (v) => setState(
@@ -312,86 +332,14 @@ class _GameEditorState extends State<GameEditor> {
                       ),
                       const SizedBox(height: 16),
                     ],
-                    Card(
-                      color: BowlColors.mint,
-                      child: Padding(
-                        padding: const EdgeInsets.all(22),
-                        child: Row(
-                          children: [
-                            const Icon(Icons.scoreboard_outlined, size: 34),
-                            const SizedBox(width: 16),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    result.complete
-                                        ? 'Ready to save'
-                                        : 'Every delivery counts',
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.w800,
-                                      fontSize: 18,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  const Text(
-                                    'X strike · / spare · - miss · F foul. Examples: X, 9/, 81, X7/.',
-                                    style: TextStyle(height: 1.5),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            Text(
-                              '${result.total ?? result.runningTotal}',
-                              style: const TextStyle(
-                                fontSize: 38,
-                                fontWeight: FontWeight.w900,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
+                    ScoringSummary(result: result),
                     const SizedBox(height: 24),
                     ScoreStrip(frames: frames),
                     const SizedBox(height: 24),
-                    LayoutBuilder(
-                      builder: (context, c) {
-                        final count = c.maxWidth > 750
-                            ? 5
-                            : (c.maxWidth > 430 ? 3 : 2);
-                        return Wrap(
-                          spacing: 12,
-                          runSpacing: 16,
-                          children: [
-                            for (var i = 0; i < 10; i++)
-                              SizedBox(
-                                width: (c.maxWidth - (count - 1) * 12) / count,
-                                child: TextField(
-                                  key: ValueKey('frame-$i'),
-                                  controller: _frames[i],
-                                  textCapitalization:
-                                      TextCapitalization.characters,
-                                  autocorrect: false,
-                                  enableSuggestions: false,
-                                  maxLength: i == 9 ? 3 : 2,
-                                  textInputAction: i == 9
-                                      ? TextInputAction.done
-                                      : TextInputAction.next,
-                                  decoration: InputDecoration(
-                                    labelText: 'Frame ${i + 1}',
-                                    hintText: i == 9 ? 'X7/' : '9/',
-                                    counterText: '',
-                                    errorText: result.frames[i].error,
-                                    errorMaxLines: 3,
-                                  ),
-                                  onChanged: (_) => _changed(),
-                                ),
-                              ),
-                          ],
-                        );
-                      },
+                    FrameGrid(
+                      controllers: _frames,
+                      result: result,
+                      onChanged: _changed,
                     ),
                     const SizedBox(height: 32),
                     Text(
@@ -400,9 +348,11 @@ class _GameEditorState extends State<GameEditor> {
                           ?.copyWith(fontWeight: FontWeight.w700),
                     ),
                     const SizedBox(height: 8),
-                    const Text(
+                    Text(
                       'Tag every ball used. Choose a primary ball if you wish.',
-                      style: TextStyle(color: BowlColors.muted),
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
                     ),
                     const SizedBox(height: 16),
                     TextButton.icon(
@@ -490,14 +440,19 @@ class _GameEditorState extends State<GameEditor> {
                     ),
                     const SizedBox(height: 20),
                     if (_draftError)
-                      const Text(
+                      Text(
                         'Draft could not be saved. Keep this screen open and try again.',
-                        style: TextStyle(color: Colors.red),
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.error,
+                        ),
                       )
                     else if (widget.game == null)
-                      const Text(
+                      Text(
                         'Your unfinished game stays on this device when you leave this screen.',
-                        style: TextStyle(fontSize: 12, color: BowlColors.muted),
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
                       ),
                     const SizedBox(height: 40),
                   ],

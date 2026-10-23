@@ -1,3 +1,5 @@
+import '../ui/layout.dart';
+
 import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -7,7 +9,6 @@ import '../config.dart';
 import '../data/bowl_store.dart';
 import '../data/exports.dart';
 import '../domain/models.dart';
-import '../theme.dart';
 import '../ui/common.dart';
 import '../ui/dialogs.dart';
 
@@ -104,7 +105,10 @@ class _ProfileSettingsState extends State<ProfileSettings> {
   Widget build(BuildContext context) => ListenableBuilder(
     listenable: widget.controller,
     builder: (context, _) => Scaffold(
-      appBar: AppBar(title: const Text('Settings')),
+      appBar: AppBar(
+        toolbarHeight: BowlLayout.toolbarHeight(context),
+        title: const Text('Settings'),
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
         child: Center(
@@ -151,10 +155,12 @@ class _ProfileSettingsState extends State<ProfileSettings> {
                           ),
                         ),
                         const SizedBox(height: 10),
-                        const Text(
+                        Text(
                           'Save a full backup of your records and unfinished frame draft. Original scoreboard photos are not included. On iPad and Android, choose Files or another destination from the share sheet.',
                           style: TextStyle(
-                            color: BowlColors.muted,
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSurfaceVariant,
                             height: 1.6,
                           ),
                         ),
@@ -227,10 +233,12 @@ class _ProfileSettingsState extends State<ProfileSettings> {
                           ),
                         ),
                         const SizedBox(height: 10),
-                        const Text(
+                        Text(
                           'Export games or individual deliveries as CSV for your own analysis. Use a full backup to move or restore your journal.',
                           style: TextStyle(
-                            color: BowlColors.muted,
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSurfaceVariant,
                             height: 1.6,
                           ),
                         ),
@@ -279,11 +287,13 @@ class _ProfileSettingsState extends State<ProfileSettings> {
                           ),
                         ),
                         const SizedBox(height: 12),
-                        const Text(
+                        Text(
                           'Your bowling records are stored locally on this device. Image recognition runs on the device. Original scoreboard photos stay with unfinished drafts and are removed after saving or discarding them. Maps download tiles from the map service. An alley search sends only the search words to Photon, using OpenStreetMap data. Saved alleys and game recording work offline.',
                           style: TextStyle(
                             height: 1.7,
-                            color: BowlColors.muted,
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSurfaceVariant,
                           ),
                         ),
                         const SizedBox(height: 20),
