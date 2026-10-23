@@ -8,6 +8,8 @@ import 'features/journal.dart';
 import 'theme.dart';
 import 'ui/common.dart';
 import 'ui/dialogs.dart';
+import 'recognition/photo_service.dart';
+import 'features/photo_capture.dart';
 
 class TallyBowlApp extends StatefulWidget {
   const TallyBowlApp({super.key, this.controller});
@@ -69,6 +71,41 @@ class BowlShell extends StatefulWidget {
 
 class _BowlShellState extends State<BowlShell> {
   int _index = 0;
+  @override
+  void initState() {
+    super.initState();
+    if (widget.controller.store != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _recoverPhoto());
+    }
+  }
+
+  Future<void> _recoverPhoto() async {
+    try {
+      final controller = widget.controller;
+      await PhotoService.cleanOrphans(
+        controller.data.draft?['sourcePath'] as String?,
+      );
+      final session = controller.activeSession;
+      if (session == null || controller.data.draft != null) return;
+      final recovered = await PhotoService.recover();
+      if (recovered != null && mounted) {
+        await importScorePhoto(
+          context,
+          controller,
+          session,
+          recoveredPath: recovered,
+        );
+      }
+    } catch (_) {
+      if (mounted) {
+        message(
+          context,
+          'The interrupted photo could not be recovered. You can select it again.',
+        );
+      }
+    }
+  }
+
   static const destinations = <(String, IconData)>[
     ('Tonight', Icons.nights_stay_outlined),
     ('History', Icons.history_rounded),

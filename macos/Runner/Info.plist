@@ -28,5 +28,9 @@
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Take a photo of your bowling scoreboard to record your frames on this device.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Select scoreboard photos to recognize and review your bowling frames on this device.</string>
 </dict>
 </plist>

@@ -5,6 +5,8 @@ import '../domain/models.dart';
 import '../domain/scoring.dart';
 import '../theme.dart';
 import '../ui/common.dart';
+import '../ui/score_photo_preview.dart';
+import '../recognition/photo_service.dart';
 
 Future<void> openGameEditor(
   BuildContext context,
@@ -30,11 +32,16 @@ class GameEditor extends StatefulWidget {
     required this.session,
     this.game,
     this.initialFrames,
+    this.sourcePath,
+    this.sourceLabel,
+    this.displayedTotal,
   });
   final BowlController controller;
   final BowlingSession session;
   final BowlingGame? game;
   final List<String>? initialFrames;
+  final String? sourcePath, sourceLabel;
+  final int? displayedTotal;
   @override
   State<GameEditor> createState() => _GameEditorState();
 }
@@ -45,6 +52,9 @@ class _GameEditorState extends State<GameEditor> {
   late final TextEditingController _notes;
   late Set<String> _balls;
   String? _primary;
+  String? _sourcePath, _sourceLabel;
+  int? _displayedTotal;
+  bool _mismatchAcknowledged = false;
   bool _saving = false;
   bool _draftError = false;
   List<String> get frames => _frames.map((c) => c.text).toList();
@@ -61,6 +71,9 @@ class _GameEditorState extends State<GameEditor> {
         widget.game?.frames ??
         (draft?['frames'] as List?)?.cast<String>() ??
         List.filled(10, '');
+    _sourcePath = widget.sourcePath ?? draft?['sourcePath'] as String?;
+    _sourceLabel = widget.sourceLabel ?? draft?['sourceLabel'] as String?;
+    _displayedTotal = widget.displayedTotal ?? draft?['displayedTotal'] as int?;
     _frames = [for (final value in values) TextEditingController(text: value)];
     _lane = TextEditingController(
       text:
@@ -87,7 +100,7 @@ class _GameEditorState extends State<GameEditor> {
   }
 
   void _changed() {
-    setState(() {});
+    setState(() => _mismatchAcknowledged = false);
     _persistDraft();
   }
 
@@ -101,6 +114,9 @@ class _GameEditorState extends State<GameEditor> {
         'notes': _notes.text,
         'ballIds': _balls.toList(),
         'primaryBallId': _primary,
+        'sourcePath': _sourcePath,
+        'sourceLabel': _sourceLabel,
+        'displayedTotal': _displayedTotal,
       });
       if (_draftError && mounted) setState(() => _draftError = false);
     } catch (_) {
@@ -110,7 +126,13 @@ class _GameEditorState extends State<GameEditor> {
 
   Future<void> _save() async {
     final result = TenPinScorer.score(frames);
-    if (!result.complete || _saving) return;
+    if (!result.complete ||
+        _saving ||
+        (_displayedTotal != null &&
+            _displayedTotal != result.total &&
+            !_mismatchAcknowledged)) {
+      return;
+    }
     setState(() => _saving = true);
     try {
       await widget.controller.saveGame(
@@ -125,6 +147,11 @@ class _GameEditorState extends State<GameEditor> {
           notes: _notes.text.trim(),
         ),
       );
+      try {
+        await PhotoService.remove(_sourcePath);
+      } catch (_) {
+        /* Retried by orphan cleanup on the next launch. */
+      }
       if (mounted) {
         Navigator.pop(context);
         message(context, 'Game saved · ${result.total}');
@@ -154,7 +181,14 @@ class _GameEditorState extends State<GameEditor> {
           Padding(
             padding: const EdgeInsets.only(right: 16),
             child: FilledButton.icon(
-              onPressed: result.complete && !_saving ? _save : null,
+              onPressed:
+                  result.complete &&
+                      !_saving &&
+                      (_displayedTotal == null ||
+                          _displayedTotal == result.total ||
+                          _mismatchAcknowledged)
+                  ? _save
+                  : null,
               icon: const Icon(Icons.check_rounded),
               label: Text(_saving ? 'Saving…' : 'Save game'),
             ),
@@ -176,6 +210,40 @@ class _GameEditorState extends State<GameEditor> {
                   '${dateLabel(widget.session.startedAt)} · ${widget.session.league ? 'League' : 'Practice'}',
                   action: LabelPill('$completeCount / 10 frames'),
                 ),
+                if (_sourcePath != null) ...[
+                  ScorePhotoPreview(path: _sourcePath!),
+                  if (_sourceLabel != null)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 10),
+                      child: Text(
+                        'Your selected row: $_sourceLabel',
+                        style: const TextStyle(
+                          color: BowlColors.muted,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ),
+                  const SizedBox(height: 20),
+                ],
+                if (_displayedTotal != null &&
+                    result.complete &&
+                    _displayedTotal != result.total) ...[
+                  Card(
+                    color: const Color(0xFFFFE4DE),
+                    child: CheckboxListTile(
+                      value: _mismatchAcknowledged,
+                      onChanged: (v) =>
+                          setState(() => _mismatchAcknowledged = v ?? false),
+                      title: Text(
+                        'The photo shows $_displayedTotal; these frames score ${result.total}.',
+                      ),
+                      subtitle: const Text(
+                        'Check the row, scratch score, and deliveries. Confirm only after reviewing the difference.',
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                ],
                 Card(
                   color: BowlColors.mint,
                   child: Padding(

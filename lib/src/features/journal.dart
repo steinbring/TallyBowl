@@ -6,6 +6,8 @@ import '../theme.dart';
 import '../ui/common.dart';
 import '../ui/dialogs.dart';
 import 'game_editor.dart';
+import 'photo_capture.dart';
+import '../recognition/photo_service.dart';
 
 class TonightPage extends StatelessWidget {
   const TonightPage({
@@ -117,6 +119,10 @@ class TonightPage extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 24),
+        if (session != null) ...[
+          PhotoCaptureActions(controller: controller, session: session),
+          const SizedBox(height: 24),
+        ],
         if (name.isEmpty) ...[
           Card(
             child: ListTile(
@@ -235,7 +241,12 @@ class TonightPage extends StatelessWidget {
                       action: 'Discard draft',
                     ) &&
                     context.mounted) {
-                  await safely(context, controller.discardDraft);
+                  await safely(context, () async {
+                    final source =
+                        controller.data.draft?['sourcePath'] as String?;
+                    await controller.discardDraft();
+                    await PhotoService.remove(source);
+                  });
                 }
               },
               icon: const Icon(Icons.delete_outline_rounded),
