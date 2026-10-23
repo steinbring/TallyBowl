@@ -26,8 +26,13 @@ class BowlController extends ChangeNotifier {
   Future<void> update(BowlData Function(BowlData) change) {
     final work = _pending.then((_) async {
       final next = change(data);
-      next.validate();
-      await store?.save(next);
+      // The store validates persisted snapshots before its transaction. Keep
+      // the same guard for in-memory controllers without doing it twice.
+      if (store == null) {
+        next.validate();
+      } else {
+        await store!.save(next);
+      }
       data = next;
       notifyListeners();
     });
