@@ -3,3 +3,6 @@
 
 // Applies to release/profile; debug keeps Flutter's development entitlements.
 ENABLE_HARDENED_RUNTIME = YES
+// Xcode otherwise injects get-task-allow for ad hoc builds. Public release
+// entitlements stay strict; owner packages have an explicit local-only step.
+CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO
