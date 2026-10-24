@@ -1,6 +1,6 @@
 # TallyBowl! development status
 
-Updated October 24, 2026. Development build 0.1.2 (3) is intended for owner testing. Production distribution is not configured.
+Updated October 24, 2026. Development build 0.1.3 (4) is intended for owner testing. Production distribution is not configured.
 
 ## Feature branches
 
@@ -26,6 +26,10 @@ Features are committed on `codex/` branches and merged locally into `main`. The 
 | `codex/audit-photo-recovery` | Retained pending photo review before OCR, reopen/cancel tests, live narrow/wide editor resizing |
 | `codex/audit-macos-local-build` | Strict release entitlements plus an explicit, guarded ad hoc owner-package step |
 | `codex/audit-verification-report` | Independent disposition of all 27 external findings, physical-device checklist and refreshed local packages |
+| `codex/audit2-android-signing` | Protected release signing configuration, explicit missing-key failure, debug-build independence |
+| `codex/audit2-mac-artifact-labels` | Owner-only archive filename and sealed signing-policy manifest |
+| `codex/audit2-startup-recovery` | Nonblocking metadata refresh, first-frame test and photo failure/cleanup matrix |
+| `codex/audit2-verification-record` | Five-finding round-2 disposition, signing timeline and build 0.1.3 evidence |
 
 The completed stack is integrated into local `main` after verification. Feature branches are retained. All work is local until explicitly pushed to the remote repository.
 
@@ -90,11 +94,24 @@ Run `./tool/verify_native.sh` to build Android debug, macOS release and iPad sim
 
 Run `flutter test integration_test/on_device_recognition_test.dart -d <device>` for native image recognition and local 1080-pixel-wide recap PNG generation. These checks use generated test content. They do not exercise physical cameras or send a recap to a recipient.
 
-The full 27-finding external audit disposition is in [AUDIT_RESOLUTION.md](AUDIT_RESOLUTION.md), including corrected audit claims and explicit production gates. The next owner-testing phase follows [DEVICE_TESTING.md](DEVICE_TESTING.md), beginning with the Samsung Galaxy Z Fold 8.
+The 27-finding first audit disposition is in [AUDIT_RESOLUTION.md](AUDIT_RESOLUTION.md). [AUDIT_ROUND2_RESOLUTION.md](AUDIT_ROUND2_RESOLUTION.md) covers the five follow-up findings, signing history and current verification. Release signing setup is documented in [ANDROID_SIGNING.md](ANDROID_SIGNING.md). The next owner-testing phase follows [DEVICE_TESTING.md](DEVICE_TESTING.md), beginning with the Samsung Galaxy Z Fold 8.
 
 Before release, test actual camera permission/capture flows, platform photo formats/orientations, native share destinations and file import/export, interrupted Android picking, and app lifecycle recovery on physical iPad and Android devices and supported Macs. A successful native build is not evidence that these hardware flows have been tested.
 
-## Verified build 0.1.2 (3) results
+## Verified build 0.1.3 (4) results
+
+| Check | Result |
+| --- | --- |
+| `flutter analyze` | No issues |
+| `flutter test` | 68 passed, including delayed metadata, recognition failure/manual entry, failed draft persistence and real retained-photo cleanup |
+| Android release guard | APK and AAB commands explicitly rejected missing credentials before Flutter release compilation |
+| Disposable signing fixture | Release APK built and its v2 signature/certificate verified; test key and installable fixture outputs removed |
+| `tool/verify_native.sh` | Passed: Android debug build/Lint, universal macOS release and iPad simulator build. Lint: 0 errors, 7 existing advisory warnings |
+| Mac owner packaging | OWNER-TEST-ONLY archive and sealed manifest match actual runtime/entitlement policy; modified manifest fails strict signature verification; extracted 0.1.3/build 4 archive smoke-launched |
+
+Native recognition/camera bridges are unchanged in this pass. The 15 native integration checks below are retained as **0.1.2 evidence**, not a claim of new physical-device coverage. Current physical-device gates are in DEVICE_TESTING.md.
+
+## Prior verified build 0.1.2 (3) results
 
 | Check | Result |
 | --- | --- |
@@ -127,18 +144,18 @@ The generator uses Core Graphics/ImageIO, preserves transparency on macOS, and w
 
 ## Install the local test build
 
-Version **0.1.2**, build **3**. These packages are generated locally and ignored by Git:
+Version **0.1.3**, build **4**. These packages are generated locally and ignored by Git:
 
 | Target | Local package | Installation |
 | --- | --- | --- |
-| macOS | `build/releases/TallyBowl-0.1.2-macos.zip` (about 20 MB) | Unzip, move `TallyBowl!.app` to Applications if desired, then open it. The app is a universal Intel/Apple silicon release build with an ad hoc signature and an explicit local library-validation exception; it is not a notarized distribution. |
-| Android | `build/releases/TallyBowl-0.1.2-android-debug.apk` (about 221 MB) | Transfer the APK to the device and open it, allowing installation from the selected source if Android prompts. This uses the local development key; release signing is not configured. |
+| macOS | `build/releases/TallyBowl-0.1.3-macos-OWNER-TEST-ONLY.zip` (about 20 MB) | Unzip, move `TallyBowl!.app` to Applications if desired, then open it. The app is a universal Intel/Apple silicon release build with an ad hoc signature and an explicit local library-validation exception; it is not a notarized distribution. |
+| Android | `build/releases/TallyBowl-0.1.3-android-debug.apk` (about 221 MB) | Transfer the APK to the device and open it, allowing installation from the selected source if Android prompts. This uses the local development key. Production releases use explicit protected key properties; missing credentials stop release builds. |
 | iPad simulator | `build/ios/iphonesimulator/Runner.app` | Run `flutter run -d <simulator-id>` or install this app through the simulator tools. A simulator binary cannot be installed on a physical iPad. |
 
 For a physical iPad, select a development team and provisioning/signing setup in the iOS Runner project using Xcode, then run `flutter run -d <device-id>`. No physical-device IPA has been signed or exported.
 
-The strict release build enables hardened runtime and disables Xcode's injected `get-task-allow`. Ad hoc apps/frameworks have no Team ID: the strict build failed the runtime library check during smoke launch. `tool/package_macos_local.sh` therefore signs a **copy** with only the local `disable-library-validation` exception, retaining sandbox/runtime protections and no JIT/debug entitlement. It refuses to change a team-signed app. Production entitlements retain library validation; proper Apple signing of the app and its embedded code, plus notarization, remains required.
+The strict release build enables hardened runtime and disables Xcode's injected `get-task-allow`. Ad hoc apps/frameworks have no Team ID: the strict build failed the runtime library check during smoke launch. `tool/package_macos_local.sh` therefore signs a **copy** with only the local `disable-library-validation` exception, retaining sandbox/runtime protections and no JIT/debug entitlement. It refuses to change a team-signed app. The archive filename includes `OWNER-TEST-ONLY`; a signed/sealed `Contents/Resources/TallyBowlBuild.json` records its version, build, non-distribution warning and exact signing/runtime policy. Production entitlements retain library validation; proper Apple signing of the app and its embedded code, plus notarization, remains required.
 
-`build/releases/checksums.json` records SHA-256 values for the packaged Mac and Android builds. The Mac archive was built from the normal `lib/main.dart` entry point after integration testing, extracted and smoke-launched successfully; `codesign --verify --deep --strict` and ZIP integrity passed. Android APK v2 signature and package version/build were verified.
+`build/releases/checksums.json` records SHA-256 values, code revision and owner-only distribution policy for the packaged Mac and Android builds. The Mac archive was built from the normal `lib/main.dart` entry point after integration testing, extracted and smoke-launched successfully; `codesign --verify --deep --strict` and ZIP integrity passed. Android APK v2 signature and package version/build were verified.
 
 Start by adding a profile, a searched or manual alley, and balls from suggestions or custom names. Record a manual game, then try a real scoreboard photo and compare every frame. Finish the session, inspect the branded recap and try a share destination. Export a JSON backup before experimenting with restore. Physical camera/share workflows, Android picker process recovery, TalkBack/VoiceOver and representative scoreboard recognition are the key remaining device checks. See [review findings](REVIEW.md) for the full record.

@@ -1,12 +1,12 @@
-# Owner testing — build 0.1.2 (3)
+# Owner testing — build 0.1.3 (4)
 
-Start with the Samsung Galaxy Z Fold 8, then repeat the camera, import, sharing, and accessibility checks on a physical iPad and a supported Mac. Automated checks are described in [audit verification](AUDIT_RESOLUTION.md). This checklist is preparation; no physical phone has been installed or tested yet.
+Start with the Samsung Galaxy Z Fold 8, then repeat the camera, import, sharing, and accessibility checks on a physical iPad and a supported Mac. Automated checks are described in [round-2 audit verification](AUDIT_ROUND2_RESOLUTION.md). This checklist is preparation; no physical phone has been installed or tested yet.
 
 ## Install and preserve data
 
 - Use the packaged **Android debug APK** for this first local test. Public/store release signing is a separate setup task.
 - If an earlier version contains bowling history, export a JSON backup first. Update in place with the same development signing key. A signature mismatch is a reason to inspect signing, not to uninstall and erase data automatically.
-- Confirm version 0.1.2/build 3 in the installed package. Initial installation/USB setup will be handled with the owner in the next step.
+- Confirm version 0.1.3/build 4 in the installed package. Initial installation/USB setup will be handled with the owner in the next step.
 
 ## First complete session
 

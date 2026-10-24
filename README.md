@@ -4,7 +4,7 @@
 
 A Flutter bowling journal for macOS, iPadOS, and Android. Its website will be [tallybowl.jws.app](https://tallybowl.jws.app).
 
-Development build 0.1.2 (3) includes:
+Development build 0.1.3 (4) includes:
 
 - A personal profile with scoreboard names and aliases.
 - Ball inventory with an offline manufacturer/model starter catalog and custom entries.
@@ -49,8 +49,8 @@ The native integration test generates its own synthetic image, exercises on-devi
 The development map uses OpenStreetMap's public raster tiles with attribution, an identifying User-Agent, HTTP caching, and no offscreen prefetch buffer. Select production map/search hosting before release. A different OSM-compatible tile service can be supplied using `--dart-define=TALLYBOWL_TILE_URL=...`; set `TALLYBOWL_TILE_ATTRIBUTION` and `TALLYBOWL_TILE_ATTRIBUTION_URL` for that provider's requirements. The identifying User-Agent derives its version from installed package metadata. Alley suggestions use the documented Photon API and require neither a key nor screen scraping. Searches are submitted explicitly; the app caches queries and handles service limits. Configure another Photon endpoint with `--dart-define=TALLYBOWL_PHOTON_URL=https://your-host/api/`.
 
 
-The ball starter catalog is bundled and works offline. It contains 11 brands and 22 selected model names, plus previously entered models; it accepts any custom entry. A suitable documented, key-free public ball API was not found. See [data sources and service policies](docs/DATA_SOURCES.md), the [pre-test review](docs/REVIEW.md), and the [external audit verification](docs/AUDIT_RESOLUTION.md).
+The ball starter catalog is bundled and works offline. It contains 11 brands and 22 selected model names, plus previously entered models; it accepts any custom entry. A suitable documented, key-free public ball API was not found. See [data sources and service policies](docs/DATA_SOURCES.md), the [pre-test review](docs/REVIEW.md), the [first audit verification](docs/AUDIT_RESOLUTION.md), and the [round-2 verification](docs/AUDIT_ROUND2_RESOLUTION.md).
 
 ## Try this build
 
-On this Mac, run `flutter run -d macos`. For an ad hoc Mac release archive, run `flutter build macos --release` followed by `./tool/package_macos_local.sh`; the packaging step applies an explicit local library-validation exception without changing production entitlements. Local packaged builds and installation notes are listed in [development status](docs/DEVELOPMENT.md). Physical iPad installation requires Apple development signing; a simulator build cannot be installed on an iPad.
+On this Mac, run `flutter run -d macos`. For an ad hoc Mac release archive, run `flutter build macos --release` followed by `./tool/package_macos_local.sh`; the packaging step applies an explicit local library-validation exception without changing production entitlements. Its `OWNER-TEST-ONLY` archive and sealed build manifest identify it as unsuitable for public distribution. Local packaged builds and installation notes are listed in [development status](docs/DEVELOPMENT.md). Android release APK/AAB builds require [explicit protected signing configuration](docs/ANDROID_SIGNING.md); missing credentials stop the build. Use the debug APK for initial owner testing. Physical iPad installation requires Apple development signing; a simulator build cannot be installed on an iPad.
