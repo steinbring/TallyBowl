@@ -18,6 +18,13 @@ case "$signature" in
   *) echo 'Refusing to change a team-signed app.' >&2; exit 1 ;;
 esac
 version=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$source_app/Contents/Info.plist")
+build=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' "$source_app/Contents/Info.plist")
+case "$version" in
+  ''|*[!A-Za-z0-9.+_-]*) echo 'Invalid app version for packaging.' >&2; exit 1 ;;
+esac
+case "$build" in
+  ''|*[!0-9]*) echo 'Invalid app build number for packaging.' >&2; exit 1 ;;
+esac
 mkdir -p build/releases
 stage_dir=$(mktemp -d "$repo_dir/build/releases/macos-local.XXXXXX")
 trap 'rm -rf "$stage_dir"' EXIT HUP INT TERM
@@ -25,6 +32,24 @@ local_app="$stage_dir/TallyBowl!.app"
 local_entitlements="$stage_dir/Local.entitlements"
 ditto "$source_app" "$local_app"
 cp macos/Runner/Release.entitlements "$local_entitlements"
+# Write before signing so the bundle seal covers the warning and exact policy.
+cat > "$local_app/Contents/Resources/TallyBowlBuild.json" <<EOF
+{
+  "app": "TallyBowl!",
+  "version": "$version",
+  "build": "$build",
+  "distribution": "owner-test-only",
+  "public_distribution_allowed": false,
+  "signing": "adhoc",
+  "notarized": false,
+  "hardened_runtime": true,
+  "library_validation": false,
+  "sandbox": true,
+  "get_task_allow": false,
+  "jit": false,
+  "warning": "OWNER TEST ONLY. DO NOT DISTRIBUTE. Library validation is disabled for local ad hoc Flutter frameworks; this is not a production-hardened distribution."
+}
+EOF
 # Ad hoc signatures have no Team ID. Hardened library validation rejects the
 # embedded ad hoc Flutter frameworks even when all signatures are valid. Relax
 # only this check in the local copy, retaining runtime/sandbox protections and
@@ -32,6 +57,7 @@ cp macos/Runner/Release.entitlements "$local_entitlements"
 /usr/libexec/PlistBuddy -c 'Add :com.apple.security.cs.disable-library-validation bool true' "$local_entitlements"
 codesign --force --sign - --options runtime --entitlements "$local_entitlements" "$local_app"
 codesign --verify --deep --strict "$local_app"
-archive="build/releases/TallyBowl-$version-macos.zip"
+archive="build/releases/TallyBowl-$version-macos-OWNER-TEST-ONLY.zip"
 ditto -c -k --sequesterRsrc --keepParent "$local_app" "$archive"
+echo 'WARNING: OWNER TEST ONLY. DO NOT DISTRIBUTE. Library validation is disabled.' >&2
 echo "Packaged local ad hoc build: $archive"
