@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../app_controller.dart';
 import '../domain/models.dart';
+import '../domain/journal_index.dart';
 import '../ui/common.dart';
 
 class InsightsPage extends StatefulWidget {
@@ -29,6 +30,7 @@ class _InsightsPageState extends State<InsightsPage> {
         .toList();
     final ids = sessions.map((s) => s.id).toSet();
     final games = data.games.where((g) => ids.contains(g.sessionId)).toList();
+    final journal = JournalIndex(sessions, games);
     final strikes = games.fold<int>(0, (n, g) => n + g.result.strikes);
     final spares = games.fold<int>(0, (n, g) => n + g.result.spares);
     final opportunities = games.fold<int>(
@@ -199,22 +201,12 @@ class _InsightsPageState extends State<InsightsPage> {
             subtitle: 'Visits count sessions with at least one saved game.',
             rows: [
               for (final a in data.alleys.where(
-                (a) => games.any(
-                  (g) => sessions.any(
-                    (s) => s.id == g.sessionId && s.alleyId == a.id,
-                  ),
-                ),
+                (a) => journal.gamesAtAlley(a.id).isNotEmpty,
               ))
                 (
                   a.name,
-                  '${sessions.where((s) => s.alleyId == a.id && games.any((g) => g.sessionId == s.id)).length} visits',
-                  games
-                      .where(
-                        (g) => sessions.any(
-                          (s) => s.id == g.sessionId && s.alleyId == a.id,
-                        ),
-                      )
-                      .toList(),
+                  '${journal.visitsAtAlley(a.id)} visits',
+                  journal.gamesAtAlley(a.id),
                 ),
             ],
           ),
@@ -224,12 +216,12 @@ class _InsightsPageState extends State<InsightsPage> {
             subtitle: 'Game-level tags overlap when several balls were used. Scores describe those games, not the contribution of a single ball.',
             rows: [
               for (final b in data.balls.where(
-                (b) => games.any((g) => g.ballIds.contains(b.id)),
+                (b) => journal.gamesWithBall(b.id).isNotEmpty,
               ))
                 (
                   b.name,
-                  '${games.where((g) => g.primaryBallId == b.id).length} primary',
-                  games.where((g) => g.ballIds.contains(b.id)).toList(),
+                  '${journal.gamesWithBall(b.id).where((g) => g.primaryBallId == b.id).length} primary',
+                  journal.gamesWithBall(b.id),
                 ),
             ],
           ),

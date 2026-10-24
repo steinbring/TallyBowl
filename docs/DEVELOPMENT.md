@@ -92,6 +92,8 @@ Run `flutter analyze` and `flutter test` for scoring, persistence/reopen, backup
 
 Run `./tool/verify_native.sh` to build Android debug, macOS release and iPad simulator debug targets and run Android Lint. Dart analysis cannot type-check the Kotlin/Swift bridges. Run `flutter test benchmark/journal_benchmark.dart` for the optional synthetic 10,000-game check; output is in `build/benchmarks/journal.json`.
 
+Run `flutter test benchmark/journal_widgets_benchmark.dart` for the optional 10,000-game/1,000-session view benchmark; output is in `build/benchmarks/journal-widgets.json`. It measures host widget-test timings without machine-dependent timing assertions. History opens with 50 sessions and offers additional pages; shared snapshot indexes group games for journal and comparison views.
+
 Run `flutter test integration_test/on_device_recognition_test.dart -d <device>` for native image recognition and local 1080-pixel-wide recap PNG generation. These checks use generated test content. They do not exercise physical cameras or send a recap to a recipient.
 
 The 27-finding first audit disposition is in [AUDIT_RESOLUTION.md](AUDIT_RESOLUTION.md). [AUDIT_ROUND2_RESOLUTION.md](AUDIT_ROUND2_RESOLUTION.md) covers the five follow-up findings, signing history and current verification. Release signing setup is documented in [ANDROID_SIGNING.md](ANDROID_SIGNING.md). The next owner-testing phase follows [DEVICE_TESTING.md](DEVICE_TESTING.md), beginning with the Samsung Galaxy Z Fold 8.

@@ -78,14 +78,15 @@ class SessionCard extends StatelessWidget {
     super.key,
     required this.session,
     required this.data,
+    required this.games,
     required this.onTap,
   });
   final BowlingSession session;
   final BowlData data;
+  final List<BowlingGame> games;
   final VoidCallback onTap;
   @override
   Widget build(BuildContext context) {
-    final games = data.sessionGames(session.id);
     final muted = Theme.of(context).colorScheme.onSurfaceVariant;
     return MergeSemantics(
       child: Card(
