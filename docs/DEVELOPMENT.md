@@ -1,6 +1,6 @@
 # TallyBowl! development status
 
-Updated October 23, 2026. Development build 0.1.1 (2) is intended for owner testing. Production distribution is not configured.
+Updated October 24, 2026. Development build 0.1.2 (3) is intended for owner testing. Production distribution is not configured.
 
 ## Feature branches
 
@@ -20,6 +20,12 @@ Features are committed on `codex/` branches and merged locally into `main`. The 
 | `codex/ball-suggestions` | Offline manufacturer/model suggestions and custom entries |
 | `codex/pretest-review-fixes` | Form retries, edit protection, incremental writes/migration, CSV/photo safeguards, camera lifecycle |
 | `codex/test-build-polish` | Native previews, matching launcher icons, coherent dialog colors, test build packaging |
+| `codex/audit-platform-verification` | Package-derived User-Agent, map credit configuration, hardened runtime, supported dropdown state, cache/catalog safeguards, native verification script |
+| `codex/audit-accessibility` | System dark appearance, large-text layouts, desktop rail, frame/chart semantics, golden and accessibility checks, extracted UI components |
+| `codex/audit-history-validation` | Indexed reference validation, one persisted validation pass, reproducible 10,000-game benchmark |
+| `codex/audit-photo-recovery` | Retained pending photo review before OCR, reopen/cancel tests, live narrow/wide editor resizing |
+| `codex/audit-macos-local-build` | Strict release entitlements plus an explicit, guarded ad hoc owner-package step |
+| `codex/audit-verification-report` | Independent disposition of all 27 external findings, physical-device checklist and refreshed local packages |
 
 The completed stack is integrated into local `main` after verification. Feature branches are retained. All work is local until explicitly pushed to the remote repository.
 
@@ -54,11 +60,11 @@ Still to implement or expand:
 - Production-capacity map/search hosting and optional nearby search. Name-and-city suggestions now use the documented Photon API; saved alleys and manual entry remain available offline.
 - Lane comparisons, more date filters, and more equipment comparison views.
 - Optional retained evidence photos, ball photos, alley merging, and richer session editing.
-- Signing/distribution setup, accessibility review at larger text scales, and performance evaluation with large histories. Branded launcher icons now reuse the in-app ball artwork.
+- Production signing/distribution setup and physical TalkBack/VoiceOver evaluation. Automated 200% text, theme, contrast, semantics and 10,000-game checks now pass. Branded launcher icons reuse the in-app ball artwork.
 
 ## Persistence and portability
 
-The database uses stable identifiers, foreign-key checks, and atomic incremental writes. Schema v2 adds explicit record positions and migrates v1 journals without changing their data. Serialized rows are compared before writing; a draft autosave leaves history tables untouched. The controller serializes writes so draft saves cannot overwrite newer game records, and the store advances its row cache only after commit. Snapshot validation/serialization still scales with journal size; profile large histories before further optimization.
+The database uses stable identifiers, foreign-key checks, and atomic incremental writes. Schema v2 adds explicit record positions and migrates v1 journals without changing their data. Serialized rows are compared before writing; a draft autosave leaves history tables untouched. The controller serializes writes so draft saves cannot overwrite newer game records, and the store advances its row cache only after commit. Reference validation uses indexed identifier lookups, and each persisted update validates once. Snapshot serialization still scales with journal size. The 10,000-game host benchmark observed draft updates fall from 245 ms to 76 ms after this optimization; this is not phone performance evidence. See AUDIT_RESOLUTION.md for measurements and reproduction.
 
 A confirmed history game must contain a valid, complete ten-frame sequence. Unfinished frames are stored separately as a draft and excluded from statistics. Only one session can be in progress. Balls and alleys can be retired/archived without losing referenced history.
 
@@ -70,33 +76,41 @@ CSV exports are for analysis rather than restoration. One file contains game met
 
 Scoreboard recognition is local. Apple uses Vision; Android links `com.google.mlkit:text-recognition:16.0.1` rather than the downloadable Play Services model. No app code sends photos or extracted scores to an AI service.
 
-The app copies selected photos into its private imports folder while reviewing a new game. A draft retains that photo locally. Saving or discarding the draft removes it; startup removes orphaned import files. Temporary share/export files are kept long enough for receiving apps and old files are cleaned when another export is created.
+The app copies selected photos into its private imports folder while reviewing a new game. A draft retains that photo locally **before** recognition/row selection begins. Interrupted pending review is reopened on launch; selected frames are persisted before opening the editor. Saving or discarding the draft removes it; startup removes orphaned import files. Temporary share/export files are kept long enough for receiving apps and old files are cleaned when another export is created.
 
-Maps contact the selected tile service. Explicit alley searches send only the entered query to Photon. Ball suggestions are offline. There is no background location collection, account, cloud synchronization, or public Nominatim integration. See [data sources](DATA_SOURCES.md) for endpoints, service policies, attribution, limits, caching and offline behavior. OSM attribution remains visible, a TallyBowl User-Agent identifies the app, built-in tile caching honors HTTP headers, and tile buffers are zero to avoid offscreen prefetch. Production hosting and its attribution/usage requirements remain release decisions.
+Maps contact the selected tile service. Explicit alley searches send only the entered query to Photon. Ball suggestions are offline. There is no background location collection, account, cloud synchronization, or public Nominatim integration. See [data sources](DATA_SOURCES.md) for endpoints, service policies, attribution, limits, caching and offline behavior. OSM attribution remains visible, a package-version-derived TallyBowl User-Agent identifies the app, built-in tile caching honors HTTP headers, and tile buffers are zero to avoid offscreen prefetch. Production hosting and its attribution/usage requirements remain release decisions.
 
 The canonical website address is `https://tallybowl.jws.app`, included in About, recap images, and map-service identification. This change does not create or deploy that website.
 
 ## Verification
 
-Run `flutter analyze` and `flutter test` for scoring, persistence/reopen, backup validation, CSV, parser, desktop/phone recording, draft recovery, conflicting totals, and recap privacy behavior.
+Run `flutter analyze` and `flutter test` for scoring, persistence/reopen, backup validation, CSV, parser, desktop/phone recording, pending-photo/draft recovery, conflicting totals, recap privacy/golden behavior, contrast, semantics, target sizes, dark/light appearance and layouts at 200% text.
+
+Run `./tool/verify_native.sh` to build Android debug, macOS release and iPad simulator debug targets and run Android Lint. Dart analysis cannot type-check the Kotlin/Swift bridges. Run `flutter test benchmark/journal_benchmark.dart` for the optional synthetic 10,000-game check; output is in `build/benchmarks/journal.json`.
 
 Run `flutter test integration_test/on_device_recognition_test.dart -d <device>` for native image recognition and local 1080-pixel-wide recap PNG generation. These checks use generated test content. They do not exercise physical cameras or send a recap to a recipient.
 
+The full 27-finding external audit disposition is in [AUDIT_RESOLUTION.md](AUDIT_RESOLUTION.md), including corrected audit claims and explicit production gates. The next owner-testing phase follows [DEVICE_TESTING.md](DEVICE_TESTING.md), beginning with the Samsung Galaxy Z Fold 8.
+
 Before release, test actual camera permission/capture flows, platform photo formats/orientations, native share destinations and file import/export, interrupted Android picking, and app lifecycle recovery on physical iPad and Android devices and supported Macs. A successful native build is not evidence that these hardware flows have been tested.
 
-## Verified build 0.1.1 (2) results
+## Verified build 0.1.2 (3) results
 
 | Check | Result |
 | --- | --- |
 | `flutter analyze` | No issues |
-| `flutter test` | 42 tests passed |
-| Native macOS integration | Recognition, 1080-pixel recap PNG, suggestion workflows and launcher rendering passed (4 checks) |
-| Native iPad simulator integration | Recognition, 1080-pixel recap PNG, suggestion workflows and launcher rendering passed (4 checks) |
-| `flutter build macos --release` | Built universal x86_64/arm64 app; tested on Apple silicon; signature verified |
+| `flutter test` | 65 tests passed |
+| Native macOS integration | Recognition, 1080-pixel recap PNG, suggestion workflows and launcher rendering passed (5 checks) |
+| Native iPad simulator integration | Recognition, 1080-pixel recap PNG, suggestion workflows and launcher rendering passed (5 checks) |
+| `flutter build macos --release` | Built universal x86_64/arm64 app with hardened runtime; strict signature verified |
 | `flutter build ios --simulator --debug --no-codesign` | Built |
 | `flutter build apk --debug` | Built |
+| Packaged owner Mac smoke launch | Extracted 0.1.2 archive launched on Apple silicon with hardened runtime/local library exception; strict signature and archive integrity passed |
+| Normal Android APK smoke launch | Installed/launched on the local emulator after rebuilding `lib/main.dart`; package version 0.1.2/code 3 and APK v2 signature verified |
+| Android Lint `:app:lintDebug` | Passed, 0 errors; 7 advisory warnings (Gradle update, redundant v21 resource folder, legacy square launcher silhouettes) |
+| Native Android emulator integration | Bundled ML Kit recognition, 1080-pixel recap, suggestions, dark-mode dashboard and artwork passed (5 checks) |
 
-The macOS landing screen, recap PNG, new suggestion dialogs and launcher artwork were visually inspected. Final dialog previews are in `build/previews/ball-suggestions.png` and `build/previews/alley-suggestions.png`. A sample recap is available locally at `build/previews/tallybowl-recap.png` after this session's checks; build artifacts are ignored by Git. Android recognition is compile-verified, with runtime device checks still outstanding. See the recognition limitations above; a labeled synthetic fixture is not a real-photo accuracy benchmark.
+The macOS landing screen, recap PNG, new suggestion dialogs and launcher artwork were visually inspected. Final dialog previews are in `build/previews/ball-suggestions.png` and `build/previews/alley-suggestions.png`. A sample recap is available locally at `build/previews/tallybowl-recap.png` after this session's checks; build artifacts are ignored by Git. Android native recognition also passed on a local ARM64 Android 17 / API 37 emulator with a 16 KiB-page system image. Physical Samsung camera/gallery/share and interruption checks remain outstanding. See the recognition limitations above; a labeled synthetic fixture is not a real-photo accuracy benchmark.
 
 
 ## Launcher artwork
@@ -108,21 +122,23 @@ flutter test integration_test/suggestions_preview_test.dart -d macos
 swift tool/generate_icons.swift <tallybowl-icon.png-path> <tallybowl-icon-mac.png-path>
 ```
 
-The generator uses Core Graphics/ImageIO, preserves transparency on macOS, and writes opaque iPad/Android icons at every configured size. Rebuild the normal `lib/main.dart` target after integration tests before packaging an app for installation.
+The generator uses Core Graphics/ImageIO, preserves transparency on macOS, and writes opaque iPad/Android icons at every configured size. Rebuild the normal `lib/main.dart` target after integration tests before packaging an app for installation. For the local Mac archive, run `./tool/package_macos_local.sh` after the release build.
 
 
 ## Install the local test build
 
-Version **0.1.1**, build **2**. These packages are generated locally and ignored by Git:
+Version **0.1.2**, build **3**. These packages are generated locally and ignored by Git:
 
 | Target | Local package | Installation |
 | --- | --- | --- |
-| macOS | `build/releases/TallyBowl-0.1.1-macos.zip` (about 20 MB) | Unzip, move `TallyBowl!.app` to Applications if desired, then open it. The app is a universal Intel/Apple silicon release build with an ad hoc signature, not a notarized distribution. |
-| Android | `build/releases/TallyBowl-0.1.1-android-debug.apk` (about 200 MB) | Transfer the APK to the device and open it, allowing installation from the selected source if Android prompts. This uses the local development key; release signing is not configured. |
+| macOS | `build/releases/TallyBowl-0.1.2-macos.zip` (about 20 MB) | Unzip, move `TallyBowl!.app` to Applications if desired, then open it. The app is a universal Intel/Apple silicon release build with an ad hoc signature and an explicit local library-validation exception; it is not a notarized distribution. |
+| Android | `build/releases/TallyBowl-0.1.2-android-debug.apk` (about 221 MB) | Transfer the APK to the device and open it, allowing installation from the selected source if Android prompts. This uses the local development key; release signing is not configured. |
 | iPad simulator | `build/ios/iphonesimulator/Runner.app` | Run `flutter run -d <simulator-id>` or install this app through the simulator tools. A simulator binary cannot be installed on a physical iPad. |
 
 For a physical iPad, select a development team and provisioning/signing setup in the iOS Runner project using Xcode, then run `flutter run -d <device-id>`. No physical-device IPA has been signed or exported.
 
-`build/releases/checksums.json` records SHA-256 values for the packaged Mac and Android builds. The Mac archive was built from the normal `lib/main.dart` entry point after integration testing; `codesign --verify --deep --strict` passed.
+The strict release build enables hardened runtime and disables Xcode's injected `get-task-allow`. Ad hoc apps/frameworks have no Team ID: the strict build failed the runtime library check during smoke launch. `tool/package_macos_local.sh` therefore signs a **copy** with only the local `disable-library-validation` exception, retaining sandbox/runtime protections and no JIT/debug entitlement. It refuses to change a team-signed app. Production entitlements retain library validation; proper Apple signing of the app and its embedded code, plus notarization, remains required.
 
-Start by adding a profile, a searched or manual alley, and balls from suggestions or custom names. Record a manual game, then try a real scoreboard photo and compare every frame. Finish the session, inspect the branded recap and try a share destination. Export a JSON backup before experimenting with restore. Physical camera/share workflows and Android recognition runtime are the key remaining device checks. See [review findings](REVIEW.md) for the full record.
+`build/releases/checksums.json` records SHA-256 values for the packaged Mac and Android builds. The Mac archive was built from the normal `lib/main.dart` entry point after integration testing, extracted and smoke-launched successfully; `codesign --verify --deep --strict` and ZIP integrity passed. Android APK v2 signature and package version/build were verified.
+
+Start by adding a profile, a searched or manual alley, and balls from suggestions or custom names. Record a manual game, then try a real scoreboard photo and compare every frame. Finish the session, inspect the branded recap and try a share destination. Export a JSON backup before experimenting with restore. Physical camera/share workflows, Android picker process recovery, TalkBack/VoiceOver and representative scoreboard recognition are the key remaining device checks. See [review findings](REVIEW.md) for the full record.
