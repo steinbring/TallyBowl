@@ -75,21 +75,20 @@ class _AlleyDialogState extends State<AlleyDialog> {
       _error = null;
     });
     try {
-      await widget.controller.saveAlley(
-        BowlingAlley(
-          id: _id,
-          name: _name.text.trim(),
-          address: _address.text.trim(),
-          notes: _notes.text.trim(),
-          latitude: _latitude,
-          longitude: _longitude,
-          osmId: _osmId,
-          retired: _retired,
-        ),
+      final saved = BowlingAlley(
+        id: _id,
+        name: _name.text.trim(),
+        address: _address.text.trim(),
+        notes: _notes.text.trim(),
+        latitude: _latitude,
+        longitude: _longitude,
+        osmId: _osmId,
+        retired: _retired,
       );
+      await widget.controller.saveAlley(saved);
       if (mounted) {
         setState(() => _saving = false);
-        Navigator.pop(context);
+        Navigator.pop(context, saved);
       }
     } catch (_) {
       if (mounted) {

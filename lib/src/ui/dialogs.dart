@@ -80,11 +80,11 @@ Future<void> editBall(
   builder: (_) => BallDialog(controller: controller, ball: ball),
 );
 
-Future<void> editAlley(
+Future<BowlingAlley?> editAlley(
   BuildContext context,
   BowlController controller, [
   BowlingAlley? alley,
-]) => showDialog<void>(
+]) => showDialog<BowlingAlley>(
   context: context,
   barrierDismissible: false,
   builder: (_) => AlleyDialog(controller: controller, alley: alley),
