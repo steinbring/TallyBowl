@@ -27,7 +27,7 @@ class TonightPage extends StatelessWidget {
     final session = controller.activeSession;
     final games = session == null
         ? <BowlingGame>[]
-        : data.sessionGames(session.id);
+        : controller.journal.gamesForSession(session.id);
     final name = data.profile.name;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -172,7 +172,7 @@ class TonightPage extends StatelessWidget {
             MetricCard(
               session == null ? 'Alleys visited' : 'Session total',
               session == null
-                  ? '${data.sessions.where((s) => data.sessionGames(s.id).isNotEmpty).map((s) => s.alleyId).toSet().length}'
+                  ? '${controller.journal.visitedAlleyCount}'
                   : '${games.fold<int>(0, (n, g) => n + g.score)}',
               session == null
                   ? 'With recorded games'
@@ -299,6 +299,7 @@ class TonightPage extends StatelessWidget {
               child: SessionCard(
                 session: s,
                 data: data,
+                games: controller.journal.gamesForSession(s.id),
                 onTap: () => showSession(context, controller, s),
               ),
             ),
@@ -317,7 +318,7 @@ Future<void> showSession(
     builder: (context) => ListenableBuilder(
       listenable: controller,
       builder: (context, _) {
-        final games = controller.data.sessionGames(session.id);
+        final games = controller.journal.gamesForSession(session.id);
         return Scaffold(
           appBar: AppBar(
             toolbarHeight: BowlLayout.toolbarHeight(context),
@@ -460,6 +461,8 @@ class HistoryPage extends StatefulWidget {
 class _HistoryPageState extends State<HistoryPage> {
   String query = '';
   bool? league;
+  static const _pageSize = 50;
+  int _visibleSessions = _pageSize;
   @override
   Widget build(BuildContext context) {
     final data = widget.controller.data;
@@ -484,7 +487,10 @@ class _HistoryPageState extends State<HistoryPage> {
             prefixIcon: Icon(Icons.search_rounded),
             hintText: 'Search alleys, leagues, dates…',
           ),
-          onChanged: (v) => setState(() => query = v),
+          onChanged: (v) => setState(() {
+            query = v;
+            _visibleSessions = _pageSize;
+          }),
         ),
         const SizedBox(height: 16),
         Wrap(
@@ -498,7 +504,10 @@ class _HistoryPageState extends State<HistoryPage> {
               ChoiceChip(
                 label: Text(item.$1),
                 selected: league == item.$2,
-                onSelected: (_) => setState(() => league = item.$2),
+                onSelected: (_) => setState(() {
+                  league = item.$2;
+                  _visibleSessions = _pageSize;
+                }),
               ),
           ],
         ),
@@ -513,15 +522,24 @@ class _HistoryPageState extends State<HistoryPage> {
                 ? 'Every session you record will find a home here.'
                 : 'Try a different search or session type.',
           ),
-        for (final s in sessions)
+        for (final s in sessions.take(_visibleSessions))
           Padding(
             padding: const EdgeInsets.only(bottom: 12),
             child: SessionCard(
               session: s,
               data: data,
+              games: widget.controller.journal.gamesForSession(s.id),
               onTap: () => showSession(context, widget.controller, s),
             ),
           ),
+        if (sessions.length > _visibleSessions) ...[
+          Text('Showing $_visibleSessions of ${sessions.length} sessions'),
+          const SizedBox(height: 8),
+          OutlinedButton(
+            onPressed: () => setState(() => _visibleSessions += _pageSize),
+            child: const Text('Show more sessions'),
+          ),
+        ],
       ],
     );
   }

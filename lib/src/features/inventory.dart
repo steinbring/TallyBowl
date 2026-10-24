@@ -53,9 +53,7 @@ class BagPage extends StatelessWidget {
                     child: Builder(
                       builder: (context) {
                         final ball = data.balls[i];
-                        final games = data.games
-                            .where((g) => g.ballIds.contains(ball.id))
-                            .toList();
+                        final games = controller.journal.gamesWithBall(ball.id);
                         final primary = games
                             .where((g) => g.primaryBallId == ball.id)
                             .length;
@@ -244,17 +242,8 @@ class AlleysPage extends StatelessWidget {
             padding: const EdgeInsets.only(bottom: 16),
             child: Builder(
               builder: (context) {
-                final sessions = data.sessions
-                    .where(
-                      (s) =>
-                          s.alleyId == alley.id &&
-                          data.sessionGames(s.id).isNotEmpty,
-                    )
-                    .toList();
-                final ids = sessions.map((s) => s.id).toSet();
-                final games = data.games
-                    .where((g) => ids.contains(g.sessionId))
-                    .toList();
+                final games = controller.journal.gamesAtAlley(alley.id);
+                final visits = controller.journal.visitsAtAlley(alley.id);
                 return Card(
                   child: Padding(
                     padding: const EdgeInsets.all(24),
@@ -309,7 +298,7 @@ class AlleysPage extends StatelessWidget {
                           runSpacing: 12,
                           children: [
                             Text(
-                              '${sessions.length} visits',
+                              '$visits visits',
                               style: const TextStyle(
                                 fontWeight: FontWeight.w700,
                               ),

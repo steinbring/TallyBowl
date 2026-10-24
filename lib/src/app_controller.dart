@@ -3,11 +3,20 @@ import 'package:uuid/uuid.dart';
 
 import 'data/bowl_store.dart';
 import 'domain/models.dart';
+import 'domain/journal_index.dart';
 
 class BowlController extends ChangeNotifier {
   BowlController(this.store, this.data);
   final BowlStore? store;
   BowlData data;
+  JournalIndex? _journal;
+  JournalIndex get journal {
+    if (_journal?.matches(data.sessions, data.games) != true) {
+      _journal = JournalIndex(data.sessions, data.games);
+    }
+    return _journal!;
+  }
+
   Future<void> _pending = Future.value();
   Object? _photoAcquisition;
   bool get isAcquiringPhoto => _photoAcquisition != null;
