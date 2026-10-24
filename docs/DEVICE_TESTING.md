@@ -1,16 +1,16 @@
-# Owner testing — build 0.1.3 (4)
+# Owner testing — build 0.1.4 (5)
 
-Start with the Samsung Galaxy Z Fold 8, then repeat the camera, import, sharing, and accessibility checks on a physical iPad and a supported Mac. Automated checks are described in [round-2 audit verification](AUDIT_ROUND2_RESOLUTION.md). This checklist is preparation; no physical phone has been installed or tested yet.
+Start with the Samsung Galaxy Z Fold 8, then repeat the camera, import, sharing, and accessibility checks on a physical iPad and a supported Mac. Current automated checks are described in [development status](DEVELOPMENT.md). This checklist is preparation; no physical phone has been installed or tested yet.
 
 ## Install and preserve data
 
 - Use the packaged **Android debug APK** for this first local test. Public/store release signing is a separate setup task.
 - If an earlier version contains bowling history, export a JSON backup first. Update in place with the same development signing key. A signature mismatch is a reason to inspect signing, not to uninstall and erase data automatically.
-- Confirm version 0.1.3/build 4 in the installed package. Initial installation/USB setup will be handled with the owner in the next step.
+- Confirm version 0.1.4/build 5 in the installed package. Initial installation/USB setup will be handled with the owner in the next step.
 
 ## First complete session
 
-- Add the bowler name and scoreboard aliases. Add an alley by name/city search, confirm its address, and select a map pin. Try a manual alley with networking disabled.
+- Add the bowler name and scoreboard aliases. Add an alley by name/city search, confirm its address, and select a map pin. Try a manual alley with networking disabled. Try Enter coordinates with the keyboard and TalkBack; save an existing search result from the map and confirm the map closes.
 - Add a ball from manufacturer/model suggestions, then a custom model. Add a second ball. Verify everything remains after closing/reopening.
 - Start practice or league, choose alley/lane, and record a manual game. Check a strike, spare, open frame, and valid tenth-frame fills against a known scorecard.
 - Tag both balls, select a primary ball, then untag it. Confirm the primary selection clears and another ball can be chosen.
@@ -35,7 +35,8 @@ Start with the Samsung Galaxy Z Fold 8, then repeat the camera, import, sharing,
 ## Recap and backups
 
 - Finish the session, inspect the branded image and privacy switches, then export to a local destination. Test the native share sheet and cancel it. Send to another person only when the owner chooses to do so.
-- Confirm the recap contains the correct date, scores, selected details, TallyBowl branding and tallybowl.jws.app, with no clipping or hidden private details.
+- Turn Date off and check that the exported attachment is named `tallybowl-recap.png`, with no date in the image.
+- Confirm the recap contains the correct scores, chosen details, TallyBowl branding and tallybowl.jws.app, with no clipping or hidden private details.
 - Export JSON and both CSV formats. Reopen the JSON on the same device, confirm replacement, and verify inventory, history and unfinished frames. Source photos are intentionally excluded from portable backups.
 - Verify the before-restore recovery action is available after reopening. Preserve the original export outside the app before experimenting with replacements.
 
