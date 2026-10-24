@@ -87,25 +87,35 @@ class _BowlShellState extends State<BowlShell> {
   Future<void> _recoverPhoto() async {
     try {
       final controller = widget.controller;
-      await PhotoService.cleanOrphans(
-        controller.data.draft?['sourcePath'] as String?,
+      String? reviewPath;
+      final release = await controller.reservePhotoAcquisition(
+        allowDraft: true,
       );
-      final session = controller.activeSession;
-      if (session == null) return;
-      if (controller.data.draft != null) {
-        if (controller.data.draft?['pendingPhotoReview'] == true && mounted) {
-          await recordOrResumeGame(context, controller, session);
-        }
-        return;
-      }
-      final recovered = await PhotoService.recover();
-      if (recovered != null && mounted) {
-        await importScorePhoto(
-          context,
-          controller,
-          session,
-          recoveredPath: recovered,
+      try {
+        // Startup cleanup and lost-picker recovery share the same reservation
+        // as a new capture, so cleanup cannot delete a concurrently retained file.
+        await PhotoService.cleanOrphans(
+          controller.data.draft?['sourcePath'] as String?,
         );
+        final session = controller.activeSession;
+        if (session == null) return;
+        if (controller.data.draft != null) {
+          if (controller.data.draft?['pendingPhotoReview'] == true) {
+            reviewPath = controller.data.draft?['sourcePath'] as String?;
+          }
+        } else {
+          final recovered = await PhotoService.recover();
+          if (recovered != null) {
+            await controller.beginPhotoReview(session.id, recovered);
+            reviewPath = recovered;
+          }
+        }
+      } finally {
+        release();
+      }
+      final session = controller.activeSession;
+      if (reviewPath != null && session != null && mounted) {
+        await recordOrResumeGame(context, controller, session);
       }
     } catch (_) {
       if (mounted) {

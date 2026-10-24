@@ -57,6 +57,9 @@ class _ProfileSettingsState extends State<ProfileSettings> {
   }
 
   Future<void> _restore() async {
+    if (widget.controller.isAcquiringPhoto) {
+      throw StateError('Finish or cancel the open photo picker first.');
+    }
     const type = XTypeGroup(
       label: 'TallyBowl backups',
       extensions: ['json'],
@@ -74,6 +77,9 @@ class _ProfileSettingsState extends State<ProfileSettings> {
       action: 'Restore backup',
     );
     if (!approved || !mounted) return;
+    if (widget.controller.isAcquiringPhoto) {
+      throw StateError('Finish or cancel the open photo picker first.');
+    }
     await BowlExports.safetyCopy(widget.controller.data);
     await widget.controller.restore(incoming);
     if (mounted) {

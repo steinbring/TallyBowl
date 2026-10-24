@@ -17,16 +17,22 @@ Future<void> openGameEditor(
   BowlingSession session, {
   BowlingGame? game,
   List<String>? initialFrames,
-}) => Navigator.of(context).push<void>(
-  MaterialPageRoute(
-    builder: (_) => GameEditor(
-      controller: controller,
-      session: session,
-      game: game,
-      initialFrames: initialFrames,
+}) async {
+  if (controller.isAcquiringPhoto) {
+    message(context, 'Finish or cancel the open photo picker first.');
+    return;
+  }
+  await Navigator.of(context).push<void>(
+    MaterialPageRoute(
+      builder: (_) => GameEditor(
+        controller: controller,
+        session: session,
+        game: game,
+        initialFrames: initialFrames,
+      ),
     ),
-  ),
-);
+  );
+}
 
 class GameEditor extends StatefulWidget {
   const GameEditor({

@@ -14,7 +14,11 @@ Future<void> recordOrResumeGame(
   BuildContext context,
   BowlController controller,
   BowlingSession session,
-) {
+) async {
+  if (controller.isAcquiringPhoto) {
+    message(context, 'Finish or cancel the open photo picker first.');
+    return;
+  }
   final draft = controller.data.draft;
   if (draft?['pendingPhotoReview'] == true &&
       draft?['sessionId'] == session.id &&
@@ -54,14 +58,22 @@ Future<void> importScorePhoto(
   }
   String? path;
   try {
-    path = recoveredPath ?? await PhotoService.pick(camera: camera);
-    if (path == null) return;
-    if (!context.mounted) {
-      return;
+    if (!resuming) {
+      final release = await controller.reservePhotoAcquisition(
+        sessionId: session.id,
+      );
+      try {
+        path = recoveredPath ?? await PhotoService.pick(camera: camera);
+        if (path == null || !context.mounted) return;
+        // Attach before releasing acquisition so finish/restore cannot race the
+        // transition from an external picker to a persisted review draft.
+        await controller.beginPhotoReview(session.id, path);
+      } finally {
+        release();
+      }
+    } else {
+      path = recoveredPath;
     }
-    // Save before OCR/row selection, not only after a row is accepted. The
-    // retained source now survives process death and launch orphan cleanup.
-    if (!resuming) await controller.beginPhotoReview(session.id, path);
     if (!context.mounted) return;
     final selection = await Navigator.of(context).push<PhotoSelection>(
       MaterialPageRoute(
@@ -153,12 +165,14 @@ class _PhotoCaptureActionsState extends State<PhotoCaptureActions> {
     runSpacing: 12,
     children: [
       FilledButton.icon(
-        onPressed: _busy ? null : () => _open(camera: true),
+        onPressed: _busy || widget.controller.isAcquiringPhoto
+            ? null
+            : () => _open(camera: true),
         icon: const Icon(Icons.photo_camera_outlined),
         label: const Text('Scan scoreboard'),
       ),
       OutlinedButton.icon(
-        onPressed: _busy ? null : _open,
+        onPressed: _busy || widget.controller.isAcquiringPhoto ? null : _open,
         icon: const Icon(Icons.photo_library_outlined),
         label: const Text('Import photo'),
       ),
