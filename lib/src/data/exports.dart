@@ -7,24 +7,41 @@ import 'package:flutter/material.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:uuid/uuid.dart';
 
 import '../domain/models.dart';
 import 'bowl_store.dart';
+import 'bounded_file.dart';
 
 abstract final class BowlExports {
+  static const maxBackupBytes = 100 * 1024 * 1024;
+  static Future<BowlData> readBackupFile(XFile file) async =>
+      BowlStore.readBackup(
+        utf8.decode(
+          await readBoundedFile(
+            file,
+            maxBytes: maxBackupBytes,
+            tooLargeMessage: 'Choose a backup smaller than 100 MB.',
+          ),
+        ),
+      );
   static Future<File> temporaryFile(String name, Uint8List bytes) async {
     final directory = await Directory(
       p.join((await getTemporaryDirectory()).path, 'tallybowl-exports'),
     ).create(recursive: true);
     final before = DateTime.now().subtract(const Duration(days: 1));
     await for (final entry in directory.list(followLinks: false)) {
-      if (entry is File && (await entry.stat()).modified.isBefore(before)) {
-        await entry.delete();
+      if ((entry is File || entry is Directory) &&
+          (await entry.stat()).modified.isBefore(before)) {
+        await entry.delete(recursive: true);
       }
     }
-    final file = File(
-      p.join(directory.path, '${DateTime.now().microsecondsSinceEpoch}-$name'),
-    );
+    // Isolate identical export names without exposing a timestamp in the name
+    // or relying on share plugins to override the name of an existing file.
+    final exportDirectory = await Directory(
+      p.join(directory.path, const Uuid().v4()),
+    ).create();
+    final file = File(p.join(exportDirectory.path, name));
     return file.writeAsBytes(bytes, flush: true);
   }
 
@@ -82,9 +99,7 @@ abstract final class BowlExports {
         'before-restore.json',
       ),
     );
-    return await file.exists()
-        ? BowlStore.readBackup(await file.readAsString())
-        : null;
+    return await file.exists() ? readBackupFile(XFile(file.path)) : null;
   }
 
   static String gameCsv(BowlData data) {

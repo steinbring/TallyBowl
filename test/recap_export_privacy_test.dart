@@ -1,0 +1,96 @@
+import 'dart:async';
+import 'dart:io';
+
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:path/path.dart' as p;
+import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
+import 'package:tallybowl/src/domain/models.dart';
+import 'package:tallybowl/src/features/session_share.dart';
+
+class _ExportPaths extends PathProviderPlatform {
+  _ExportPaths(this.path);
+  final String path;
+  @override
+  Future<String?> getTemporaryPath() async => path;
+}
+
+void main() {
+  testWidgets(
+    'hiding the date also hides it from the actual shared attachment name',
+    (tester) async {
+      await tester.runAsync(() async {
+        tester.view.physicalSize = const Size(1440, 2800);
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+        final directory = await Directory.systemTemp.createTemp(
+          'tallybowl-recap-privacy-',
+        );
+        final original = PathProviderPlatform.instance;
+        PathProviderPlatform.instance = _ExportPaths(directory.path);
+        addTearDown(() => PathProviderPlatform.instance = original);
+        addTearDown(() => directory.delete(recursive: true));
+        final shared = Completer<Map<dynamic, dynamic>>();
+        final dismissed = Completer<String>();
+        const channel = MethodChannel('dev.fluttercommunity.plus/share');
+        tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+          channel,
+          (call) {
+            shared.complete(call.arguments as Map);
+            return dismissed.future;
+          },
+        );
+        addTearDown(
+          () => tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+            channel,
+            null,
+          ),
+        );
+        final session = BowlingSession(
+          id: 's',
+          alleyId: 'a',
+          startedAt: DateTime(2026, 10, 23),
+        );
+        final data = BowlData(
+          alleys: const [BowlingAlley(id: 'a', name: 'Home lanes')],
+          sessions: [session],
+          games: [
+            BowlingGame(
+              id: 'g',
+              sessionId: 's',
+              frames: List.filled(10, '9-'),
+              createdAt: session.startedAt,
+            ),
+          ],
+        );
+        await tester.pumpWidget(
+          MaterialApp(
+            home: SessionSharePage(data: data, session: session),
+          ),
+        );
+        await tester.pumpAndSettle();
+        await tester.tap(find.widgetWithText(FilterChip, 'Date'));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('Share image'));
+        await tester.pump();
+        final args = await shared.future.timeout(const Duration(seconds: 10));
+        try {
+          final path = (args['paths'] as List).single as String;
+          expect(await File(path).exists(), isTrue);
+          expect(p.basename(path), 'tallybowl-recap.png');
+          expect(path, isNot(contains('2026-10-23')));
+          for (final chip in tester.widgetList<FilterChip>(
+            find.byType(FilterChip),
+          )) {
+            expect(chip.onSelected, isNull);
+          }
+        } finally {
+          dismissed.complete('');
+          await tester.pumpAndSettle();
+        }
+      });
+    },
+  );
+}

@@ -53,8 +53,9 @@ class _SessionSharePageState extends State<SessionSharePage> {
       final encoded = await image.toByteData(format: ui.ImageByteFormat.png);
       image.dispose();
       final bytes = encoded!.buffer.asUint8List();
-      final name =
-          'tallybowl-${widget.session.startedAt.toIso8601String().substring(0, 10)}.png';
+      final name = _showDate
+          ? 'tallybowl-${widget.session.startedAt.toIso8601String().substring(0, 10)}.png'
+          : 'tallybowl-recap.png';
       if (share) {
         final file = await BowlExports.temporaryFile(name, bytes);
         await SharePlus.instance.share(
@@ -103,106 +104,119 @@ class _SessionSharePageState extends State<SessionSharePage> {
   ].join('. ');
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(
-      toolbarHeight: BowlLayout.toolbarHeight(context),
-      title: const Text('Share your night'),
-    ),
-    body: SingleChildScrollView(
-      padding: const EdgeInsets.all(24),
-      child: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: BowlLayout.recapWidth),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const PageHeading(
-                'A night worth sharing.',
-                'Make it yours, then send a little bowling joy.',
-              ),
-              Wrap(
-                spacing: 10,
-                runSpacing: 8,
-                children: [
-                  FilterChip(
-                    label: const Text('Your name'),
-                    selected: _showName,
-                    onSelected: (v) => setState(() => _showName = v),
-                  ),
-                  FilterChip(
-                    label: const Text('Alley & lane'),
-                    selected: _showAlley,
-                    onSelected: (v) => setState(() => _showAlley = v),
-                  ),
-                  FilterChip(
-                    label: const Text('Balls used'),
-                    selected: _showBalls,
-                    onSelected: (v) => setState(() => _showBalls = v),
-                  ),
-                  FilterChip(
-                    label: const Text('Date'),
-                    selected: _showDate,
-                    onSelected: (v) => setState(() => _showDate = v),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 24),
-              Text(
-                _scoreSummary,
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-              const SizedBox(height: 16),
-              Semantics(
-                label: _detailsSummary,
-                image: true,
-                excludeSemantics: true,
-                child: Center(
-                  child: FittedBox(
-                    fit: BoxFit.scaleDown,
-                    child: RepaintBoundary(
-                      key: _imageKey,
-                      child: RecapCard(
-                        data: widget.data,
-                        session: widget.session,
-                        showName: _showName,
-                        showAlley: _showAlley,
-                        showBalls: _showBalls,
-                        showDate: _showDate,
+  Widget build(BuildContext context) => PopScope(
+    canPop: !_busy,
+    child: Scaffold(
+      appBar: AppBar(
+        toolbarHeight: BowlLayout.toolbarHeight(context),
+        title: const Text('Share your night'),
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(24),
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: BowlLayout.recapWidth),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const PageHeading(
+                  'A night worth sharing.',
+                  'Make it yours, then send a little bowling joy.',
+                ),
+                Wrap(
+                  spacing: 10,
+                  runSpacing: 8,
+                  children: [
+                    FilterChip(
+                      label: const Text('Your name'),
+                      selected: _showName,
+                      onSelected: _busy
+                          ? null
+                          : (v) => setState(() => _showName = v),
+                    ),
+                    FilterChip(
+                      label: const Text('Alley & lane'),
+                      selected: _showAlley,
+                      onSelected: _busy
+                          ? null
+                          : (v) => setState(() => _showAlley = v),
+                    ),
+                    FilterChip(
+                      label: const Text('Balls used'),
+                      selected: _showBalls,
+                      onSelected: _busy
+                          ? null
+                          : (v) => setState(() => _showBalls = v),
+                    ),
+                    FilterChip(
+                      label: const Text('Date'),
+                      selected: _showDate,
+                      onSelected: _busy
+                          ? null
+                          : (v) => setState(() => _showDate = v),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 24),
+                Text(
+                  _scoreSummary,
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                const SizedBox(height: 16),
+                Semantics(
+                  label: _detailsSummary,
+                  image: true,
+                  excludeSemantics: true,
+                  child: Center(
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: RepaintBoundary(
+                        key: _imageKey,
+                        child: RecapCard(
+                          data: widget.data,
+                          session: widget.session,
+                          showName: _showName,
+                          showAlley: _showAlley,
+                          showBalls: _showBalls,
+                          showDate: _showDate,
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 24),
-              Wrap(
-                spacing: 12,
-                runSpacing: 12,
-                children: [
-                  Builder(
-                    builder: (c) => FilledButton.icon(
-                      onPressed: _busy ? null : () => _export(c),
-                      icon: const Icon(Icons.ios_share_rounded),
-                      label: Text(_busy ? 'Creating image…' : 'Share image'),
+                const SizedBox(height: 24),
+                Wrap(
+                  spacing: 12,
+                  runSpacing: 12,
+                  children: [
+                    Builder(
+                      builder: (c) => FilledButton.icon(
+                        onPressed: _busy ? null : () => _export(c),
+                        icon: const Icon(Icons.ios_share_rounded),
+                        label: Text(_busy ? 'Creating image…' : 'Share image'),
+                      ),
                     ),
-                  ),
-                  Builder(
-                    builder: (c) => OutlinedButton.icon(
-                      onPressed: _busy ? null : () => _export(c, share: false),
-                      icon: const Icon(Icons.download_outlined),
-                      label: const Text('Export image'),
+                    Builder(
+                      builder: (c) => OutlinedButton.icon(
+                        onPressed: _busy
+                            ? null
+                            : () => _export(c, share: false),
+                        icon: const Icon(Icons.download_outlined),
+                        label: const Text('Export image'),
+                      ),
                     ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              Text(
-                'Only this recap is shared. Your original photo and other bowlers are never included.',
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  fontSize: 12,
+                  ],
                 ),
-              ),
-            ],
+                const SizedBox(height: 16),
+                Text(
+                  'Only this recap is shared. Your original photo and other bowlers are never included.',
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    fontSize: 12,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
