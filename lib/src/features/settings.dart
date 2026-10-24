@@ -65,10 +65,7 @@ class _ProfileSettingsState extends State<ProfileSettings> {
     );
     final file = await openFile(acceptedTypeGroups: [type]);
     if (file == null) return;
-    if (await file.length() > 100 * 1024 * 1024) {
-      throw const FormatException('Choose a backup smaller than 100 MB.');
-    }
-    final incoming = BowlStore.readBackup(await file.readAsString());
+    final incoming = await BowlExports.readBackupFile(file);
     if (!mounted) return;
     final approved = await confirm(
       context,

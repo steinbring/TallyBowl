@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:crypto/crypto.dart';
 import 'package:file_selector/file_selector.dart';
@@ -8,6 +7,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
+import '../data/bounded_file.dart';
 import 'score_parser.dart';
 
 abstract final class PhotoService {
@@ -28,19 +28,11 @@ abstract final class PhotoService {
 
   /// Check before allocating, and cap the stream too in case a file changes
   /// after its size was checked. macOS files are not resized by image_picker.
-  static Future<Uint8List> readPhoto(XFile file) async {
-    if (await file.length() > maxPhotoBytes) {
-      throw const FormatException('Choose a photo smaller than 40 MB.');
-    }
-    final bytes = BytesBuilder(copy: false);
-    await for (final chunk in file.openRead()) {
-      if (bytes.length + chunk.length > maxPhotoBytes) {
-        throw const FormatException('Choose a photo smaller than 40 MB.');
-      }
-      bytes.add(chunk);
-    }
-    return bytes.takeBytes();
-  }
+  static Future<Uint8List> readPhoto(XFile file) => readBoundedFile(
+    file,
+    maxBytes: maxPhotoBytes,
+    tooLargeMessage: 'Choose a photo smaller than 40 MB.',
+  );
 
   static Future<String?> pick({required bool camera}) async {
     if (Platform.isMacOS && camera) {
