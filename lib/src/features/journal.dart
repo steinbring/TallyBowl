@@ -92,9 +92,15 @@ class TonightPage extends StatelessWidget {
                           backgroundColor: const Color(0xFFFFAC8A),
                           foregroundColor: BowlColors.ink,
                         ),
-                        onPressed: () => session == null
-                            ? startSession(context, controller)
-                            : recordOrResumeGame(context, controller, session),
+                        onPressed: controller.isAcquiringPhoto
+                            ? null
+                            : () => session == null
+                                  ? startSession(context, controller)
+                                  : recordOrResumeGame(
+                                      context,
+                                      controller,
+                                      session,
+                                    ),
                         icon: Icon(
                           session == null
                               ? Icons.add_rounded
@@ -187,29 +193,35 @@ class TonightPage extends StatelessWidget {
                     ?.copyWith(fontWeight: FontWeight.w800),
               ),
               OutlinedButton.icon(
-                onPressed: () async {
-                  if (data.draft?['sessionId'] == session.id) {
-                    message(
-                      context,
-                      'Save or discard your unfinished game first.',
-                    );
-                    return;
-                  }
-                  if (await confirm(
-                        context,
-                        'Wrap up this session?',
-                        'Your games stay editable in History.',
-                        action: 'Finish session',
-                      ) &&
-                      context.mounted) {
-                    await safely(context, () async {
-                      await controller.finishSession(session.id);
-                      if (context.mounted && games.isNotEmpty) {
-                        await openSessionShare(context, controller, session);
-                      }
-                    });
-                  }
-                },
+                onPressed: controller.isAcquiringPhoto
+                    ? null
+                    : () async {
+                        if (data.draft?['sessionId'] == session.id) {
+                          message(
+                            context,
+                            'Save or discard your unfinished game first.',
+                          );
+                          return;
+                        }
+                        if (await confirm(
+                              context,
+                              'Wrap up this session?',
+                              'Your games stay editable in History.',
+                              action: 'Finish session',
+                            ) &&
+                            context.mounted) {
+                          await safely(context, () async {
+                            await controller.finishSession(session.id);
+                            if (context.mounted && games.isNotEmpty) {
+                              await openSessionShare(
+                                context,
+                                controller,
+                                session,
+                              );
+                            }
+                          });
+                        }
+                      },
                 icon: const Icon(Icons.flag_outlined),
                 label: const Text('Finish session'),
               ),

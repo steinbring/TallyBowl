@@ -9,6 +9,50 @@ class BowlController extends ChangeNotifier {
   final BowlStore? store;
   BowlData data;
   Future<void> _pending = Future.value();
+  Object? _photoAcquisition;
+  bool get isAcquiringPhoto => _photoAcquisition != null;
+
+  /// Reserve acquisition before showing an external picker/nonmodal camera.
+  /// Earlier writes finish first; later conflicting actions cannot invalidate
+  /// the session. The returned release belongs only to this reservation.
+  Future<VoidCallback> reservePhotoAcquisition({
+    String? sessionId,
+    bool allowDraft = false,
+  }) async {
+    if (isAcquiringPhoto) {
+      throw StateError('Finish or cancel the open photo picker first.');
+    }
+    final token = Object();
+    _photoAcquisition = token;
+    notifyListeners();
+    void release() {
+      if (identical(_photoAcquisition, token)) {
+        _photoAcquisition = null;
+        notifyListeners();
+      }
+    }
+
+    try {
+      await _pending;
+      if ((sessionId != null && activeSession?.id != sessionId) ||
+          (!allowDraft && data.draft != null)) {
+        throw StateError(
+          'Resume your unfinished game or select the current session first.',
+        );
+      }
+      return release;
+    } catch (_) {
+      release();
+      rethrow;
+    }
+  }
+
+  Future<void> _updateJournal(BowlData Function(BowlData) change) =>
+      isAcquiringPhoto
+      ? Future.error(
+          StateError('Finish or cancel the open photo picker first.'),
+        )
+      : update(change);
   static const _uuid = Uuid();
   String newId() => _uuid.v4();
   static Future<BowlController> open() async {
@@ -57,22 +101,22 @@ class BowlController extends ChangeNotifier {
           : [...d.alleys, alley],
     ),
   );
-  Future<void> startSession(BowlingSession session) => update((d) {
+  Future<void> startSession(BowlingSession session) => _updateJournal((d) {
     if (d.sessions.any((s) => !s.finished)) {
       throw StateError('Finish your current session first.');
     }
     return d.copyWith(sessions: [...d.sessions, session]);
   });
-  Future<void> finishSession(String id) => update(
+  Future<void> finishSession(String id) => _updateJournal(
     (d) => d.copyWith(
       sessions: [for (final s in d.sessions) s.id == id ? s.finish() : s],
     ),
   );
   Future<void> saveDraft(Map<String, dynamic> draft) =>
-      update((d) => d.copyWith(draft: draft));
+      _updateJournal((d) => d.copyWith(draft: draft));
   Future<void> beginPhotoReview(String sessionId, String sourcePath) =>
       update((d) {
-        if (d.draft != null) {
+        if (d.draft != null || activeSession?.id != sessionId) {
           throw StateError('Resume or discard your unfinished game first.');
         }
         return d.copyWith(
@@ -84,8 +128,9 @@ class BowlController extends ChangeNotifier {
           },
         );
       });
-  Future<void> discardDraft() => update((d) => d.copyWith(clearDraft: true));
-  Future<void> saveGame(BowlingGame game) => update((d) {
+  Future<void> discardDraft() =>
+      _updateJournal((d) => d.copyWith(clearDraft: true));
+  Future<void> saveGame(BowlingGame game) => _updateJournal((d) {
     final isNew = !d.games.any((g) => g.id == game.id);
     return d.copyWith(
       games: isNew
@@ -94,8 +139,8 @@ class BowlController extends ChangeNotifier {
       clearDraft: isNew && d.draft?['sessionId'] == game.sessionId,
     );
   });
-  Future<void> deleteGame(String id) => update(
+  Future<void> deleteGame(String id) => _updateJournal(
     (d) => d.copyWith(games: d.games.where((g) => g.id != id).toList()),
   );
-  Future<void> restore(BowlData restored) => update((_) => restored);
+  Future<void> restore(BowlData restored) => _updateJournal((_) => restored);
 }
