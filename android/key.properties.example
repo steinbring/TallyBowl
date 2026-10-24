@@ -1,0 +1,7 @@
+# Copy to android/key.properties and replace every placeholder.
+# Keep the real properties file and upload keystore private and backed up.
+# Relative storeFile paths resolve from android/, not android/app/.
+storeFile=/absolute/path/to/tallybowl-upload.jks
+storePassword=REPLACE_WITH_STORE_PASSWORD
+keyAlias=upload
+keyPassword=REPLACE_WITH_KEY_PASSWORD
