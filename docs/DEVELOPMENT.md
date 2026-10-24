@@ -149,7 +149,7 @@ Version **0.1.3**, build **4**. These packages are generated locally and ignored
 | Target | Local package | Installation |
 | --- | --- | --- |
 | macOS | `build/releases/TallyBowl-0.1.3-macos-OWNER-TEST-ONLY.zip` (about 20 MB) | Unzip, move `TallyBowl!.app` to Applications if desired, then open it. The app is a universal Intel/Apple silicon release build with an ad hoc signature and an explicit local library-validation exception; it is not a notarized distribution. |
-| Android | `build/releases/TallyBowl-0.1.3-android-debug.apk` (about 221 MB) | Transfer the APK to the device and open it, allowing installation from the selected source if Android prompts. This uses the local development key. Production releases use explicit protected key properties; missing credentials stop release builds. |
+| Android | `build/releases/TallyBowl-0.1.3-android-debug.apk` (about 200 MB) | Transfer the APK to the device and open it, allowing installation from the selected source if Android prompts. This uses the local development key. Production releases use explicit protected key properties; missing credentials stop release builds. |
 | iPad simulator | `build/ios/iphonesimulator/Runner.app` | Run `flutter run -d <simulator-id>` or install this app through the simulator tools. A simulator binary cannot be installed on a physical iPad. |
 
 For a physical iPad, select a development team and provisioning/signing setup in the iOS Runner project using Xcode, then run `flutter run -d <device-id>`. No physical-device IPA has been signed or exported.
