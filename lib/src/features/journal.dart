@@ -94,7 +94,7 @@ class TonightPage extends StatelessWidget {
                         ),
                         onPressed: () => session == null
                             ? startSession(context, controller)
-                            : openGameEditor(context, controller, session),
+                            : recordOrResumeGame(context, controller, session),
                         icon: Icon(
                           session == null
                               ? Icons.add_rounded
@@ -111,7 +111,7 @@ class TonightPage extends StatelessWidget {
                     ],
                   ),
                 ),
-                if (c.maxWidth > 600) ...[
+                if (c.maxWidth > BowlLayout.heroArtWidth) ...[
                   const SizedBox(width: 32),
                   Transform.rotate(
                     angle: -.22,
@@ -324,7 +324,9 @@ Future<void> showSession(
             padding: const EdgeInsets.all(24),
             child: Center(
               child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 1000),
+                constraints: const BoxConstraints(
+                  maxWidth: BowlLayout.editorWidth,
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [

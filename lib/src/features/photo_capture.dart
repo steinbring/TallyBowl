@@ -10,14 +10,42 @@ import '../ui/common.dart';
 import 'game_editor.dart';
 import '../ui/score_photo_preview.dart';
 
+Future<void> recordOrResumeGame(
+  BuildContext context,
+  BowlController controller,
+  BowlingSession session,
+) {
+  final draft = controller.data.draft;
+  if (draft?['pendingPhotoReview'] == true &&
+      draft?['sessionId'] == session.id &&
+      draft?['sourcePath'] is String) {
+    return importScorePhoto(
+      context,
+      controller,
+      session,
+      recoveredPath: draft!['sourcePath'] as String,
+      resumePendingReview: true,
+    );
+  }
+  return openGameEditor(context, controller, session);
+}
+
 Future<void> importScorePhoto(
   BuildContext context,
   BowlController controller,
   BowlingSession session, {
   bool camera = false,
   String? recoveredPath,
+  bool resumePendingReview = false,
 }) async {
-  if (controller.data.draft != null) {
+  final draft = controller.data.draft;
+  final resuming =
+      resumePendingReview &&
+      draft?['pendingPhotoReview'] == true &&
+      draft?['sessionId'] == session.id &&
+      recoveredPath != null &&
+      draft?['sourcePath'] == recoveredPath;
+  if (draft != null && !resuming) {
     message(
       context,
       'Save or discard your unfinished game before importing another photo.',
@@ -29,9 +57,12 @@ Future<void> importScorePhoto(
     path = recoveredPath ?? await PhotoService.pick(camera: camera);
     if (path == null) return;
     if (!context.mounted) {
-      await PhotoService.remove(path);
       return;
     }
+    // Save before OCR/row selection, not only after a row is accepted. The
+    // retained source now survives process death and launch orphan cleanup.
+    if (!resuming) await controller.beginPhotoReview(session.id, path);
+    if (!context.mounted) return;
     final selection = await Navigator.of(context).push<PhotoSelection>(
       MaterialPageRoute(
         builder: (_) => PhotoReviewPage(
@@ -41,8 +72,26 @@ Future<void> importScorePhoto(
         ),
       ),
     );
-    if (selection != null && context.mounted) {
+    if (!context.mounted) {
+      return; // Keep the pending review for the next launch.
+    }
+    if (selection == null) {
+      if (controller.data.draft?['sourcePath'] == path &&
+          controller.data.draft?['pendingPhotoReview'] == true) {
+        await controller.discardDraft();
+      }
+      return;
+    }
+    if (context.mounted) {
       final row = selection.row;
+      await controller.saveDraft({
+        'sessionId': session.id,
+        'frames': row?.frames ?? List.filled(10, ''),
+        'sourcePath': path,
+        'sourceLabel': row?.text,
+        'displayedTotal': row?.displayedTotal,
+      });
+      if (!context.mounted) return;
       await Navigator.of(context).push<void>(
         MaterialPageRoute(
           builder: (_) => GameEditor(
@@ -161,7 +210,7 @@ class _PhotoReviewPageState extends State<PhotoReviewPage> {
       padding: const EdgeInsets.all(24),
       child: Center(
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 1000),
+          constraints: const BoxConstraints(maxWidth: BowlLayout.editorWidth),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [

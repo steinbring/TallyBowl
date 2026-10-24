@@ -113,7 +113,9 @@ class _ProfileSettingsState extends State<ProfileSettings> {
         padding: const EdgeInsets.all(24),
         child: Center(
           child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 800),
+            constraints: const BoxConstraints(
+              maxWidth: BowlLayout.settingsWidth,
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [

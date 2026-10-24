@@ -91,7 +91,13 @@ class _BowlShellState extends State<BowlShell> {
         controller.data.draft?['sourcePath'] as String?,
       );
       final session = controller.activeSession;
-      if (session == null || controller.data.draft != null) return;
+      if (session == null) return;
+      if (controller.data.draft != null) {
+        if (controller.data.draft?['pendingPhotoReview'] == true && mounted) {
+          await recordOrResumeGame(context, controller, session);
+        }
+        return;
+      }
       final recovered = await PhotoService.recover();
       if (recovered != null && mounted) {
         await importScorePhoto(
