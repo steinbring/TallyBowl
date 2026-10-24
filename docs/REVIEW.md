@@ -1,6 +1,6 @@
 # Pre-test review — October 23, 2026
 
-This is the original pre-test review. See [the October 24 external audit verification](AUDIT_RESOLUTION.md) for the current 27-finding disposition and build 0.1.2 checks. Counts and limits below describe build 0.1.1.
+This is the original pre-test review. See [the October 24 external audit verification](AUDIT_RESOLUTION.md) for the 27-finding disposition and build 0.1.2 checks, and [round-2 verification](AUDIT_ROUND2_RESOLUTION.md) for build 0.1.3. Counts and limits below describe build 0.1.1.
 
 Reviewed the Flutter screens, navigation, forms, scoring/parser, persistence, exports, photo lifecycle, native recognition/camera bridge, platform permissions, and new suggestion services.
 
