@@ -70,6 +70,20 @@ class BowlController extends ChangeNotifier {
   );
   Future<void> saveDraft(Map<String, dynamic> draft) =>
       update((d) => d.copyWith(draft: draft));
+  Future<void> beginPhotoReview(String sessionId, String sourcePath) =>
+      update((d) {
+        if (d.draft != null) {
+          throw StateError('Resume or discard your unfinished game first.');
+        }
+        return d.copyWith(
+          draft: {
+            'sessionId': sessionId,
+            'frames': List.filled(10, ''),
+            'sourcePath': sourcePath,
+            'pendingPhotoReview': true,
+          },
+        );
+      });
   Future<void> discardDraft() => update((d) => d.copyWith(clearDraft: true));
   Future<void> saveGame(BowlingGame game) => update((d) {
     final isNew = !d.games.any((g) => g.id == game.id);

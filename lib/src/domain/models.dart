@@ -309,6 +309,8 @@ class BowlData {
       final d = draft!;
       final tags = d['ballIds'] ?? <String>[];
       if ((d['lane'] != null && d['lane'] is! String) ||
+          (d['pendingPhotoReview'] != null &&
+              d['pendingPhotoReview'] is! bool) ||
           (d['notes'] != null && d['notes'] is! String) ||
           (d['sourceLabel'] != null && d['sourceLabel'] is! String) ||
           (d['sourcePath'] != null && d['sourcePath'] is! String) ||

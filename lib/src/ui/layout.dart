@@ -6,6 +6,9 @@ abstract final class BowlLayout {
   static const dashboardWidth = 1200.0;
   static const editorWidth = 1000.0;
   static const recapWidth = 900.0;
+  static const settingsWidth = 800.0;
+  static const heroArtWidth = 600.0;
+  static const summaryRowWidth = 420.0;
 
   static double toolbarHeight(BuildContext context) =>
       56 * (MediaQuery.textScalerOf(context).scale(16) / 16).clamp(1.0, 2.0);

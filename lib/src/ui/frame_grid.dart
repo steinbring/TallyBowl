@@ -90,7 +90,7 @@ class ScoringSummary extends StatelessWidget {
           child: LayoutBuilder(
             builder: (context, c) {
               final scale = MediaQuery.textScalerOf(context).scale(16) / 16;
-              return c.maxWidth < 420 * scale
+              return c.maxWidth < BowlLayout.summaryRowWidth * scale
                   ? Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [

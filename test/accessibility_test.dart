@@ -221,4 +221,58 @@ void main() {
     await expectLater(tester, meetsGuideline(androidTapTargetGuideline));
     semantics.dispose();
   });
+  testWidgets('in-progress frames survive cover-to-unfolded window resizing', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(360, 800);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    final controller = accessibleJournal();
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: tallyBowlTheme,
+        home: GameEditor(
+          controller: controller,
+          session: controller.activeSession!,
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byKey(const ValueKey('frame-0')), 'X');
+    await tester.pumpAndSettle();
+    tester.view.physicalSize = const Size(840, 900);
+    await tester.pumpAndSettle();
+    expect(
+      tester
+          .widget<TextField>(find.byKey(const ValueKey('frame-0')))
+          .controller!
+          .text,
+      'X',
+    );
+    await tester.enterText(find.byKey(const ValueKey('frame-1')), '9/');
+    await tester.pumpAndSettle();
+    tester.view.physicalSize = const Size(360, 800);
+    await tester.pumpAndSettle();
+    expect(
+      tester
+          .widget<TextField>(find.byKey(const ValueKey('frame-0')))
+          .controller!
+          .text,
+      'X',
+    );
+    expect(
+      tester
+          .widget<TextField>(find.byKey(const ValueKey('frame-1')))
+          .controller!
+          .text,
+      '9/',
+    );
+    expect(controller.data.draft!['frames'], [
+      'X',
+      '9/',
+      ...List.filled(8, ''),
+    ]);
+    expect(tester.takeException(), isNull);
+  });
 }

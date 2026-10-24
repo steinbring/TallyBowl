@@ -161,7 +161,8 @@ class BowlStore {
     final document = data.toJson();
     if (data.draft != null) {
       document['draft'] = Map<String, dynamic>.from(data.draft!)
-        ..remove('sourcePath');
+        ..remove('sourcePath')
+        ..remove('pendingPhotoReview');
     }
     return const JsonEncoder.withIndent('  ').convert({
       'format': 'tallybowl',
@@ -180,7 +181,8 @@ class BowlStore {
       final document = Map<String, dynamic>.from(envelope['data'] as Map);
       if (document['draft'] is Map) {
         document['draft'] = Map<String, dynamic>.from(document['draft'] as Map)
-          ..remove('sourcePath');
+          ..remove('sourcePath')
+          ..remove('pendingPhotoReview');
       }
       return BowlData.fromJson(document);
     } on FormatException {
