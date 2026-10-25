@@ -94,4 +94,5 @@ flutter {
 // Bundled model: recognition is available without downloading a model.
 dependencies {
     implementation("com.google.mlkit:text-recognition:16.0.1")
+    implementation("androidx.exifinterface:exifinterface:1.4.2")
 }
