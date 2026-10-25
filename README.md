@@ -2,7 +2,7 @@
 
 **How you bowled, tonight.** A Flutter bowling journal for native macOS, iPadOS, and Android. Planned website: [tallybowl.jws.app](https://tallybowl.jws.app).
 
-The beta candidate is **0.1.7 (8)**, developed and published by **Joe Steinbring**. [Contact Joe for support](https://jws.dev/contact). Owner build 0.1.7 (8) is installed on the Mac, iPad, and Samsung. TestFlight account setup, the hosted privacy page, distribution signing, and physical Apple acceptance checks are tracked in [TestFlight readiness](docs/TESTFLIGHT.md). A passing local build does not establish that an upload or Apple review has passed.
+The beta candidate is **0.1.7 (8)**, developed and published by **Joe Steinbring**. [Contact Joe for support](https://jws.dev/contact). Owner build 0.1.7 (8) is installed on the Mac, iPad, and Samsung. Signed iPad and native Mac builds have been uploaded to App Store Connect app **6826931962**. Processing, owner-group availability, the hosted privacy page, and physical Apple acceptance checks are tracked in [TestFlight readiness](docs/TESTFLIGHT.md). An upload does not establish that Apple review or a TestFlight installation has passed.
 
 ## What works
 

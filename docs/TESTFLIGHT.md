@@ -1,6 +1,6 @@
 # TestFlight readiness and release runbook
 
-Assessed October 25, 2026. Candidate **0.1.7 (8)**, bundle ID **app.jws.tallybowl**, existing Apple team **R9DBX89RA5**. Owner build **0.1.7 (8)** is installed on the Mac, iPad, and Samsung. No TestFlight build has been uploaded or approved by this preparation work.
+Assessed October 25, 2026. Candidate **0.1.7 (8)**, bundle ID **app.jws.tallybowl**, existing Apple team **R9DBX89RA5**. Owner build **0.1.7 (8)** is installed on the Mac, iPad, and Samsung. Both platform builds were signed for App Store distribution and uploaded successfully on October 25, 2026. Apple processing, export compliance and tester availability are tracked below; an upload is not a completed installation.
 
 ## Readiness decision
 
@@ -14,9 +14,9 @@ The source is prepared for a **small internal owner beta**, subject to account, 
 | Release protection | Mac sandbox/hardened runtime retained; owner ad hoc library exception is excluded from TestFlight packaging |
 | Public developer/support | **Complete:** owner-approved Joe Steinbring and https://jws.dev/contact; verified HTTP 200 and the actual contact page on October 25, 2026. Bundled policy/help and beta metadata use this contact |
 | Privacy website | **Open:** planned home and `/privacy` on `tallybowl.jws.app` fail DNS lookup on this Mac. Publish `PRIVACY_POLICY.md`; a separate TallyBowl `/support` page is no longer required for the selected public contact |
-| Apple account and app records | **Not verified:** active program/team access, agreements, app record with iOS and macOS platforms, bundle registration, roles and App Store signing/profiles. Local machine currently has an Apple Development identity; this does not rule out Xcode cloud-managed distribution signing |
+| Apple account and app records | **Verified:** explicit bundle registration and App Store Connect app **6826931962**, with iOS and native macOS platforms, team **R9DBX89RA5**. Xcode automatic distribution signing/export succeeded |
 | Store privacy/export answers | **Open:** provider retention/privacy review and export questionnaire against final libraries; see below |
-| Upload and Apple validation | **Not performed:** Organizer validation, App Store Connect export/upload, processed build, selected internal group, accepted TestFlight install |
+| Upload and Apple validation | **Uploaded:** iPad and Mac **0.1.7 (8)**; both Xcode uploads ended `EXPORT SUCCEEDED`. iPad processing reached **Missing Compliance**. Internal **Owner testing** group contains only the owner, with manual build distribution. Build assignment and TestFlight installation remain pending |
 | Physical Apple workflows | **Open for this candidate:** iPad camera/import, denied permission recovery, offline recognition, correct populated frames, popover sharing to real recipients, VoiceOver, backup/restore, upgrade/migration and interruption; repeat critical flows on native Mac |
 | Recognition breadth | One real monitor regression plus synthetic fixtures; expand the permissioned corpus during internal beta. No broad accuracy claim |
 | External beta | After internal acceptance: beta metadata/contact and Apple's review, invited group, support process and service-capacity/privacy decision. This preparation does not invite anyone |
@@ -29,17 +29,44 @@ Verified against candidate **0.1.7 (8)** on October 25, 2026:
 | --- | --- |
 | Static analysis | No issues in `lib` and `test` |
 | Unit/widget suite | **105 passed**, including real bundled help/privacy navigation, installed build display, narrow 200% text and document heading semantics |
-| iPad Release archive | `flutter build ipa --release --no-codesign --target lib/main.dart` passed; version/build/ID/minimum iPadOS 15.0 validated; placeholder launch warning resolved; no signed IPA exported |
+| iPad Release archive | `flutter build ipa --release --no-codesign --target lib/main.dart` passed; version/build/ID/minimum iPadOS 15.0 validated; placeholder launch warning resolved; no signed IPA exported during the initial rehearsal; a later signed export/upload is recorded below |
 | Native Mac Release build/archive | Both passed; universal arm64/x86_64; minimum macOS 12.0; Sports category present. Signing was disabled for the archive rehearsal; linker ad hoc metadata has no distribution Team ID |
 | Archive contents | Both contain the app-owned privacy manifest matching source, identical bundled help/policy, and dSYMs; no sealed owner-only package marker |
 | Local preflight | Source and both archive checks passed. JSON: `build/readiness/local-preflight.json` |
 | Android compatibility | Normal-entry-point debug APK compiled; native Lint passed with 0 errors and 10 advisory warnings (existing dependency/SDK, launcher shape and Kotlin-style notices) |
 | Public URL check | Support contact **passed** at `https://jws.dev/contact`; planned `https://tallybowl.jws.app/privacy` **still fails DNS**. JSON: `build/readiness/public-url-check.json` |
 | Final public contact update | Joe Steinbring and the approved support link are in both bundled documents and generated Markdown; the two document/navigation/accessibility checks were rerun successfully after this content update |
-| Physical distribution install / Apple validation | **Not performed**; no current-candidate camera/share/VoiceOver or account/upload pass claimed |
+| Physical distribution install / Apple validation | **Device acceptance pending**; account/export/upload succeeded subsequently, but current-candidate camera/share/VoiceOver acceptance is not claimed |
 | Local owner installations | 0.1.7 (8) installed/launched on Mac mini and physical iPad; all journal records/profile/draft unchanged. Existing Development signing was used for iPad and the labeled owner-only package for Mac. See `DEVICE_TESTING.md`; this is separate from TestFlight acceptance |
 
-Build logs are `build/testflight-ios-archive.log`, `build/testflight-macos-build.log`, `build/testflight-macos-archive.log`, `build/testflight-tests.log` and `build/testflight-analyze.log`. Keep failures visible until resolved; the most recent successful command and its exact version matter more than the presence of an old file. These outputs are ignored by Git. Current changes are on `codex/testflight-readiness`; no populated installation was replaced by this preparation work.
+Build logs are `build/testflight-ios-archive.log`, `build/testflight-macos-build.log`, `build/testflight-macos-archive.log`, `build/testflight-tests.log` and `build/testflight-analyze.log`. Keep failures visible until resolved; the most recent successful command and its exact version matter more than the presence of an old file. These outputs are ignored by Git. Initial readiness work was on `codex/testflight-readiness`; account/signing/upload setup is on `codex/testflight-setup`. No populated installation was replaced during upload setup.
+
+## App Store Connect setup and signed upload record
+
+On October 25, 2026, registered explicit App ID `app.jws.tallybowl` and created [TallyBowl! in App Store Connect](https://appstoreconnect.apple.com/apps/6826931962/distribution), ID **6826931962**, SKU `app.jws.tallybowl`, English (U.S.), with iOS and native macOS platforms. The generated App Store version 1.0 drafts are not a store submission; the TestFlight binary version is **0.1.7 (8)**.
+
+Created internal **Owner testing**, with only the account owner and **manual distribution**. No external group or public testing link was created. Feedback email was configured with owner approval; private reviewer contact stays in App Store Connect, not this repository. The hosted policy and external-beta gates remain open.
+
+Xcode 27 exported an Apple Distribution-signed iPad IPA and an App Store installer-signed Mac package, then uploaded both successfully. Strict/deep app signature checks passed against the Apple trust store. Both apps have the correct team/bundle identifiers and no debugging/JIT/library-validation exception; Mac sandbox/camera/selected-file/network-client entitlements remain intact. iPad has `beta-reports-active=true` and `get-task-allow=false`. Private artifacts, upload logs, checksums and entitlement evidence are under ignored `build/testflight/setup/`; do not commit profiles, credentials, populated backups or distribution logs.
+
+The following signed archive commands were used (normal `lib/main.dart`; they require an authorized Xcode account). The Mac command overrides the local project's ad hoc default without changing owner-package behavior:
+
+```sh
+flutter build ipa --release --target lib/main.dart \
+  --export-options-plist release/apple/ExportOptions.plist
+xcodebuild -workspace macos/Runner.xcworkspace -scheme Runner \
+  -configuration Release -destination 'generic/platform=macOS' \
+  -archivePath build/testflight/setup/TallyBowl-macOS.xcarchive \
+  DEVELOPMENT_TEAM=R9DBX89RA5 CODE_SIGN_IDENTITY='Apple Development' \
+  CODE_SIGN_STYLE=Automatic -allowProvisioningUpdates archive
+xcodebuild -exportArchive \
+  -archivePath build/testflight/setup/TallyBowl-macOS.xcarchive \
+  -exportPath build/testflight/setup/macos-export \
+  -exportOptionsPlist release/apple/ExportOptions.plist \
+  -allowProvisioningUpdates
+```
+
+The committed options export locally. For these authorized uploads, an ignored copy at `build/testflight/setup/UploadOptions.plist` set `destination=upload`, leaving the committed template unchanged. Each platform used `xcodebuild -exportArchive` with its signed archive, separate export directory, upload options and `-allowProvisioningUpdates`. Never repeat a successful upload to check processing; inspect the existing build in App Store Connect instead. The signed iPad archive now occupies `build/ios/archive/Runner.xcarchive`, replacing the earlier unsigned rehearsal.
 
 ## Upload preparation and external-beta checklist
 
@@ -48,7 +75,7 @@ Build logs are `build/testflight-ios-archive.log`, `build/testflight-macos-build
 3. Public contact is finalized as **Joe Steinbring**, https://jws.dev/contact. Before onboarding external testers, publish the HTTPS privacy policy from `PRIVACY_POLICY.md` at `https://tallybowl.jws.app/privacy`. Keep the bundled policy/help and generated Markdown in sync with `python3 tool/render_documents.py`. Verify actual policy/contact content without login. Set TestFlight's separate Feedback Email and private reviewer contact fields in App Store Connect; a website URL does not fill an email field. Hosting and account-field entry are not performed by this runbook. An owner-only internal install can proceed while the hosted policy is completed.
 4. Review app privacy for the actual providers/platform. No journal/photos go to a developer server or cloud AI. OSM/Photon receive IP and request/query metadata and may retain logs. Android has Google ML Kit SDK diagnostics; it is absent from the Apple app. Do not automatically select “Data Not Collected” solely because OCR is local. Complete Apple's definitions/third-party review before external review or a public listing; the required-reason manifest is a different declaration.
 5. Complete Apple's export questionnaire. Technical inventory: standard HTTPS through Dart/Flutter networking and SHA-256 photo filenames; no proprietary cipher, VPN, encrypted messaging or app-level journal encryption. Dart TLS is not necessarily OS URLSession. `ITSAppUsesNonExemptEncryption` is deliberately unset pending the final determination. Once approved, encode the appropriate Boolean/compliance code in both Info.plists if applicable and rebuild. An unset key is answered in App Store Connect; it is not an assertion of exemption.
-6. Choose the next unused build number for each platform. The local candidate is build **8**, but App Store Connect history has not been inspected. If already used, increment `pubspec.yaml` and regenerate/recheck archives. Never overwrite evidence with a different build number silently.
+6. Choose the next unused build number for each platform. Build **8** has now been uploaded for iOS and macOS. Use **9 or later** for the next changed binary; inspect App Store Connect history first. Increment `pubspec.yaml` and regenerate/recheck archives. Never overwrite evidence with a different build number silently.
 
 ## Local checks and unsigned archive rehearsal
 

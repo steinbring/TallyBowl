@@ -1,6 +1,6 @@
 # TallyBowl! development status
 
-Updated October 25, 2026. Candidate source and installed Mac/iPad/Samsung owner builds are **0.1.7 (8)**. All three updates launched and preserved existing journal data; see [device testing](DEVICE_TESTING.md). See [TestFlight readiness](TESTFLIGHT.md) for candidate checks and remaining account, hosting, signing and hardware gates. The results below retain their original build labels; production distribution has not been verified.
+Updated October 25, 2026. Candidate source and installed Mac/iPad/Samsung owner builds are **0.1.7 (8)**. All three updates launched and preserved existing journal data; see [device testing](DEVICE_TESTING.md). See [TestFlight readiness](TESTFLIGHT.md) for candidate checks and remaining account, hosting, signing and hardware gates. The results below retain their original build labels; App Store distribution signatures and successful uploads were verified during TestFlight setup; physical TestFlight acceptance remains separate.
 
 ## Feature branches
 
@@ -45,6 +45,7 @@ Features are committed on `codex/` branches and merged locally into `main`. The 
 | `codex/public-support-contact` | Approved Joe Steinbring identity and verified jws.dev contact link in bundled help/privacy and release metadata |
 | `codex/owner-install-0-1-7` | Verified 0.1.7 Mac/iPad owner installations, protected backups and unchanged-journal comparisons |
 | `codex/samsung-owner-install-0-1-7` | Matching-signer 0.1.7 Samsung update, final bundled documents, protected APK/data backups and unchanged-journal comparison |
+| `codex/testflight-setup` | Explicit Apple ID/app record, signed iPad/Mac exports and uploads, private owner testing group and release runbook |
 
 The completed stack is integrated into local `main` after verification. Feature branches are retained. All work is local until explicitly pushed to the remote repository.
 
@@ -209,7 +210,7 @@ All three owner devices have version **0.1.7 (8)**. These packages are generated
 | iPad simulator | `build/ios/iphonesimulator/Runner.app` | Run `flutter run -d <simulator-id>` or install this app through the simulator tools. A simulator binary cannot be installed on a physical iPad. |
 | Physical iPad | `build/ios/iphoneos/Runner.app` | Development-signed 0.1.7 (8), installed over 0.1.4 (5) and launched on the owner's connected iPad. |
 
-For a physical iPad owner build, use the existing development signing setup in the iOS Runner project and build the normal `lib/main.dart` release target, then install with `devicectl` (or use `flutter run` for development). The current owner build is 0.1.7 (8); before/after comparisons confirmed the existing three alleys, two balls and profile/draft were unchanged. No TestFlight distribution IPA has been exported or uploaded. Follow the separate [Apple runbook](TESTFLIGHT.md) for that path.
+For a physical iPad owner build, use the existing development signing setup in the iOS Runner project and build the normal `lib/main.dart` release target, then install with `devicectl` (or use `flutter run` for development). The current owner build is 0.1.7 (8); before/after comparisons confirmed the existing three alleys, two balls and profile/draft were unchanged. A separate TestFlight distribution IPA was subsequently exported and uploaded successfully on October 25, 2026. Follow the separate [Apple runbook](TESTFLIGHT.md) for that path.
 
 The strict release build enables hardened runtime and disables Xcode's injected `get-task-allow`. Ad hoc apps/frameworks have no Team ID: the strict build failed the runtime library check during smoke launch. `tool/package_macos_local.sh` therefore signs a **copy** with only the local `disable-library-validation` exception, retaining sandbox/runtime protections and no JIT/debug entitlement. It refuses to change a team-signed app. The archive filename includes `OWNER-TEST-ONLY`; a signed/sealed `Contents/Resources/TallyBowlBuild.json` records its version, build, non-distribution warning and exact signing/runtime policy. Production entitlements retain library validation. TestFlight/App Store distribution requires its own correct signing and Apple validation; a separate direct Mac download would use Developer ID signing and notarization.
 
