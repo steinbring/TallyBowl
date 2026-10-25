@@ -3,7 +3,7 @@ package app.jws.tallybowl
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
-import android.media.ExifInterface
+import androidx.exifinterface.media.ExifInterface
 import android.graphics.Rect
 import com.google.android.gms.tasks.Tasks
 import com.google.mlkit.vision.common.InputImage
@@ -100,8 +100,8 @@ internal object ScoreTextRecognizer {
                 ExifInterface(it).getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)
             }
         } catch (_: java.io.IOException) {
-            // Some older Android versions decode PNG/WebP but cannot read their
-            // optional EXIF block. The valid bitmap remains usable upright.
+            // A missing or unreadable optional EXIF block must not prevent
+            // recognition of an otherwise decodable image.
             ExifInterface.ORIENTATION_NORMAL
         }
         val transform = Matrix()

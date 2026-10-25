@@ -1,6 +1,6 @@
 # TallyBowl! development status
 
-Updated October 24, 2026. Development build 0.1.4 (5) is intended for owner testing. Production distribution is not configured.
+Updated October 25, 2026. Development build 0.1.5 (6) is intended for owner testing. Production distribution is not configured.
 
 ## Feature branches
 
@@ -36,6 +36,9 @@ Features are committed on `codex/` branches and merged locally into `main`. The 
 | `codex/self-audit-history-performance` | Shared journal groups, session paging and widget benchmark |
 | `codex/self-audit-dialog-lifecycle` | Profile/session State ownership for form controllers |
 | `codex/self-audit-validation` | Build 0.1.4 owner packages and combined validation |
+| `codex/scoreboard-grid-recognition` | Layout-aware deliveries, bounded local refinement, checkpoint validation, automatic entry and old-draft recovery |
+| `codex/recap-handoff-validation` | Camera URI handler visibility, SDK diagnostic disclosure and PNG recipient verification |
+| `codex/owner-build-0-1-5` | AndroidX EXIF format compatibility, owner packages and in-place installation verification |
 
 The completed stack is integrated into local `main` after verification. Feature branches are retained. All work is local until explicitly pushed to the remote repository.
 
@@ -47,21 +50,22 @@ The completed stack is integrated into local `main` after verification. Feature 
 - `lib/src/features/`: session recording, photo review, history, insights, inventories, maps, sharing, settings.
 - `lib/src/ui/`: shared interface elements and forms.
 - `lib/src/config.dart`: branding, website, User-Agent, development tile and Photon endpoints.
-- `macos/Runner/MainFlutterWindow.swift`: Apple Vision channel and native AVFoundation camera window.
+- `apple/ScoreTextRecognition.swift`: shared Apple Vision image decoding, geometry and bounded refinement.
+- `macos/Runner/MainFlutterWindow.swift`: native channel and AVFoundation camera window.
 - `ios/Runner/AppDelegate.swift`: Apple Vision channel registered with the Flutter engine.
 - `android/app/src/main/kotlin/app/jws/tallybowl/MainActivity.kt`: bundled ML Kit recognition channel.
 
 The iOS project targets iPad. Android and macOS are also generated targets; web, Windows, and Linux are outside this build's scope. The initial build toolchain is Flutter 3.47.5 / Dart 3.13.4 with Xcode 27 and the installed Android SDK.
 
-## Recognition limits
+## Recognition behavior and limits
 
-The initial parser can prefill ten clearly separated, complete frame notations on a horizontal row, with an optional scratch total. It can also partition twelve explicitly recognized strike marks into a perfect game, including when OCR merges adjacent strike symbols. It never fills missing strikes from a displayed 300.
+The parser supports complete horizontal frame sequences and separate delivery/cumulative bands on regular ten-column grids. Native bridges return word bounds and Android symbol bounds in upright, EXIF-normalized coordinates. The shared Dart parser associates those bands with the bowler's name or aliases. It checks every available cumulative checkpoint and the scratch total against ordinary ten-pin scoring.
 
-Unclear layout, missing marks, totals-only images, and unsupported symbols require manual frame entry. Some scoreboards position roll marks, names, and cumulative totals on different baselines; those need dedicated geometry/layout parsing in the next increment. Alias matches only suggest a row. A human must select the row and review the frame draft. A displayed total that conflicts with calculated frames requires explicit acknowledgment after review.
+A unique matching row with a complete, consistent sequence opens the populated editor automatically. Two matching bowlers, missing marks, or conflicting totals require review. A bounded aspect correction and at most 20 frame crops improve condensed monitor fonts. For word-only Vision output, a contextual read can add non-overlapping observed marks. Known characters cannot be replaced by a disagreeing crop. A local horizontal-stroke detector can recover visible miss marks; cumulative totals never manufacture missing deliveries. Existing all-empty drafts with a retained photo reprocess on Resume while preserving lane, balls, primary ball and notes.
 
-A sparse strike-only row labeled only with a short alias was read upside down by Vision in the iPad simulator even though the input PNG was upright. A row with a full readable bowler label passes. Treat sparse or incorrectly oriented reads as a known recognition limitation requiring manual review; the labeled synthetic check does not resolve this class of image.
+One permissioned real monitor photo now produces `53 63 9- 7/ 16 7- 35 6- 42 X9-`, cumulative checkpoints `8 17 26 37 44 51 59 65 71 90`, and total 90. This was exercised through bundled ML Kit on an isolated Android 17 emulator. The shared Apple Vision helper was exercised against the same EXIF-rotated photo, with the resulting native geometry verified through the Dart refinement pipeline. Anonymized geometry fixtures and workflow tests are committed; the source photo, device backups, and diagnostic targets remain only in ignored build output.
 
-No real scoreboard photo corpus has been supplied yet. Synthetic integration checks establish the native channel and supported parser behavior, not accuracy on real alleys' displays. Before beta, collect permissioned examples, annotate the intended bowler and each delivery, reserve evaluation photos, and measure complete-game accuracy and correction effort by layout and platform.
+This is one real layout, not a broad accuracy result. Perspective, glare, low contrast, clipped frames, unsupported symbols, unusual name scripts, irregular grids and sparse strike-only displays can still need manual correction. Before beta, expand the permissioned evaluation corpus and measure complete-game accuracy and correction effort by layout and platform.
 
 Still to implement or expand:
 
@@ -84,7 +88,7 @@ CSV exports are for analysis rather than restoration. One file contains game met
 
 ## Data and network behavior
 
-Scoreboard recognition is local. Apple uses Vision; Android links `com.google.mlkit:text-recognition:16.0.1` rather than the downloadable Play Services model. No app code sends photos or extracted scores to an AI service.
+Scoreboard recognition is local. Apple uses Vision; Android links `com.google.mlkit:text-recognition:16.0.1` rather than the downloadable Play Services model. No app code sends photos or extracted scores to an AI service. Google ML Kit may send SDK diagnostic metadata; see the disclosure in Settings and DATA_SOURCES.md. Bundled inference does not imply that the SDK is network-silent.
 
 The app copies selected photos into its private imports folder while reviewing a new game. A draft retains that photo locally **before** recognition/row selection begins. Interrupted pending review is reopened on launch; selected frames are persisted before opening the editor. Saving or discarding the draft removes it; startup removes orphaned import files. Temporary share/export files are kept long enough for receiving apps and old files are cleaned when another export is created.
 
@@ -105,6 +109,20 @@ Run `flutter test integration_test/on_device_recognition_test.dart -d <device>` 
 The 27-finding first audit disposition is in [AUDIT_RESOLUTION.md](AUDIT_RESOLUTION.md). [AUDIT_ROUND2_RESOLUTION.md](AUDIT_ROUND2_RESOLUTION.md) covers the five follow-up findings, signing history and current verification. Release signing setup is documented in [ANDROID_SIGNING.md](ANDROID_SIGNING.md). The next owner-testing phase follows [DEVICE_TESTING.md](DEVICE_TESTING.md), beginning with the Samsung Galaxy Z Fold 8.
 
 Before release, test actual camera permission/capture flows, platform photo formats/orientations, native share destinations and file import/export, interrupted Android picking, and app lifecycle recovery on physical iPad and Android devices and supported Macs. A successful native build is not evidence that these hardware flows have been tested.
+
+## Verified build 0.1.5 (6) results
+
+| Check | Result |
+| --- | --- |
+| `flutter analyze` | No issues |
+| `flutter test` | 103 passed, including real monitor geometry on both OCR pipelines, disagreeing crop preservation, ambiguous aliases, intermediate checkpoint conflicts, automatic frame entry, legacy draft metadata retention and actual PNG MIME/dimensions |
+| Native builds | Android debug and Lint, universal macOS release and iPad simulator debug passed. A follow-up Android build/Lint passed with AndroidX EXIF 1.4.2 for consistent orientation/format support across Android versions |
+| Native Lint | 0 errors, 10 warnings: existing build/resource/icon advisories and three bitmap extension-style suggestions remain |
+| Real Samsung photo | Android 17 / SM_F971U1: Resume reprocessed the retained draft to all ten correct frames, total 90, and enabled Save. Alleys (3), balls (2), session (1), profile and history were unchanged; lane/notes/ball tags/primary ball/source path were preserved. No game was saved by this verification |
+| AeroSloth handoff | Native share sheet copied an identical PNG to AeroSloth and its normal composer displayed the image attachment. No post or message sent; see SHARING_VERIFICATION.md |
+| Owner installation | Normal 0.1.5/build 6 Android APK installed in place. Mac owner package signature/policy verified, installed to `/Applications/TallyBowl!.app`, and launched. Prior bundle retained in ignored build output |
+
+The original photo and read-only device safety snapshots remain private ignored build output. One real scoreboard example is regression evidence, not general recognition accuracy or comprehensive physical camera/accessibility coverage. New captures, additional layouts, iPad hardware and recipient-specific sending remain owner testing tasks.
 
 ## Verified build 0.1.4 (5) results
 

@@ -1,12 +1,18 @@
-# Owner testing — build 0.1.4 (5)
+# Owner testing — build 0.1.5 (6)
 
-Start with the Samsung Galaxy Z Fold 8, then repeat the camera, import, sharing, and accessibility checks on a physical iPad and a supported Mac. Current automated checks are described in [development status](DEVELOPMENT.md). This checklist is preparation; no physical phone has been installed or tested yet.
+Start with the Samsung Galaxy Z Fold 8, then repeat the camera, import, sharing, and accessibility checks on a physical iPad and a supported Mac. Current automated checks are described in [development status](DEVELOPMENT.md). The Samsung was installed with build 0.1.4 (5) and supplied the first real-photo regression. This checklist separates further hardware checks from automated evidence.
+
+## Verified update evidence — October 25, 2026
+
+Build 0.1.5 (6) was installed in place on the Samsung (Android 17 / SM_F971U1) and this Mac. Read-only before/after phone snapshots verified unchanged alleys, balls, session, profile and saved history. Resume of the owner's retained blank draft produced all ten correct deliveries and score 90 while preserving lane, ball selection, primary ball and notes. The game was left unsaved for the owner. Original photos and snapshots are private ignored build output.
+
+The Mac package launched successfully after strict signature and sealed owner-policy verification. An isolated Android emulator verified **Share image → AeroSloth → Compose** with an image attachment and identical received PNG; no public content was sent. This does not claim new camera capture, TalkBack/VoiceOver or every recipient app was tested.
 
 ## Install and preserve data
 
 - Use the packaged **Android debug APK** for this first local test. Public/store release signing is a separate setup task.
 - If an earlier version contains bowling history, export a JSON backup first. Update in place with the same development signing key. A signature mismatch is a reason to inspect signing, not to uninstall and erase data automatically.
-- Confirm version 0.1.4/build 5 in the installed package. Initial installation/USB setup will be handled with the owner in the next step.
+- Confirm version 0.1.5/build 6 after updating in place; retain existing alleys, balls, sessions and drafts.
 
 ## First complete session
 
@@ -20,8 +26,8 @@ Start with the Samsung Galaxy Z Fold 8, then repeat the camera, import, sharing,
 
 - Photograph an actual final scoreboard using **Scan scoreboard**. Cancel once, then complete a capture. Test the installed camera app's permission-denied/retry behavior if offered.
 - Import a gallery image; cancel once, then select it again. Include JPEG and any camera format actually enabled on the device, portrait/landscape EXIF orientations, and a large photo.
-- Verify the intended bowler alias, select the correct row and compare **every delivery**, tenth-frame fill and scratch total with the source. Correct every mismatch. Record the scoreboard layout and corrections needed; synthetic test success is not evidence of real-photo accuracy.
-- Try an unclear image: manual frame entry must remain available. A mismatched displayed total must require explicit review before saving.
+- Verify automatic name/row selection, or select the correct row when ambiguous, and compare **every delivery**, tenth-frame fill and scratch total with the source. Correct every mismatch. Record the scoreboard layout and corrections needed; synthetic test success is not evidence of real-photo accuracy.
+- Try an unclear image: manual frame entry must remain available. A mismatched displayed total or intermediate cumulative checkpoint must require explicit review before saving.
 - Disable networking and repeat import/recognition with a local photo. Recognition must remain available without a model download or cloud service.
 
 ## Interruption and fold/window behavior
@@ -33,6 +39,9 @@ Start with the Samsung Galaxy Z Fold 8, then repeat the camera, import, sharing,
 - Use 150–200% system text/display settings and light/dark appearance. Check all five sections and Settings. With TalkBack enabled, navigate the scorecard: each frame should announce number, marks and cumulative score; chart labels should announce values.
 
 ## Recap and backups
+
+The Android 17 emulator share sheet handed a real PNG to AeroSloth and its normal composer displayed the image attachment. See [handoff evidence](SHARING_VERIFICATION.md). Repeat with the owner's installed recipient accounts and platform share extensions as part of hardware testing.
+
 
 - Finish the session, inspect the branded image and privacy switches, then export to a local destination. Test the native share sheet and cancel it. Send to another person only when the owner chooses to do so.
 - Turn Date off and check that the exported attachment is named `tallybowl-recap.png`, with no date in the image.
