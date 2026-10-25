@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 
 import '../domain/models.dart';
-import 'common.dart';
+import 'branding.dart';
 
-const bowlDestinations = <(String, IconData)>[
-  ('Tonight', Icons.nights_stay_outlined),
-  ('History', Icons.history_rounded),
-  ('Insights', Icons.insights_rounded),
-  ('My Bag', Icons.sports_baseball_outlined),
-  ('Alleys', Icons.location_on_outlined),
+const bowlDestinations = <(String, Widget)>[
+  ('Tonight', Icon(Icons.nights_stay_outlined)),
+  ('History', Icon(Icons.history_rounded)),
+  ('Insights', Icon(Icons.insights_rounded)),
+  ('My Bag', BowlingBallIcon()),
+  ('Alleys', Icon(Icons.location_on_outlined)),
 ];
 
 class DesktopBowlRail extends StatelessWidget {
@@ -28,7 +28,7 @@ class DesktopBowlRail extends StatelessWidget {
     labelType: NavigationRailLabelType.none,
     leading: const Padding(
       padding: EdgeInsets.symmetric(vertical: 12),
-      child: BallArt(size: 30),
+      child: TallyBowlLogo(size: 36),
     ),
     trailing: IconButton(
       tooltip: 'Settings',
@@ -38,7 +38,7 @@ class DesktopBowlRail extends StatelessWidget {
     destinations: [
       for (final d in bowlDestinations)
         NavigationRailDestination(
-          icon: Tooltip(message: d.$1, child: Icon(d.$2)),
+          icon: Tooltip(message: d.$1, child: d.$2),
           label: Text(d.$1),
         ),
     ],
@@ -79,7 +79,7 @@ class BowlSidebar extends StatelessWidget {
                   padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                   child: Row(
                     children: [
-                      BallArt(size: 30),
+                      TallyBowlLogo(size: 36),
                       SizedBox(width: 10),
                       Expanded(
                         child: Text(
@@ -114,7 +114,7 @@ class BowlSidebar extends StatelessWidget {
                       selected: selected == i,
                       selectedTileColor: colors.primaryContainer,
                       selectedColor: colors.onPrimaryContainer,
-                      leading: Icon(bowlDestinations[i].$2),
+                      leading: bowlDestinations[i].$2,
                       title: Text(
                         bowlDestinations[i].$1,
                         style: TextStyle(

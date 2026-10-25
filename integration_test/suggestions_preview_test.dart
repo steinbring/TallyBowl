@@ -13,9 +13,9 @@ import 'package:tallybowl/src/app.dart';
 import 'package:tallybowl/src/data/place_search.dart';
 import 'package:tallybowl/src/domain/models.dart';
 import 'package:tallybowl/src/theme.dart';
+import 'package:tallybowl/src/ui/branding.dart';
 import 'package:tallybowl/src/ui/alley_dialog.dart';
 import 'package:tallybowl/src/ui/ball_dialog.dart';
-import 'package:tallybowl/src/ui/common.dart';
 
 Future<void> savePreview(GlobalKey key, String name) async {
   final boundary =
@@ -114,32 +114,39 @@ void main() {
       expect(controller.data.alleys.single.osmId, 'N/12168828291');
     },
   );
-  testWidgets('renders the adaptive dashboard in dark mode with large text', (
+  testWidgets('renders the adaptive dashboard in both themes with large text', (
     tester,
   ) async {
-    tester.platformDispatcher.platformBrightnessTestValue = Brightness.dark;
     tester.platformDispatcher.textScaleFactorTestValue = 1.5;
-    final key = GlobalKey();
-    final controller = BowlController(
-      null,
-      const BowlData(
-        profile: BowlerProfile(name: 'Sample bowler'),
-        balls: [BowlingBall(id: 'b', name: 'Phaze II', brand: 'Storm')],
-        alleys: [BowlingAlley(id: 'a', name: 'Sample lanes')],
-      ),
-    );
-    await tester.pumpWidget(
-      RepaintBoundary(
-        key: key,
-        child: TallyBowlApp(controller: controller),
-      ),
-    );
-    await tester.pumpAndSettle();
-    await savePreview(key, 'dark-dashboard');
+    for (final brightness in [Brightness.light, Brightness.dark]) {
+      tester.platformDispatcher.platformBrightnessTestValue = brightness;
+      final key = GlobalKey();
+      final controller = BowlController(
+        null,
+        const BowlData(
+          profile: BowlerProfile(name: 'Sample bowler'),
+          balls: [BowlingBall(id: 'b', name: 'Phaze II', brand: 'Storm')],
+          alleys: [BowlingAlley(id: 'a', name: 'Sample lanes')],
+        ),
+      );
+      await tester.pumpWidget(
+        RepaintBoundary(
+          key: key,
+          child: TallyBowlApp(controller: controller),
+        ),
+      );
+      await precacheImage(
+        const AssetImage(TallyBowlLogo.asset),
+        tester.element(find.byType(TallyBowlLogo).first),
+      );
+      await tester.pumpAndSettle();
+      await savePreview(key, '${brightness.name}-dashboard');
+      expect(tester.takeException(), isNull);
+    }
     tester.platformDispatcher.clearPlatformBrightnessTestValue();
     tester.platformDispatcher.clearTextScaleFactorTestValue();
   });
-  testWidgets('renders source launcher artwork using the in-app bowling ball', (
+  testWidgets('renders the committed bowler branding at launcher sizes', (
     tester,
   ) async {
     for (final mac in [false, true]) {
@@ -162,7 +169,14 @@ void main() {
                               ? BorderRadius.circular(196)
                               : BorderRadius.zero,
                         ),
-                        child: Center(child: BallArt(size: mac ? 680 : 760)),
+                        child: ClipRRect(
+                          borderRadius: mac
+                              ? BorderRadius.circular(196)
+                              : BorderRadius.zero,
+                          child: Image.asset(
+                            'assets/branding/tallybowl-logo.png',
+                          ),
+                        ),
                       ),
                     ),
                   ),

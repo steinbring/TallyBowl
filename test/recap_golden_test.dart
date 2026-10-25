@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 import 'package:tallybowl/src/domain/models.dart';
 import 'package:tallybowl/src/features/session_share.dart';
 import 'package:tallybowl/src/theme.dart';
+import 'package:tallybowl/src/ui/branding.dart';
 
 void main() {
   testWidgets(
@@ -66,6 +67,12 @@ void main() {
                 ),
               ),
             ),
+          ),
+        );
+        await tester.runAsync(
+          () => precacheImage(
+            const AssetImage(TallyBowlLogo.asset),
+            tester.element(find.byType(RecapCard)),
           ),
         );
         await tester.pumpAndSettle();

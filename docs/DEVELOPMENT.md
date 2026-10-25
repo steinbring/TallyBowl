@@ -1,6 +1,6 @@
 # TallyBowl! development status
 
-Updated October 25, 2026. Development build 0.1.5 (6) is intended for owner testing. Production distribution is not configured.
+Updated October 25, 2026. Development build 0.1.6 (7) is intended for owner testing. Production distribution is not configured.
 
 ## Feature branches
 
@@ -39,6 +39,7 @@ Features are committed on `codex/` branches and merged locally into `main`. The 
 | `codex/scoreboard-grid-recognition` | Layout-aware deliveries, bounded local refinement, checkpoint validation, automatic entry and old-draft recovery |
 | `codex/recap-handoff-validation` | Camera URI handler visibility, SDK diagnostic disclosure and PNG recipient verification |
 | `codex/owner-build-0-1-5` | AndroidX EXIF format compatibility, owner packages and in-place installation verification |
+| `codex/bowler-branding` | Pointing bowler master, matching app/recap/launcher identity, three-hole bowling-ball navigation and theme checks |
 
 The completed stack is integrated into local `main` after verification. Feature branches are retained. All work is local until explicitly pushed to the remote repository.
 
@@ -74,7 +75,7 @@ Still to implement or expand:
 - Production-capacity map/search hosting and optional nearby search. Name-and-city suggestions now use the documented Photon API; saved alleys and manual entry remain available offline.
 - Lane comparisons, more date filters, and more equipment comparison views.
 - Optional retained evidence photos, ball photos, alley merging, and richer session editing.
-- Production signing/distribution setup and physical TalkBack/VoiceOver evaluation. Automated 200% text, theme, contrast, semantics and 10,000-game checks now pass. Branded launcher icons reuse the in-app ball artwork.
+- Production signing/distribution setup and physical TalkBack/VoiceOver evaluation. Automated 200% text, theme, contrast, semantics and 10,000-game checks now pass. Launcher icons use the committed pointing-bowler brand master.
 
 ## Persistence and portability
 
@@ -170,24 +171,27 @@ The macOS landing screen, recap PNG, new suggestion dialogs and launcher artwork
 
 ## Launcher artwork
 
-The native launcher icons reuse `BallArt`, with the same colors and three finger holes as the application. `integration_test/suggestions_preview_test.dart` renders 1024-pixel masters and native form previews in the app cache; it prints their paths. To regenerate platform icons on macOS, run:
+The launcher icons and in-app identity use `assets/branding/tallybowl-logo.png`, the committed pointing-bowler master. Its dark teal badge keeps the cream figure and orange bowling ball legible in both themes. Source and generation prompt are documented in [branding notes](../assets/branding/README.md). `BowlingBallIcon` supplies the three-hole My Bag symbol; ball illustrations have no seam.
+
+Regenerate every configured icon size on macOS:
 
 ```sh
-flutter test integration_test/suggestions_preview_test.dart -d macos
-swift tool/generate_icons.swift <tallybowl-icon.png-path> <tallybowl-icon-mac.png-path>
+swift tool/generate_icons.swift
 ```
 
-The generator uses Core Graphics/ImageIO, preserves transparency on macOS, and writes opaque iPad/Android icons at every configured size. Rebuild the normal `lib/main.dart` target after integration tests before packaging an app for installation. For the local Mac archive, run `./tool/package_macos_local.sh` after the release build.
+The generator uses Core Graphics/ImageIO, writes an inset rounded tile with transparent margins for macOS, and opaque iPad/Android icons. The source PNG is bundled by Flutter and reused in phone/desktop navigation, Settings and recap headers. Recap export awaits image decoding before capturing its PNG. The golden check verifies the recap remains identical across app themes and text sizes.
+
+`integration_test/suggestions_preview_test.dart` renders native form, dashboard/theme and launcher previews to the app cache and prints their paths. Rebuild the normal `lib/main.dart` target after integration tests before packaging an app for installation. Run `./tool/package_macos_local.sh` after the Mac release build.
 
 
 ## Install the local test build
 
-Version **0.1.4**, build **5**. These packages are generated locally and ignored by Git:
+Version **0.1.6**, build **7**. These packages are generated locally and ignored by Git:
 
 | Target | Local package | Installation |
 | --- | --- | --- |
-| macOS | `build/releases/TallyBowl-0.1.4-macos-OWNER-TEST-ONLY.zip` (about 20 MB) | Unzip, move `TallyBowl!.app` to Applications if desired, then open it. The app is a universal Intel/Apple silicon release build with an ad hoc signature and an explicit local library-validation exception; it is not a notarized distribution. |
-| Android | `build/releases/TallyBowl-0.1.4-android-debug.apk` (about 224 MB) | Transfer the APK to the device and open it, allowing installation from the selected source if Android prompts. This uses the local development key. Production releases use explicit protected key properties; missing credentials stop release builds. |
+| macOS | `build/releases/TallyBowl-0.1.6-macos-OWNER-TEST-ONLY.zip` (about 20 MB) | Unzip, move `TallyBowl!.app` to Applications if desired, then open it. The app is a universal Intel/Apple silicon release build with an ad hoc signature and an explicit local library-validation exception; it is not a notarized distribution. |
+| Android | `build/releases/TallyBowl-0.1.6-android-debug.apk` (about 224 MB) | Transfer the APK to the device and open it, allowing installation from the selected source if Android prompts. This uses the local development key. Production releases use explicit protected key properties; missing credentials stop release builds. |
 | iPad simulator | `build/ios/iphonesimulator/Runner.app` | Run `flutter run -d <simulator-id>` or install this app through the simulator tools. A simulator binary cannot be installed on a physical iPad. |
 
 For a physical iPad, select a development team and provisioning/signing setup in the iOS Runner project using Xcode, then run `flutter run -d <device-id>`. No physical-device IPA has been signed or exported.

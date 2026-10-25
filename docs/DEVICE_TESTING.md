@@ -1,4 +1,4 @@
-# Owner testing — build 0.1.5 (6)
+# Owner testing — build 0.1.6 (7)
 
 Start with the Samsung Galaxy Z Fold 8, then repeat the camera, import, sharing, and accessibility checks on a physical iPad and a supported Mac. Current automated checks are described in [development status](DEVELOPMENT.md). The Samsung was installed with build 0.1.4 (5) and supplied the first real-photo regression. This checklist separates further hardware checks from automated evidence.
 
@@ -12,7 +12,7 @@ The Mac package launched successfully after strict signature and sealed owner-po
 
 - Use the packaged **Android debug APK** for this first local test. Public/store release signing is a separate setup task.
 - If an earlier version contains bowling history, export a JSON backup first. Update in place with the same development signing key. A signature mismatch is a reason to inspect signing, not to uninstall and erase data automatically.
-- Confirm version 0.1.5/build 6 after updating in place; retain existing alleys, balls, sessions and drafts.
+- Confirm version 0.1.6/build 7 after updating in place; retain existing alleys, balls, sessions and drafts.
 
 ## First complete session
 

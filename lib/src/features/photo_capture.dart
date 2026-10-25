@@ -309,7 +309,7 @@ class _PhotoReviewPageState extends State<PhotoReviewPage> {
                   }
                   if (snapshot.hasError) {
                     return EmptyCard(
-                      icon: Icons.image_search_rounded,
+                      icon: Icon(Icons.image_search_rounded),
                       title: 'This one needs a closer look.',
                       body: 'We couldn’t read the scoreboard clearly. Keep the photo alongside your frames and enter them yourself.',
                       action: FilledButton(
