@@ -43,12 +43,12 @@
       "heading": "Beta feedback and contact",
       "paragraphs": [
         "TestFlight is operated by Apple. If you send beta feedback, crash reports, screenshots, or diagnostic attachments through TestFlight, Apple and the developer may receive that information. Include only information you intend to share. For a recognition report, use a photo you have permission to send and remove other bowlers’ names.",
-        "Privacy and support contact information will be published at https://tallybowl.jws.app/support before the hosted beta opens to testers. This policy will be updated when relevant app behavior or service providers change."
+        "TallyBowl is developed and published by Joe Steinbring. For privacy questions or app support, contact Joe through https://jws.dev/contact. This policy will be updated when relevant app behavior or service providers change."
       ]
     }
   ],
   "links": [
-    {"label": "TallyBowl support", "url": "https://tallybowl.jws.app/support"},
+    {"label": "Contact Joe Steinbring", "url": "https://jws.dev/contact"},
     {"label": "OpenStreetMap Foundation privacy policy", "url": "https://osmfoundation.org/wiki/Privacy_Policy"},
     {"label": "komoot privacy policy", "url": "https://www.komoot.com/privacy"},
     {"label": "Google ML Kit Android data disclosure", "url": "https://developers.google.com/ml-kit/android-data-disclosure"},

@@ -112,8 +112,9 @@ def main():
         check(f"archive contents: {archive}", archive_check)
 
     if args.check_urls:
-        for page in ("privacy", "support"):
-            url = f"https://tallybowl.jws.app/{page}"
+        guide = json.loads((ROOT / "assets/documents/guide.json").read_text())
+        support_url = guide["links"][0]["url"]
+        for url in ("https://tallybowl.jws.app/privacy", support_url):
             def url_check(url=url):
                 request = urllib.request.Request(url, headers={"User-Agent": "TallyBowl-release-preflight"})
                 with urllib.request.urlopen(request, timeout=15) as response:
@@ -126,7 +127,7 @@ def main():
         "checked_at": datetime.now(timezone.utc).isoformat(), "candidate": f"{version}+{build}",
         "scope": "LOCAL CHECKS ONLY. Not TestFlight approval, an upload, or a guarantee of distribution signing.",
         "checks": checks, "archive_observations": observations,
-        "manual_gates": ["Approved public contact and live policy/support content", "Developer account/app records/agreements", "Export-compliance and store privacy answers", "Correctly signed production archives; Organizer validation and Apple processing", "Physical TestFlight installation and device acceptance; see docs/TESTFLIGHT.md"],
+        "manual_gates": ["Hosted privacy content and final TestFlight feedback/reviewer contact fields", "Developer account/app records/agreements", "Export-compliance and store privacy answers", "Correctly signed production archives; Organizer validation and Apple processing", "Physical TestFlight installation and device acceptance; see docs/TESTFLIGHT.md"],
     }
     if args.output:
         args.output.parent.mkdir(parents=True, exist_ok=True)

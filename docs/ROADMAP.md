@@ -14,7 +14,7 @@ The first real owner photo uncovered that name/cumulative OCR was not enough to 
 
 ## Next milestone: small internal Apple beta
 
-1. Finish public contact information and publish working privacy/support pages.
+1. Publish the privacy policy and keep the approved public support contact reachable: Joe Steinbring, https://jws.dev/contact.
 2. Verify Apple Developer membership, agreements, App Store Connect app/platform records, correct team and App Store distribution signing. Build, validate and upload production-entry-point archives; retain symbols.
 3. Install via TestFlight on the owner's iPad and Mac. Back up existing journals first; verify in-place migration, camera/photo access, offline recognition, a complete session, native sharing and recovery.
 4. Record defects and resolve any crash, data loss, wrong-row silent acceptance, unusable correction path, permission dead end or inaccessible essential control before expanding access.

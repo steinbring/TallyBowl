@@ -2,13 +2,14 @@
 
 Candidate: **0.1.7 (8)**. This is text prepared for review, not evidence of App Store Connect configuration or an upload. Do not paste unresolved fields into a submission.
 
-## Fields requiring the owner
+## Public contact and remaining account fields
 
-- Public developer/support name: **pending owner response**.
-- Feedback/support email: **pending owner response**; use a monitored address.
-- Beta reviewer contact name, email and phone: **pending account-owner entry**; do not commit private contact details.
+- Public developer/support name: **Joe Steinbring** (approved by the owner).
+- Public support/contact URL: **https://jws.dev/contact** (owner-approved; returned HTTP 200 and the Joe Steinbring contact page on October 25, 2026).
+- TestFlight feedback email: **pending account-owner entry** if required in App Store Connect; the public contact URL is not an email address. No email has been guessed or published here.
+- Beta reviewer contact name: **Joe Steinbring**; email and phone remain **pending account-owner entry**. Do not commit private contact details.
 - Privacy policy URL: `https://tallybowl.jws.app/privacy` — must be published and checked before tester onboarding/review.
-- Support URL: `https://tallybowl.jws.app/support` — must contain a working contact and the user guide.
+- Support URL: `https://jws.dev/contact`. The app's bundled user guide remains available offline in Settings.
 - Marketing URL: `https://tallybowl.jws.app` — planned, not currently hosted.
 - Export-compliance and privacy-label decisions: see [runbook](TESTFLIGHT.md); do not infer them from this draft.
 
