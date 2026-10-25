@@ -1,6 +1,6 @@
 # TestFlight readiness and release runbook
 
-Assessed October 25, 2026. Candidate **0.1.7 (8)**, bundle ID **app.jws.tallybowl**, existing Apple team **R9DBX89RA5**. Owner build **0.1.7 (8)** is installed on the Mac and iPad; Samsung remains on **0.1.6 (7)**. No TestFlight build has been uploaded or approved by this preparation work.
+Assessed October 25, 2026. Candidate **0.1.7 (8)**, bundle ID **app.jws.tallybowl**, existing Apple team **R9DBX89RA5**. Owner build **0.1.7 (8)** is installed on the Mac, iPad, and Samsung. No TestFlight build has been uploaded or approved by this preparation work.
 
 ## Readiness decision
 
