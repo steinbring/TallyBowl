@@ -22,7 +22,7 @@ class MainFlutterWindow: NSWindow {
         guard let args = call.arguments as? [String: Any], let bytes = args["bytes"] as? FlutterStandardTypedData else {
           result(FlutterError(code: "invalid_image", message: "Select an image first.", details: nil)); return
         }
-        recognizeScoreText(bytes.data, result: result)
+        recognizeScoreText(bytes.data, regions: args["regions"] as? [[String: Double]], aspect: args["aspect"] as? Double ?? 1, result: result)
       case "capturePhoto":
         guard let self = self else { result(nil); return }
         AVCaptureDevice.requestAccess(for: .video) { granted in
@@ -46,30 +46,11 @@ class MainFlutterWindow: NSWindow {
   }
 }
 
-private func recognizeScoreText(_ data: Data, result: @escaping FlutterResult) {
-  DispatchQueue.global(qos: .userInitiated).async {
-    do {
-      let request = VNRecognizeTextRequest()
-      request.recognitionLevel = .accurate
-      request.usesLanguageCorrection = false
-      request.recognitionLanguages = ["en-US"]
-      guard let source = CGImageSourceCreateWithData(data as CFData, nil),
-                let image = CGImageSourceCreateThumbnailAtIndex(source, 0, [
-                  kCGImageSourceCreateThumbnailFromImageAlways: true,
-                  kCGImageSourceCreateThumbnailWithTransform: true,
-                  kCGImageSourceThumbnailMaxPixelSize: 4096
-                ] as CFDictionary) else {
-            throw NSError(domain: "TallyBowl", code: 1)
-          }
-          try VNImageRequestHandler(cgImage: image, orientation: .up, options: [:]).perform([request])
-      let lines: [[String: Any]] = (request.results ?? []).compactMap { observation in
-        guard let text = observation.topCandidates(1).first else { return nil }
-        let box = observation.boundingBox
-        return ["text": text.string, "confidence": Double(text.confidence), "x": box.minX, "y": 1 - box.maxY, "width": box.width, "height": box.height]
-      }
-      DispatchQueue.main.async { result(lines) }
-    } catch {
-      DispatchQueue.main.async { result(FlutterError(code: "recognition", message: "This image could not be read. Try a clearer photo or enter the frames manually.", details: nil)) }
+private func recognizeScoreText(_ data: Data, regions: [[String: Double]]?, aspect: Double, result: @escaping FlutterResult) {
+  ScoreTextRecognition.recognize(data, regions: regions, aspect: aspect) { outcome in
+    switch outcome {
+    case .success(let lines): result(lines)
+    case .failure: result(FlutterError(code:"recognition",message:"This image could not be read. Try a clearer photo or enter the frames manually.",details:nil))
     }
   }
 }

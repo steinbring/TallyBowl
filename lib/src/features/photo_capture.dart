@@ -31,7 +31,42 @@ Future<void> recordOrResumeGame(
       resumePendingReview: true,
     );
   }
-  return openGameEditor(context, controller, session);
+  // Older drafts may contain a retained photo but no delivery marks. Retry with
+  // the current parser while keeping lane, equipment and notes intact.
+  if (draft?['sessionId'] == session.id &&
+      draft?['sourcePath'] is String &&
+      (draft?['frames'] as List?)?.every((v) => v == '') == true) {
+    final release = await controller.reservePhotoAcquisition(
+      sessionId: session.id,
+      allowDraft: true,
+    );
+    try {
+      final rows = ScoreSheetParser.rows(
+        await PhotoService.recognize(
+          draft!['sourcePath'] as String,
+          profile: controller.data.profile,
+        ),
+        controller.data.profile,
+      );
+      final row = ScoreSheetParser.automaticRow(rows);
+      if (row != null &&
+          controller.data.draft?['sourcePath'] == draft['sourcePath']) {
+        release();
+        await controller.saveDraft({
+          ...controller.data.draft!,
+          'frames': row.frames,
+          'sourceLabel': row.text,
+          'displayedTotal': row.displayedTotal,
+          'sourceCumulative': row.cumulativeTotals,
+        });
+      }
+    } catch (_) {
+      // Keep the existing draft and manual frame entry if reading fails.
+    } finally {
+      release();
+    }
+  }
+  if (context.mounted) return openGameEditor(context, controller, session);
 }
 
 Future<void> importScorePhoto(
@@ -102,6 +137,7 @@ Future<void> importScorePhoto(
         'sourcePath': path,
         'sourceLabel': row?.text,
         'displayedTotal': row?.displayedTotal,
+        'sourceCumulative': row?.cumulativeTotals,
       });
       if (!context.mounted) return;
       await Navigator.of(context).push<void>(
@@ -113,6 +149,7 @@ Future<void> importScorePhoto(
             sourcePath: path,
             sourceLabel: row?.text,
             displayedTotal: row?.displayedTotal,
+            sourceCumulative: row?.cumulativeTotals,
           ),
         ),
       );
@@ -202,15 +239,34 @@ class PhotoReviewPage extends StatefulWidget {
 class _PhotoReviewPageState extends State<PhotoReviewPage> {
   late Future<List<ScoreRow>> _rows;
   ScoreRow? _selected;
+  bool _leaving = false;
   @override
   void initState() {
     super.initState();
-    _rows = PhotoService.recognize(widget.path).then(
-      (lines) => ScoreSheetParser.rows(lines, widget.controller.data.profile),
-    );
+    _rows =
+        PhotoService.recognize(
+          widget.path,
+          profile: widget.controller.data.profile,
+        ).then((lines) {
+          final rows = ScoreSheetParser.rows(
+            lines,
+            widget.controller.data.profile,
+          );
+          final automatic = ScoreSheetParser.automaticRow(rows);
+          if (automatic != null) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (mounted && ModalRoute.of(context)?.isCurrent == true) {
+                _review(automatic);
+              }
+            });
+          }
+          return rows;
+        });
   }
 
   void _review(ScoreRow? row) {
+    if (_leaving) return;
+    _leaving = true;
     Navigator.pop(context, PhotoSelection(row));
   }
 
@@ -291,7 +347,9 @@ class _PhotoReviewPageState extends State<PhotoReviewPage> {
                                 ),
                               ),
                               subtitle: Text(
-                                row.extracted
+                                row.hasScoreConflict
+                                    ? 'Delivery marks found · displayed scores need review'
+                                    : row.extracted
                                     ? 'Frame sequence found · verify it against the photo'
                                     : 'Frame details need manual review',
                               ),

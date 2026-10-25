@@ -44,6 +44,7 @@ class GameEditor extends StatefulWidget {
     this.sourcePath,
     this.sourceLabel,
     this.displayedTotal,
+    this.sourceCumulative,
   });
   final BowlController controller;
   final BowlingSession session;
@@ -51,6 +52,7 @@ class GameEditor extends StatefulWidget {
   final List<String>? initialFrames;
   final String? sourcePath, sourceLabel;
   final int? displayedTotal;
+  final List<int>? sourceCumulative;
   @override
   State<GameEditor> createState() => _GameEditorState();
 }
@@ -63,6 +65,7 @@ class _GameEditorState extends State<GameEditor> {
   String? _primary;
   String? _sourcePath, _sourceLabel;
   int? _displayedTotal;
+  List<int>? _sourceCumulative;
   bool _mismatchAcknowledged = false;
   bool _saving = false;
   bool _draftError = false;
@@ -86,6 +89,9 @@ class _GameEditorState extends State<GameEditor> {
     _sourcePath = widget.sourcePath ?? draft?['sourcePath'] as String?;
     _sourceLabel = widget.sourceLabel ?? draft?['sourceLabel'] as String?;
     _displayedTotal = widget.displayedTotal ?? draft?['displayedTotal'] as int?;
+    _sourceCumulative =
+        widget.sourceCumulative ??
+        (draft?['sourceCumulative'] as List?)?.cast<int>();
     _frames = [for (final value in values) TextEditingController(text: value)];
     _lane = TextEditingController(
       text:
@@ -130,6 +136,7 @@ class _GameEditorState extends State<GameEditor> {
         'sourcePath': _sourcePath,
         'sourceLabel': _sourceLabel,
         'displayedTotal': _displayedTotal,
+        'sourceCumulative': _sourceCumulative,
       });
       await _pendingDraft;
       if (_draftError && mounted && version == _draftVersion) {
@@ -141,6 +148,15 @@ class _GameEditorState extends State<GameEditor> {
       }
     }
   }
+
+  bool _hasPhotoConflict(ScoreResult result) =>
+      result.complete &&
+      ((_displayedTotal != null && _displayedTotal != result.total) ||
+          (_sourceCumulative != null &&
+              List.generate(
+                10,
+                (i) => i,
+              ).any((i) => _sourceCumulative![i] != result.cumulative[i])));
 
   bool get _hasEdits {
     final game = widget.game;
@@ -186,9 +202,7 @@ class _GameEditorState extends State<GameEditor> {
     final result = TenPinScorer.score(frames);
     if (!result.complete ||
         _saving ||
-        (_displayedTotal != null &&
-            _displayedTotal != result.total &&
-            !_mismatchAcknowledged)) {
+        (_hasPhotoConflict(result) && !_mismatchAcknowledged)) {
       return;
     }
     FocusScope.of(context).unfocus();
@@ -246,9 +260,7 @@ class _GameEditorState extends State<GameEditor> {
       onPressed:
           result.complete &&
               !_saving &&
-              (_displayedTotal == null ||
-                  _displayedTotal == result.total ||
-                  _mismatchAcknowledged)
+              (!_hasPhotoConflict(result) || _mismatchAcknowledged)
           ? _save
           : null,
       icon: const Icon(Icons.check_rounded),
@@ -318,9 +330,7 @@ class _GameEditorState extends State<GameEditor> {
                         ),
                       const SizedBox(height: 20),
                     ],
-                    if (_displayedTotal != null &&
-                        result.complete &&
-                        _displayedTotal != result.total) ...[
+                    if (_hasPhotoConflict(result)) ...[
                       Card(
                         color: Theme.of(context).colorScheme.errorContainer,
                         child: CheckboxListTile(
@@ -329,7 +339,10 @@ class _GameEditorState extends State<GameEditor> {
                             () => _mismatchAcknowledged = v ?? false,
                           ),
                           title: Text(
-                            'The photo shows $_displayedTotal; these frames score ${result.total}.',
+                            _displayedTotal != null &&
+                                    _displayedTotal != result.total
+                                ? 'The photo shows $_displayedTotal; these frames score ${result.total}.'
+                                : 'The photo’s frame totals differ from these deliveries.',
                           ),
                           subtitle: const Text(
                             'Check the row, scratch score, and deliveries. Confirm only after reviewing the difference.',

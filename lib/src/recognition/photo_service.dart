@@ -8,6 +8,9 @@ import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
 import '../data/bounded_file.dart';
+import '../domain/models.dart';
+import '../domain/scoring.dart';
+import 'scoreboard_grid.dart';
 import 'score_parser.dart';
 
 abstract final class PhotoService {
@@ -57,14 +60,220 @@ abstract final class PhotoService {
     return image == null ? null : retain(await readPhoto(image));
   }
 
-  static Future<List<RecognizedLine>> recognize(String path) async {
+  static Future<List<RecognizedLine>> recognize(
+    String path, {
+    BowlerProfile? profile,
+  }) async {
     final bytes = await readPhoto(XFile(path));
-    final output = await channel.invokeMethod<List<dynamic>>('recognizeText', {
-      'bytes': bytes,
-    });
-    return (output ?? [])
-        .map((v) => RecognizedLine.fromJson(v as Map))
-        .toList();
+    Future<List<RecognizedLine>> read({
+      List<RecognitionRegion>? regions,
+      double aspect = 1,
+    }) async {
+      final output = await channel.invokeMethod<List<dynamic>>(
+        'recognizeText',
+        {
+          'bytes': bytes,
+          if (aspect != 1) 'aspect': aspect,
+          if (regions != null)
+            'regions': regions.map((r) => r.toJson()).toList(),
+        },
+      );
+      return (output ?? [])
+          .map((v) => RecognizedLine.fromJson(v as Map))
+          .toList();
+    }
+
+    var lines = await read();
+    if (profile == null ||
+        ScoreSheetParser.automaticRow(ScoreSheetParser.rows(lines, profile)) !=
+            null) {
+      return lines;
+    }
+    // Condensed, tall monitor fonts can lose narrow miss marks. Retry once
+    // with a bounded aspect correction while retaining full-row context.
+    try {
+      final corrected = await read(aspect: 2);
+      int quality(List<RecognizedLine> input) =>
+          ScoreSheetParser.rows(input, profile)
+              .where((row) => row.suggested)
+              .fold(
+                0,
+                (best, row) =>
+                    row.frames.where((f) => f.isNotEmpty).length > best
+                    ? row.frames.where((f) => f.isNotEmpty).length
+                    : best,
+              );
+      if (ScoreSheetParser.automaticRow(
+                ScoreSheetParser.rows(corrected, profile),
+              ) !=
+              null ||
+          quality(corrected) > quality(lines)) {
+        lines = corrected;
+      }
+    } catch (_) {
+      /* Regional reading can still use the original geometry. */
+    }
+    if (ScoreSheetParser.automaticRow(ScoreSheetParser.rows(lines, profile)) !=
+        null) {
+      return lines;
+    }
+    final regions = ScoreboardGrid.regions(lines, profile);
+    if (regions.isEmpty) return lines;
+    try {
+      final refined = await read(regions: regions);
+      // Apple Vision reports word bounds, so retain a full-row contextual
+      // reading for sparse cells that remain incomplete in isolated crops.
+      var contextLines = <RecognizedLine>[];
+      if (!lines
+          .expand(ScoreboardGrid.words)
+          .any((w) => w.elements.isNotEmpty)) {
+        try {
+          contextLines = await read(aspect: 1.5);
+        } catch (_) {
+          /* Optional retry. */
+        }
+      }
+      final replacements = <RecognizedLine>[];
+      final active = <RecognitionRegion>[];
+      List<RecognizedLine> marks(
+        List<RecognizedLine> input,
+        RecognitionRegion region, {
+        bool strokes = false,
+      }) => [
+        for (final line in input)
+          for (final word in ScoreboardGrid.words(line))
+            for (final symbol in ScoreboardGrid.symbols(word))
+              if (region.contains(symbol) &&
+                  symbol.isStroke == strokes &&
+                  RegExp(
+                    r'^[0-9XF/×–—\-]$',
+                    caseSensitive: false,
+                  ).hasMatch(symbol.text))
+                symbol,
+      ]..sort((a, b) => a.x.compareTo(b.x));
+      for (final region in regions) {
+        final original = marks(lines, region);
+        final observed = marks(refined, region);
+        final strokes = marks(refined, region, strokes: true);
+        final contextual = marks(contextLines, region);
+        String notation(List<RecognizedLine> input) => input
+            .map((s) => s.text)
+            .join()
+            .toUpperCase()
+            .replaceAll('×', 'X')
+            .replaceAll('–', '-')
+            .replaceAll('—', '-');
+        bool containsOriginal(List<RecognizedLine> proposed) {
+          var index = 0;
+          for (final symbol in proposed) {
+            if (index < original.length &&
+                notation([original[index]]) == notation([symbol])) {
+              index++;
+            }
+          }
+          return index == original.length;
+        }
+
+        // An isolated stroke augments actual observed deliveries, never a
+        // combination inferred from a cumulative or final score.
+        bool isNewStroke(RecognizedLine stroke, List<RecognizedLine> base) {
+          if (base.isEmpty) return false;
+          if (stroke.centerX > base.last.centerX + stroke.width * .3) {
+            return true;
+          }
+          // Interior or leading strokes must occupy a real gap; exclude
+          // horizontal fragments within an already-recognized digit.
+          return !base.any(
+            (o) => stroke.x < o.x + o.width && stroke.x + stroke.width > o.x,
+          );
+        }
+
+        List<RecognizedLine> withStrokes(List<RecognizedLine> base) =>
+            [...base, ...strokes.where((s) => isNewStroke(s, base))]
+              ..sort((a, b) => a.x.compareTo(b.x));
+        List<RecognizedLine> complement(List<RecognizedLine> extra) => [
+          ...original,
+          ...extra.where(
+            (s) => !original.any(
+              (o) => s.x < o.x + o.width && s.x + s.width > o.x,
+            ),
+          ),
+        ]..sort((a, b) => a.x.compareTo(b.x));
+        final observedPlus = complement(observed);
+        final contextualPlus = complement(contextual);
+        // Prefer complete OCR over morphology. Combine only non-overlapping
+        // observations, preserving every character already seen in the row.
+        final choices = [
+          observed,
+          contextual,
+          observedPlus,
+          contextualPlus,
+          withStrokes(original),
+          withStrokes(observedPlus),
+          withStrokes(contextualPlus),
+        ];
+        final choice = choices
+            .where(
+              (c) =>
+                  c.isNotEmpty &&
+                  containsOriginal(c) &&
+                  TenPinScorer.parseFrame(
+                    notation(c),
+                    tenth: region.tenth,
+                  ).complete,
+            )
+            .firstOrNull;
+        if (choice == null) continue;
+        active.add(region);
+        for (final symbol in choice) {
+          replacements.add(
+            RecognizedLine(
+              text: symbol.text,
+              x: symbol.x,
+              y: symbol.y,
+              width: symbol.width,
+              height: symbol.height,
+              elements: [symbol],
+            ),
+          );
+        }
+      }
+      // Retain original symbols outside each replaced cell, including words
+      // which crossed a frame boundary in the first pass.
+      final merged = <RecognizedLine>[];
+      for (final line in lines) {
+        for (final word in ScoreboardGrid.words(line)) {
+          final original = ScoreboardGrid.symbols(word).toList();
+          final kept = original
+              .where((symbol) => !active.any((r) => r.contains(symbol)))
+              .toList();
+          if (kept.isEmpty) continue;
+          final retained = kept.length == original.length
+              ? word
+              : RecognizedLine(
+                  text: kept.map((s) => s.text).join(),
+                  x: word.x,
+                  y: word.y,
+                  width: word.width,
+                  height: word.height,
+                  elements: kept,
+                );
+          merged.add(
+            RecognizedLine(
+              text: retained.text,
+              x: retained.x,
+              y: retained.y,
+              width: retained.width,
+              height: retained.height,
+              elements: [retained],
+            ),
+          );
+        }
+      }
+      return [...merged, ...replacements];
+    } catch (_) {
+      return lines; // A failed regional pass keeps the original/manual review.
+    }
   }
 
   static Future<String?> recover() async {
