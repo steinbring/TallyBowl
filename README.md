@@ -1,56 +1,66 @@
 # TallyBowl!
 
-**How you bowled, tonight.**
+**How you bowled, tonight.** A Flutter bowling journal for native macOS, iPadOS, and Android. Planned website: [tallybowl.jws.app](https://tallybowl.jws.app).
 
-A Flutter bowling journal for macOS, iPadOS, and Android. Its website will be [tallybowl.jws.app](https://tallybowl.jws.app).
+The beta candidate is **0.1.7 (8)**. The previously installed owner build is 0.1.6 (7). TestFlight account setup, hosted privacy/support pages, distribution signing, and physical Apple acceptance checks are tracked in [TestFlight readiness](docs/TESTFLIGHT.md). A passing local build does not establish that an upload or Apple review has passed.
 
-Development build 0.1.3 (4) includes:
+## What works
 
-- A personal profile with scoreboard names and aliases.
-- Ball inventory with an offline manufacturer/model starter catalog and custom entries.
-- Saved alleys with key-free Photon/OpenStreetMap name-and-city suggestions, manual entry, and map pin selection with `flutter_map`.
-- League/practice sessions, per-game lanes, ball tags, and an optional primary ball.
-- An editable ten-pin frame grid with deterministic scoring, tenth-frame validation, and recoverable drafts.
-- Camera/photo import with local Apple Vision or bundled Android ML Kit recognition, explicit row selection, and manual correction.
-- History, scoring trends, ball usage, alley visits, strike rates, and spare conversion statistics.
-- Branded session recap images and native image sharing.
-- System light/dark appearance, scalable layouts, and accessible scorecard labels.
-- Local SQLite storage, versioned JSON backup/restore with a recovery copy, and game/delivery CSV export.
+- One bowler with scoreboard name/nickname aliases; standard ten-pin scratch scoring.
+- An offline ball starter catalog, unrestricted custom entries, and retiring inventory while retaining history.
+- Saved alleys with explicit key-free Photon/OpenStreetMap suggestions, manual entry, and `flutter_map` pin selection.
+- Practice/league sessions, date and lane/pair, per-game ball tags, optional primary ball, and notes.
+- Camera/photo import with on-device Apple Vision or bundled Android ML Kit; geometry-based frame parsing, editable frames, deterministic scoring, and recoverable drafts.
+- Automatic frame filling for a unique matching row only when the complete delivery sequence validates against available cumulative checkpoints. Ambiguous results open review; missing deliveries are never invented from totals.
+- History and statistics with sample counts, alley visits, ball usage, strike/spare rates, and scoring trends.
+- Branded PNG recaps, privacy switches, native image sharing and export.
+- Local SQLite storage, versioned JSON backups with before-restore recovery, and game/delivery CSV exports.
+- System light/dark appearance, scalable layouts, accessible scorecard labels, offline help/privacy pages, and installed version/build in Settings.
 
-Recognition is a prototype for clear horizontal score rows. Real scoreboard layout coverage and camera behavior still need representative photo and physical-device testing. No cloud AI fallback is implemented. See [development status](docs/DEVELOPMENT.md) for limits and verification details, and the [project roadmap](docs/ROADMAP.md) for the wider release plan.
+There is no cloud AI fallback, account, automatic sync, or iPhone target. Real-photo verification currently covers **one monitor layout** plus synthetic fixtures; always compare every delivery before saving. Multi-photo combining, crop/rotation tools, handicap scoring, and per-delivery ball assignment are deferred. Android ML Kit may send SDK diagnostics to Google; map/search providers receive requests. See the [privacy policy](docs/PRIVACY_POLICY.md).
 
-## Run
+## Documentation
 
-Use Flutter **3.47.5 or newer** with Dart **3.13.4 or newer** and the target platform toolchain. The verified toolchain uses Xcode 27 and the installed Android SDK. From the project folder:
+| Need | Document |
+| --- | --- |
+| Learn recording, sharing, backup and recovery | [User guide](docs/USER_GUIDE.md), also available offline in Settings |
+| Prepare an Apple beta and understand remaining gates | [TestFlight readiness and release runbook](docs/TESTFLIGHT.md) |
+| Fill in beta/reviewer information | [TestFlight metadata draft](docs/TESTFLIGHT_METADATA.md) |
+| Understand architecture and change it safely | [Architecture and maintenance](docs/ARCHITECTURE.md) |
+| Verify hardware workflows | [Device testing](docs/DEVICE_TESTING.md) |
+| Understand scope and what comes next | [Roadmap](docs/ROADMAP.md) |
+| Review service policies and attribution | [Data sources](docs/DATA_SOURCES.md) |
+| Inspect previous implementation/test evidence | [Development history](docs/DEVELOPMENT.md), [share handoff](docs/SHARING_VERIFICATION.md) |
+| Prepare Android store signing | [Android signing](docs/ANDROID_SIGNING.md) |
+
+Historical audit dispositions remain in `docs/AUDIT_RESOLUTION.md`, `docs/AUDIT_ROUND2_RESOLUTION.md`, and `docs/REVIEW.md`. Their older test counts and build numbers describe those revisions.
+
+## Develop and verify
+
+Use Flutter **3.47.5+**, Dart **3.13.4+**, Xcode 27 for Apple targets, and the Android SDK. Commit `pubspec.lock`; review upgrades deliberately.
 
 ```sh
 flutter pub get
 flutter run -d macos
-```
-
-Use `flutter devices` to find an iPad simulator/device or Android target, then `flutter run -d <device-id>`.
-
-## Check
-
-```sh
 flutter analyze
 flutter test
-flutter test integration_test/on_device_recognition_test.dart -d macos
-flutter test integration_test/suggestions_preview_test.dart -d macos
-./tool/verify_native.sh
+python3 tool/render_documents.py --check
+python3 tool/testflight_preflight.py
 ```
 
-For the optional 10,000-game benchmark, run `flutter test benchmark/journal_benchmark.dart`. It writes observations to `build/benchmarks/journal.json` without machine-dependent timing assertions. The recap golden is checked by the normal test suite.
+Use `flutter devices` then `flutter run -d <device-id>` for another target. Native bridge checks are separate from Dart tests:
 
-The native integration test generates its own synthetic image, exercises on-device recognition, and renders a branded recap PNG. It does not access the camera or user photos.
+```sh
+./tool/verify_native.sh
+flutter test integration_test/on_device_recognition_test.dart -d macos
+```
 
-## Maps and suggestions
+The native integration test uses a synthetic scoreboard and exports a recap; it does not establish real camera accuracy. `integration_test/suggestions_preview_test.dart` is an optional visual harness; a recent rerun stalled in native focus/foreground handling and is not part of the release acceptance evidence. The optional large-journal benchmark is `flutter test benchmark/journal_benchmark.dart` and writes ignored `build/benchmarks/journal.json`.
 
-The development map uses OpenStreetMap's public raster tiles with attribution, an identifying User-Agent, HTTP caching, and no offscreen prefetch buffer. Select production map/search hosting before release. A different OSM-compatible tile service can be supplied using `--dart-define=TALLYBOWL_TILE_URL=...`; set `TALLYBOWL_TILE_ATTRIBUTION` and `TALLYBOWL_TILE_ATTRIBUTION_URL` for that provider's requirements. The identifying User-Agent derives its version from installed package metadata. Alley suggestions use the documented Photon API and require neither a key nor screen scraping. Searches are submitted explicitly; the app caches queries and handles service limits. Configure another Photon endpoint with `--dart-define=TALLYBOWL_PHOTON_URL=https://your-host/api/`.
+App help and privacy Markdown are generated from the same bundled JSON shown in Settings. Edit `assets/documents/*.json`, then run `python3 tool/render_documents.py`. Do not edit their generated Markdown copies directly.
 
+## Services and distribution
 
-The ball starter catalog is bundled and works offline. It contains 11 brands and 22 selected model names, plus previously entered models; it accepts any custom entry. A suitable documented, key-free public ball API was not found. See [data sources and service policies](docs/DATA_SOURCES.md), the [pre-test review](docs/REVIEW.md), the [first audit verification](docs/AUDIT_RESOLUTION.md), and the [round-2 verification](docs/AUDIT_ROUND2_RESOLUTION.md).
+No API key or scraping is used for alley suggestions. Public OSM tiles and the Photon demo are suitable only while usage complies with their policies; they have no availability guarantee. Manual alley entry and saved alleys remain usable offline. Before expanding the beta, review capacity, provider retention/privacy, attribution and any necessary hosting change. Configuration uses `--dart-define=TALLYBOWL_TILE_URL=...`, `TALLYBOWL_TILE_ATTRIBUTION`, `TALLYBOWL_TILE_ATTRIBUTION_URL`, and `TALLYBOWL_PHOTON_URL`. Update the privacy policy whenever providers change.
 
-## Try this build
-
-On this Mac, run `flutter run -d macos`. For an ad hoc Mac release archive, run `flutter build macos --release` followed by `./tool/package_macos_local.sh`; the packaging step applies an explicit local library-validation exception without changing production entitlements. Its `OWNER-TEST-ONLY` archive and sealed build manifest identify it as unsuitable for public distribution. Local packaged builds and installation notes are listed in [development status](docs/DEVELOPMENT.md). Android release APK/AAB builds require [explicit protected signing configuration](docs/ANDROID_SIGNING.md); missing credentials stop the build. Use the debug APK for initial owner testing. Physical iPad installation requires Apple development signing; a simulator build cannot be installed on an iPad.
+For local owner testing, Android debug builds use the existing development key. A Mac build packaged with `tool/package_macos_local.sh` is explicitly **OWNER-TEST-ONLY**, ad hoc signed with a local library-validation exception. It is unsuitable for TestFlight. Apple beta distribution uses separately archived and App Store Connect signed products described in the [runbook](docs/TESTFLIGHT.md). Preserve JSON backups before changing signing/distribution channels; never uninstall a populated app automatically to bypass a signing error.

@@ -1,5 +1,7 @@
 # Owner testing — build 0.1.6 (7)
 
+The documented installed owner build is 0.1.6 (7). Source candidate **0.1.7 (8)** adds offline help/privacy, installed version display and Apple packaging metadata; it has not been installed through TestFlight. Repeat this checklist on the distribution-signed candidate and record its exact version. Current distribution gates and local archive evidence are in [TESTFLIGHT.md](TESTFLIGHT.md).
+
 Start with the Samsung Galaxy Z Fold 8, then repeat the camera, import, sharing, and accessibility checks on a physical iPad and a supported Mac. Current automated checks are described in [development status](DEVELOPMENT.md). The Samsung was installed with build 0.1.4 (5) and supplied the first real-photo regression. This checklist separates further hardware checks from automated evidence.
 
 ## Verified branding update — October 25, 2026
