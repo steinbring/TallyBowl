@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -79,6 +80,14 @@ void main() {
         try {
           final path = (args['paths'] as List).single as String;
           expect(await File(path).exists(), isTrue);
+          expect(args['mimeTypes'], ['image/png']);
+          final png = await File(path).readAsBytes();
+          expect(png.take(8).toList(), [137, 80, 78, 71, 13, 10, 26, 10]);
+          final codec = await ui.instantiateImageCodec(png);
+          final frame = await codec.getNextFrame();
+          expect(frame.image.width, 1080);
+          frame.image.dispose();
+          codec.dispose();
           expect(p.basename(path), 'tallybowl-recap.png');
           expect(path, isNot(contains('2026-10-23')));
           for (final chip in tester.widgetList<FilterChip>(
