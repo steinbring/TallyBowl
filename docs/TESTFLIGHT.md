@@ -1,6 +1,6 @@
 # TestFlight readiness and release runbook
 
-Assessed October 25, 2026. Candidate **0.1.7 (8)**, bundle ID **app.jws.tallybowl**, existing Apple team **R9DBX89RA5**. Previously installed owner build: **0.1.6 (7)** on Mac and Samsung. No TestFlight build has been uploaded or approved by this preparation work.
+Assessed October 25, 2026. Candidate **0.1.7 (8)**, bundle ID **app.jws.tallybowl**, existing Apple team **R9DBX89RA5**. Owner build **0.1.7 (8)** is installed on the Mac and iPad; Samsung remains on **0.1.6 (7)**. No TestFlight build has been uploaded or approved by this preparation work.
 
 ## Readiness decision
 
@@ -37,6 +37,7 @@ Verified against candidate **0.1.7 (8)** on October 25, 2026:
 | Public URL check | Support contact **passed** at `https://jws.dev/contact`; planned `https://tallybowl.jws.app/privacy` **still fails DNS**. JSON: `build/readiness/public-url-check.json` |
 | Final public contact update | Joe Steinbring and the approved support link are in both bundled documents and generated Markdown; the two document/navigation/accessibility checks were rerun successfully after this content update |
 | Physical distribution install / Apple validation | **Not performed**; no current-candidate camera/share/VoiceOver or account/upload pass claimed |
+| Local owner installations | 0.1.7 (8) installed/launched on Mac mini and physical iPad; all journal records/profile/draft unchanged. Existing Development signing was used for iPad and the labeled owner-only package for Mac. See `DEVICE_TESTING.md`; this is separate from TestFlight acceptance |
 
 Build logs are `build/testflight-ios-archive.log`, `build/testflight-macos-build.log`, `build/testflight-macos-archive.log`, `build/testflight-tests.log` and `build/testflight-analyze.log`. Keep failures visible until resolved; the most recent successful command and its exact version matter more than the presence of an old file. These outputs are ignored by Git. Current changes are on `codex/testflight-readiness`; no populated installation was replaced by this preparation work.
 
@@ -95,7 +96,7 @@ Uploading, changing App Store Connect state and inviting testers are separate ex
 
 ## Internal acceptance and external expansion
 
-Install the processed build through TestFlight on the real iPad and native Mac. Record its installed version from Settings. Use a fresh isolated journal first and separately verify a backed-up in-place owner upgrade. Complete [DEVICE_TESTING.md](DEVICE_TESTING.md), with particular attention to permissions, a real final scoreboard, offline recognition, every delivery/total, an interrupted draft, native PNG handoff/popover, recovery after restore, and accessibility. The plugged-in iPad was offline during this assessment and its earlier development installation is not evidence for candidate 0.1.7.
+Install the processed build through TestFlight on the real iPad and native Mac. Record its installed version from Settings. Use a fresh isolated journal first and separately verify a backed-up in-place owner upgrade. Complete [DEVICE_TESTING.md](DEVICE_TESTING.md), with particular attention to permissions, a real final scoreboard, offline recognition, every delivery/total, an interrupted draft, native PNG handoff/popover, recovery after restore, and accessibility. The iPad became available after the initial readiness assessment: development-signed 0.1.7 (8) is now installed and running with unchanged data. This owner-install check does not replace distribution-signed TestFlight or full device-flow acceptance.
 
 AeroSloth's Android image-receive path previously passed a real emulator handoff; Apple share-extension availability still needs testing. “Share sheet opened” alone does not prove the destination received a valid image. Use a recipient composer/local attachment without publishing unless the owner intentionally sends it.
 

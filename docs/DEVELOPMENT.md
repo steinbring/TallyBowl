@@ -1,6 +1,6 @@
 # TallyBowl! development status
 
-Updated October 25, 2026. Candidate source is **0.1.7 (8)**; the installed Mac/Samsung owner build remains **0.1.6 (7)**. See [TestFlight readiness](TESTFLIGHT.md) for current candidate checks and remaining account, hosting, signing and hardware gates. The results below retain their original build labels; production distribution has not been verified.
+Updated October 25, 2026. Candidate source and installed Mac/iPad owner builds are **0.1.7 (8)**; the Samsung remains on **0.1.6 (7)**. The Apple updates launched and preserved all existing data; see [device testing](DEVICE_TESTING.md). See [TestFlight readiness](TESTFLIGHT.md) for candidate checks and remaining account, hosting, signing and hardware gates. The results below retain their original build labels; production distribution has not been verified.
 
 ## Feature branches
 
@@ -42,6 +42,8 @@ Features are committed on `codex/` branches and merged locally into `main`. The 
 | `codex/bowler-branding` | Pointing bowler master, matching app/recap/launcher identity, three-hole bowling-ball navigation and theme checks |
 | `codex/owner-build-0-1-6` | Branding preview timing, verified owner packages and data-preserving updates |
 | `codex/testflight-readiness` | Offline help/privacy, version display, Apple manifests/launch art/category, current documentation and archive preflight |
+| `codex/public-support-contact` | Approved Joe Steinbring identity and verified jws.dev contact link in bundled help/privacy and release metadata |
+| `codex/owner-install-0-1-7` | Verified 0.1.7 Mac/iPad owner installations, protected backups and unchanged-journal comparisons |
 
 The completed stack is integrated into local `main` after verification. Feature branches are retained. All work is local until explicitly pushed to the remote repository.
 
@@ -197,18 +199,19 @@ The generator uses Core Graphics/ImageIO, writes an inset rounded tile with tran
 
 ## Install the local test build
 
-Version **0.1.6**, build **7**. These packages are generated locally and ignored by Git:
+Mac/iPad owner version **0.1.7 (8)**; Samsung version **0.1.6 (7)**. These packages are generated locally and ignored by Git:
 
 | Target | Local package | Installation |
 | --- | --- | --- |
-| macOS | `build/releases/TallyBowl-0.1.6-macos-OWNER-TEST-ONLY.zip` (about 20 MB) | Unzip, move `TallyBowl!.app` to Applications if desired, then open it. The app is a universal Intel/Apple silicon release build with an ad hoc signature and an explicit local library-validation exception; it is not a notarized distribution. |
+| macOS | `build/releases/TallyBowl-0.1.7-macos-OWNER-TEST-ONLY.zip` | Installed in Applications and launched. The app is a universal Intel/Apple silicon release build with an ad hoc signature and an explicit local library-validation exception; it is not a notarized distribution. |
 | Android | `build/releases/TallyBowl-0.1.6-android-debug.apk` (about 224 MB) | Transfer the APK to the device and open it, allowing installation from the selected source if Android prompts. This uses the local development key. Production releases use explicit protected key properties; missing credentials stop release builds. |
 | iPad simulator | `build/ios/iphonesimulator/Runner.app` | Run `flutter run -d <simulator-id>` or install this app through the simulator tools. A simulator binary cannot be installed on a physical iPad. |
+| Physical iPad | `build/ios/iphoneos/Runner.app` | Development-signed 0.1.7 (8), installed over 0.1.4 (5) and launched on the owner's connected iPad. |
 
-For a physical iPad owner build, use development signing in the iOS Runner project, then `flutter run -d <device-id>`. A development-signed 0.1.4 build was installed on the owner's iPad previously; that does not verify the current candidate. No TestFlight distribution IPA has been exported or uploaded. Follow the separate [Apple runbook](TESTFLIGHT.md) for that path.
+For a physical iPad owner build, use the existing development signing setup in the iOS Runner project and build the normal `lib/main.dart` release target, then install with `devicectl` (or use `flutter run` for development). The current owner build is 0.1.7 (8); before/after comparisons confirmed the existing three alleys, two balls and profile/draft were unchanged. No TestFlight distribution IPA has been exported or uploaded. Follow the separate [Apple runbook](TESTFLIGHT.md) for that path.
 
 The strict release build enables hardened runtime and disables Xcode's injected `get-task-allow`. Ad hoc apps/frameworks have no Team ID: the strict build failed the runtime library check during smoke launch. `tool/package_macos_local.sh` therefore signs a **copy** with only the local `disable-library-validation` exception, retaining sandbox/runtime protections and no JIT/debug entitlement. It refuses to change a team-signed app. The archive filename includes `OWNER-TEST-ONLY`; a signed/sealed `Contents/Resources/TallyBowlBuild.json` records its version, build, non-distribution warning and exact signing/runtime policy. Production entitlements retain library validation. TestFlight/App Store distribution requires its own correct signing and Apple validation; a separate direct Mac download would use Developer ID signing and notarization.
 
-`build/releases/checksums.json` records SHA-256 values, code revision and owner-only distribution policy for the packaged Mac and Android builds. The current Mac archive is built from the normal `lib/main.dart` entry point. Package signature/ZIP integrity and Android APK signature/version checks are recorded with each build; previous smoke-launch evidence is labeled by build above.
+`build/releases/checksums-0.1.7.json` records the new Mac package hash, source revision, owner-only policy and iPad development-install identity. `build/releases/checksums.json` retains the prior 0.1.6 Mac/Android package record. The current Mac archive is built from the normal `lib/main.dart` entry point. Package signatures/versions and the private before/after journal comparisons were verified; previous smoke-launch evidence is labeled by build above.
 
 Start by adding a profile, a searched or manual alley, and balls from suggestions or custom names. Record a manual game, then try a real scoreboard photo and compare every frame. Finish the session, inspect the branded recap and try a share destination. Export a JSON backup before experimenting with restore. Physical camera/share workflows, Android picker process recovery, TalkBack/VoiceOver and representative scoreboard recognition are the key remaining device checks. See [review findings](REVIEW.md) for the full record.
