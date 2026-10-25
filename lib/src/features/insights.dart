@@ -75,7 +75,7 @@ class _InsightsPageState extends State<InsightsPage> {
         const SizedBox(height: 24),
         if (games.isEmpty)
           const EmptyCard(
-            icon: Icons.insights_rounded,
+            icon: Icon(Icons.insights_rounded),
             title: 'Patterns come with practice.',
             body: 'Record a few games to see your averages, strike rate, spare conversions, and equipment comparisons.',
           )

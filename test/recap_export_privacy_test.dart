@@ -76,6 +76,12 @@ void main() {
         await tester.pumpAndSettle();
         await tester.tap(find.text('Share image'));
         await tester.pump();
+        // Continue painting while a cold asset decode completes, as a real
+        // application does before exporting the finished recap.
+        for (var i = 0; i < 100 && !shared.isCompleted; i++) {
+          await Future<void>.delayed(const Duration(milliseconds: 10));
+          await tester.pump(const Duration(milliseconds: 16));
+        }
         final args = await shared.future.timeout(const Duration(seconds: 10));
         try {
           final path = (args['paths'] as List).single as String;

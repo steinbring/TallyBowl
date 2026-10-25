@@ -1,5 +1,3 @@
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -103,7 +101,7 @@ class EmptyCard extends StatelessWidget {
     required this.body,
     this.action,
   });
-  final IconData icon;
+  final Widget icon;
   final String title, body;
   final Widget? action;
   @override
@@ -117,10 +115,12 @@ class EmptyCard extends StatelessWidget {
             CircleAvatar(
               radius: 30,
               backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-              child: Icon(
-                icon,
-                size: 28,
-                color: Theme.of(context).colorScheme.onPrimaryContainer,
+              child: IconTheme(
+                data: IconThemeData(
+                  size: 28,
+                  color: Theme.of(context).colorScheme.onPrimaryContainer,
+                ),
+                child: icon,
               ),
             ),
             const SizedBox(height: 18),
@@ -263,16 +263,6 @@ class _BallPainter extends CustomPainter {
         Paint()..color = BowlColors.ink.withValues(alpha: .8),
       );
     }
-    canvas.drawArc(
-      Rect.fromCircle(center: center, radius: size.width * .36),
-      math.pi * .8,
-      math.pi * .6,
-      false,
-      Paint()
-        ..color = Colors.white.withValues(alpha: .16)
-        ..strokeWidth = size.width * .04
-        ..style = PaintingStyle.stroke,
-    );
   }
 
   @override

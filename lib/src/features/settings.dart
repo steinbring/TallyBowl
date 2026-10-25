@@ -10,6 +10,7 @@ import '../data/bowl_store.dart';
 import '../data/exports.dart';
 import '../domain/models.dart';
 import '../ui/common.dart';
+import '../ui/branding.dart';
 import '../ui/dialogs.dart';
 
 class ProfileSettings extends StatefulWidget {
@@ -302,6 +303,8 @@ class _ProfileSettingsState extends State<ProfileSettings> {
                           ),
                         ),
                         const SizedBox(height: 20),
+                        const TallyBowlLogo(size: 64),
+                        const SizedBox(height: 12),
                         const Text(
                           AppConfig.name,
                           style: TextStyle(

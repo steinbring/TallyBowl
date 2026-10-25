@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../app_controller.dart';
 import '../theme.dart';
 import '../ui/common.dart';
+import '../ui/branding.dart';
 import '../ui/layout.dart';
 import '../ui/dialogs.dart';
 import 'alley_map.dart';
@@ -27,7 +28,7 @@ class BagPage extends StatelessWidget {
         ),
         if (data.balls.isEmpty)
           EmptyCard(
-            icon: Icons.sports_baseball_rounded,
+            icon: const BowlingBallIcon(),
             title: 'Meet your next favorite ball.',
             body: 'Add the balls you own, then tag them in your games to track usage and scoring trends.',
             action: OutlinedButton(
@@ -229,7 +230,7 @@ class AlleysPage extends StatelessWidget {
         ),
         if (data.alleys.isEmpty)
           EmptyCard(
-            icon: Icons.location_on_outlined,
+            icon: Icon(Icons.location_on_outlined),
             title: 'Where do you roll?',
             body: 'Save your favorite bowling alleys. Each session adds to their visit history and scoring averages.',
             action: OutlinedButton(

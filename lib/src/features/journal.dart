@@ -230,7 +230,7 @@ class TonightPage extends StatelessWidget {
           const SizedBox(height: 16),
           if (games.isEmpty)
             const EmptyCard(
-              icon: Icons.scoreboard_outlined,
+              icon: Icon(Icons.scoreboard_outlined),
               title: 'The first frame starts here.',
               body: 'Record your opening game. You can leave a draft and finish it later.',
             ),
@@ -289,7 +289,7 @@ class TonightPage extends StatelessWidget {
           const SizedBox(height: 16),
           if (data.sessions.isEmpty)
             const EmptyCard(
-              icon: Icons.nights_stay_outlined,
+              icon: Icon(Icons.nights_stay_outlined),
               title: 'A fresh scorecard.',
               body: 'Start a practice or league session, choose your lanes, and make tonight part of your story.',
             ),
@@ -370,7 +370,7 @@ Future<void> showSession(
                     const SizedBox(height: 24),
                     if (games.isEmpty)
                       const EmptyCard(
-                        icon: Icons.scoreboard_outlined,
+                        icon: Icon(Icons.scoreboard_outlined),
                         title: 'No saved games',
                         body: 'Your session is ready for its first game.',
                       ),
@@ -514,7 +514,7 @@ class _HistoryPageState extends State<HistoryPage> {
         const SizedBox(height: 24),
         if (sessions.isEmpty)
           EmptyCard(
-            icon: Icons.history_rounded,
+            icon: Icon(Icons.history_rounded),
             title: data.sessions.isEmpty
                 ? 'Your history starts tonight.'
                 : 'No matching sessions',

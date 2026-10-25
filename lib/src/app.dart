@@ -8,6 +8,7 @@ import 'features/inventory.dart';
 import 'features/journal.dart';
 import 'theme.dart';
 import 'ui/common.dart';
+import 'ui/branding.dart';
 import 'ui/layout.dart';
 import 'ui/app_navigation.dart';
 import 'features/settings.dart';
@@ -48,7 +49,7 @@ class _TallyBowlAppState extends State<TallyBowlApp> {
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 500),
                 child: EmptyCard(
-                  icon: Icons.storage_outlined,
+                  icon: Icon(Icons.storage_outlined),
                   title: 'Your journal couldn’t be opened.',
                   body: 'Your saved data has been left in place. Try opening it again.',
                   action: FilledButton(
@@ -156,12 +157,22 @@ class _BowlShellState extends State<BowlShell> {
               ? null
               : AppBar(
                   toolbarHeight: BowlLayout.toolbarHeight(context),
-                  title: const Text(
-                    'TallyBowl!',
-                    style: TextStyle(
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: -1,
-                    ),
+                  title: const Row(
+                    children: [
+                      ExcludeSemantics(child: TallyBowlLogo(size: 34)),
+                      SizedBox(width: 10),
+                      Flexible(
+                        child: Text(
+                          'TallyBowl!',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: -1,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                   actions: [
                     IconButton(
@@ -251,7 +262,7 @@ class _BowlShellState extends State<BowlShell> {
                   onDestinationSelected: (i) => setState(() => _index = i),
                   destinations: [
                     for (final d in bowlDestinations)
-                      NavigationDestination(icon: Icon(d.$2), label: d.$1),
+                      NavigationDestination(icon: d.$2, label: d.$1),
                   ],
                 ),
         );

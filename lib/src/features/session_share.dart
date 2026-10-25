@@ -10,6 +10,7 @@ import '../data/exports.dart';
 import '../domain/models.dart';
 import '../theme.dart';
 import '../ui/common.dart';
+import '../ui/branding.dart';
 import '../ui/layout.dart';
 
 Future<void> openSessionShare(
@@ -46,6 +47,9 @@ class _SessionSharePageState extends State<SessionSharePage> {
     setState(() => _busy = true);
     final anchor = BowlExports.origin(buttonContext);
     try {
+      // Asset decoding can outlast the first frame on a cold image cache.
+      await precacheImage(const AssetImage(TallyBowlLogo.asset), context);
+      if (!mounted) return;
       await WidgetsBinding.instance.endOfFrame;
       final boundary =
           _imageKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
@@ -265,7 +269,7 @@ class RecapCard extends StatelessWidget {
           children: [
             const Row(
               children: [
-                BallArt(size: 34, color: Color(0xFFFF9C73)),
+                TallyBowlLogo(size: 48),
                 SizedBox(width: 12),
                 Text(
                   'TallyBowl!',
