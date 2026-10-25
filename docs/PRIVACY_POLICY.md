@@ -40,11 +40,11 @@ For a full local reset, export anything you want to keep first. On Android, use 
 
 TestFlight is operated by Apple. If you send beta feedback, crash reports, screenshots, or diagnostic attachments through TestFlight, Apple and the developer may receive that information. Include only information you intend to share. For a recognition report, use a photo you have permission to send and remove other bowlers’ names.
 
-Privacy and support contact information will be published at https://tallybowl.jws.app/support before the hosted beta opens to testers. This policy will be updated when relevant app behavior or service providers change.
+TallyBowl is developed and published by Joe Steinbring. For privacy questions or app support, contact Joe through https://jws.dev/contact. This policy will be updated when relevant app behavior or service providers change.
 
 ## Links
 
-- [TallyBowl support](https://tallybowl.jws.app/support)
+- [Contact Joe Steinbring](https://jws.dev/contact)
 - [OpenStreetMap Foundation privacy policy](https://osmfoundation.org/wiki/Privacy_Policy)
 - [komoot privacy policy](https://www.komoot.com/privacy)
 - [Google ML Kit Android data disclosure](https://developers.google.com/ml-kit/android-data-disclosure)

@@ -53,12 +53,12 @@
     {
       "heading": "Report a beta problem",
       "paragraphs": [
-        "Settings shows the installed version and build number. Include those, your device and OS, the steps taken, what you expected, and what happened. Note whether you were offline, using large text or a screen reader, or had just rotated, folded, or resized the app. TestFlight feedback can attach screenshots and diagnostics.",
+        "TallyBowl is developed and published by Joe Steinbring. Contact Joe for help through https://jws.dev/contact. Settings shows the installed version and build number. Include those, your device and OS, the steps taken, what you expected, and what happened. Note whether you were offline, using large text or a screen reader, or had just rotated, folded, or resized the app. TestFlight feedback can attach screenshots and diagnostics.",
         "For a recognition error, record the expected delivery marks for all ten frames and whether the selected name was correct. Share only photos you have permission to send, and hide other bowlers’ information. Keep your original backup. This beta has been checked against one real monitor layout and synthetic fixtures; additional scoreboards need evaluation."
       ]
     }
   ],
   "links": [
-    {"label": "TallyBowl support", "url": "https://tallybowl.jws.app/support"}
+    {"label": "Contact Joe Steinbring", "url": "https://jws.dev/contact"}
   ]
 }
