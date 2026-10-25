@@ -1,8 +1,14 @@
 # Device testing and owner installations
 
-The Mac and iPad have owner build **0.1.7 (8)**; the Samsung remains on **0.1.6 (7)**. Candidate 0.1.7 adds offline help/privacy, installed version display and Apple packaging metadata; it has not been installed through TestFlight. Repeat this checklist on the distribution-signed candidate and record its exact version. Current distribution gates and local archive evidence are in [TESTFLIGHT.md](TESTFLIGHT.md).
+The Mac, iPad, and Samsung have owner build **0.1.7 (8)**. Candidate 0.1.7 adds offline help/privacy, installed version display and Apple packaging metadata; it has not been installed through TestFlight. Repeat this checklist on the distribution-signed candidate and record its exact version. Current distribution gates and local archive evidence are in [TESTFLIGHT.md](TESTFLIGHT.md).
 
 Start with the Samsung Galaxy Z Fold 8, then repeat the camera, import, sharing, and accessibility checks on a physical iPad and a supported Mac. Current automated checks are described in [development status](DEVELOPMENT.md). The Samsung was installed with build 0.1.4 (5) and supplied the first real-photo regression. This checklist separates further hardware checks from automated evidence.
+
+## Verified Samsung update — October 25, 2026
+
+The Samsung Galaxy Z Fold 8 (SM_F971U1) was updated in place from **0.1.6 (7)** to **0.1.7 (8)**. The normal `lib/main.dart` debug APK was rebuilt with the final Joe Steinbring/jws.dev support information. The installed and new APK signing certificates matched, both bundled documents matched source, installation succeeded with `adb install -r`, and the new activity launched with a running app process. The original install time was retained; no uninstall or app-data clearing was performed.
+
+Private before/after app-data snapshots and SQLite integrity/record comparisons verified **3 alleys, 2 balls, no sessions/games**, and all profile/draft fields unchanged. The original APK and app data are retained under ignored `build/owner-updates/0.1.7/samsung/`. No game was saved, discarded, or shared during the update. This installation check does not add new camera, recognition-accuracy, recipient-sharing or accessibility evidence.
 
 ## Verified Mac/iPad update — October 25, 2026
 
@@ -26,7 +32,7 @@ The Mac package launched successfully after strict signature and sealed owner-po
 
 - Use the packaged **Android debug APK** for this first local test. Public/store release signing is a separate setup task.
 - If an earlier version contains bowling history, export a JSON backup first. Update in place with the same development signing key. A signature mismatch is a reason to inspect signing, not to uninstall and erase data automatically.
-- Confirm the intended version/build after updating in place (currently 0.1.7/8 for Mac/iPad, 0.1.6/7 for Samsung); retain existing alleys, balls, sessions and drafts.
+- Confirm the intended version/build after updating in place (currently 0.1.7/8 on all three owner devices); retain existing alleys, balls, sessions and drafts.
 
 ## First complete session
 
