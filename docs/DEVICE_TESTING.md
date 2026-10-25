@@ -1,12 +1,18 @@
-# Owner testing — build 0.1.6 (7)
+# Device testing and owner installations
 
-The documented installed owner build is 0.1.6 (7). Source candidate **0.1.7 (8)** adds offline help/privacy, installed version display and Apple packaging metadata; it has not been installed through TestFlight. Repeat this checklist on the distribution-signed candidate and record its exact version. Current distribution gates and local archive evidence are in [TESTFLIGHT.md](TESTFLIGHT.md).
+The Mac and iPad have owner build **0.1.7 (8)**; the Samsung remains on **0.1.6 (7)**. Candidate 0.1.7 adds offline help/privacy, installed version display and Apple packaging metadata; it has not been installed through TestFlight. Repeat this checklist on the distribution-signed candidate and record its exact version. Current distribution gates and local archive evidence are in [TESTFLIGHT.md](TESTFLIGHT.md).
 
 Start with the Samsung Galaxy Z Fold 8, then repeat the camera, import, sharing, and accessibility checks on a physical iPad and a supported Mac. Current automated checks are described in [development status](DEVELOPMENT.md). The Samsung was installed with build 0.1.4 (5) and supplied the first real-photo regression. This checklist separates further hardware checks from automated evidence.
 
-## Verified branding update — October 25, 2026
+## Verified Mac/iPad update — October 25, 2026
 
-Version 0.1.6 (7) is installed on the Samsung and Mac. The pointing bowler is used in launcher icons, app headers/navigation, Settings and recap images. My Bag symbols and ball illustrations show three finger holes with no seam. A live native preview showed the production shell in light and dark themes; the installed Mac header and My Bag empty state were inspected. All 103 unit/widget checks and normal native builds passed.
+Normal `lib/main.dart` release builds of **0.1.7 (8)** were installed in place and launched on this Mac mini and the owner's iPad Air 11-inch (M3), iPadOS 27.0.1. The iPad was updated from 0.1.4 (5) using the existing Apple Development identity/team and a verified device-covering profile. The Mac was updated from 0.1.6 (7) using its verified owner-only package; its previous application bundle was retained privately for rollback.
+
+Before/after SQLite comparisons verified every record, profile and draft unchanged. The iPad retains **3 alleys and 2 balls**, with no sessions/games; the Mac journal remains empty. The updated iPad process remained running. The Mac home screen and Settings were inspected, including **Version 0.1.7 (build 8)**, new guide/privacy controls and logo. Private snapshots/install logs are under ignored `build/owner-updates/0.1.7/`. No game was saved or shared during this installation. This verifies owner installation/launch/data preservation, not the remaining camera, sharing, accessibility or TestFlight acceptance checks.
+
+## Previous branding update — October 25, 2026
+
+Version 0.1.6 (7) was installed on the Samsung and Mac in the previous update. The pointing bowler is used in launcher icons, app headers/navigation, Settings and recap images. My Bag symbols and ball illustrations show three finger holes with no seam. A live native preview showed the production shell in light and dark themes; the installed Mac header and My Bag empty state were inspected. All 103 unit/widget checks and normal native builds passed.
 
 Before/after comparisons verified unchanged records, profile and draft on both devices. Samsung still has 3 alleys, 2 balls, 1 session, no saved games and its complete unsaved photo draft. No user result was saved or shared during this branding update. Camera/recognition and recipient integration coverage below remains labeled by its original build.
 
@@ -20,7 +26,7 @@ The Mac package launched successfully after strict signature and sealed owner-po
 
 - Use the packaged **Android debug APK** for this first local test. Public/store release signing is a separate setup task.
 - If an earlier version contains bowling history, export a JSON backup first. Update in place with the same development signing key. A signature mismatch is a reason to inspect signing, not to uninstall and erase data automatically.
-- Confirm version 0.1.6/build 7 after updating in place; retain existing alleys, balls, sessions and drafts.
+- Confirm the intended version/build after updating in place (currently 0.1.7/8 for Mac/iPad, 0.1.6/7 for Samsung); retain existing alleys, balls, sessions and drafts.
 
 ## First complete session
 
