@@ -2,6 +2,7 @@ import '../ui/layout.dart';
 
 import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../app_controller.dart';
@@ -12,6 +13,7 @@ import '../domain/models.dart';
 import '../ui/common.dart';
 import '../ui/branding.dart';
 import '../ui/dialogs.dart';
+import 'app_document.dart';
 
 class ProfileSettings extends StatefulWidget {
   const ProfileSettings({super.key, required this.controller});
@@ -23,6 +25,16 @@ class ProfileSettings extends StatefulWidget {
 class _ProfileSettingsState extends State<ProfileSettings> {
   bool _busy = false;
   late Future<BowlData?> _safety;
+  late final Future<PackageInfo?> _package = _loadPackage();
+
+  Future<PackageInfo?> _loadPackage() async {
+    try {
+      return await PackageInfo.fromPlatform();
+    } catch (_) {
+      return null;
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -303,6 +315,22 @@ class _ProfileSettingsState extends State<ProfileSettings> {
                           ),
                         ),
                         const SizedBox(height: 20),
+                        for (final document in AppDocument.values)
+                          TextButton.icon(
+                            onPressed: () => Navigator.of(context).push<void>(
+                              MaterialPageRoute(
+                                builder: (_) =>
+                                    AppDocumentPage(document: document),
+                              ),
+                            ),
+                            icon: Icon(
+                              document == AppDocument.guide
+                                  ? Icons.help_outline_rounded
+                                  : Icons.privacy_tip_outlined,
+                            ),
+                            label: Text(document.title),
+                          ),
+                        const SizedBox(height: 20),
                         const TallyBowlLogo(size: 64),
                         const SizedBox(height: 12),
                         const Text(
@@ -313,6 +341,15 @@ class _ProfileSettingsState extends State<ProfileSettings> {
                           ),
                         ),
                         const Text(AppConfig.tagline),
+                        FutureBuilder<PackageInfo?>(
+                          future: _package,
+                          builder: (context, snapshot) => Text(
+                            snapshot.data == null
+                                ? 'Version information unavailable'
+                                : 'Version ${snapshot.data!.version} '
+                                      '(build ${snapshot.data!.buildNumber})',
+                          ),
+                        ),
                         TextButton.icon(
                           onPressed: () => _run(() async {
                             if (!await launchUrl(

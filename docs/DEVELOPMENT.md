@@ -1,6 +1,6 @@
 # TallyBowl! development status
 
-Updated October 25, 2026. Development build 0.1.6 (7) is intended for owner testing. Production distribution is not configured.
+Updated October 25, 2026. Candidate source is **0.1.7 (8)**; the installed Mac/Samsung owner build remains **0.1.6 (7)**. See [TestFlight readiness](TESTFLIGHT.md) for current candidate checks and remaining account, hosting, signing and hardware gates. The results below retain their original build labels; production distribution has not been verified.
 
 ## Feature branches
 
@@ -41,6 +41,7 @@ Features are committed on `codex/` branches and merged locally into `main`. The 
 | `codex/owner-build-0-1-5` | AndroidX EXIF format compatibility, owner packages and in-place installation verification |
 | `codex/bowler-branding` | Pointing bowler master, matching app/recap/launcher identity, three-hole bowling-ball navigation and theme checks |
 | `codex/owner-build-0-1-6` | Branding preview timing, verified owner packages and data-preserving updates |
+| `codex/testflight-readiness` | Offline help/privacy, version display, Apple manifests/launch art/category, current documentation and archive preflight |
 
 The completed stack is integrated into local `main` after verification. Feature branches are retained. All work is local until explicitly pushed to the remote repository.
 
@@ -67,7 +68,7 @@ A unique matching row with a complete, consistent sequence opens the populated e
 
 One permissioned real monitor photo now produces `53 63 9- 7/ 16 7- 35 6- 42 X9-`, cumulative checkpoints `8 17 26 37 44 51 59 65 71 90`, and total 90. This was exercised through bundled ML Kit on an isolated Android 17 emulator. The shared Apple Vision helper was exercised against the same EXIF-rotated photo, with the resulting native geometry verified through the Dart refinement pipeline. Anonymized geometry fixtures and workflow tests are committed; the source photo, device backups, and diagnostic targets remain only in ignored build output.
 
-This is one real layout, not a broad accuracy result. Perspective, glare, low contrast, clipped frames, unsupported symbols, unusual name scripts, irregular grids and sparse strike-only displays can still need manual correction. Before beta, expand the permissioned evaluation corpus and measure complete-game accuracy and correction effort by layout and platform.
+This is one real layout, not a broad accuracy result. Perspective, glare, low contrast, clipped frames, unsupported symbols, unusual name scripts, irregular grids and sparse strike-only displays can still need manual correction. During internal beta, expand the permissioned evaluation corpus and measure complete-game accuracy and correction effort by layout and platform before making broader accuracy claims.
 
 Still to implement or expand:
 
@@ -204,9 +205,9 @@ Version **0.1.6**, build **7**. These packages are generated locally and ignored
 | Android | `build/releases/TallyBowl-0.1.6-android-debug.apk` (about 224 MB) | Transfer the APK to the device and open it, allowing installation from the selected source if Android prompts. This uses the local development key. Production releases use explicit protected key properties; missing credentials stop release builds. |
 | iPad simulator | `build/ios/iphonesimulator/Runner.app` | Run `flutter run -d <simulator-id>` or install this app through the simulator tools. A simulator binary cannot be installed on a physical iPad. |
 
-For a physical iPad, select a development team and provisioning/signing setup in the iOS Runner project using Xcode, then run `flutter run -d <device-id>`. No physical-device IPA has been signed or exported.
+For a physical iPad owner build, use development signing in the iOS Runner project, then `flutter run -d <device-id>`. A development-signed 0.1.4 build was installed on the owner's iPad previously; that does not verify the current candidate. No TestFlight distribution IPA has been exported or uploaded. Follow the separate [Apple runbook](TESTFLIGHT.md) for that path.
 
-The strict release build enables hardened runtime and disables Xcode's injected `get-task-allow`. Ad hoc apps/frameworks have no Team ID: the strict build failed the runtime library check during smoke launch. `tool/package_macos_local.sh` therefore signs a **copy** with only the local `disable-library-validation` exception, retaining sandbox/runtime protections and no JIT/debug entitlement. It refuses to change a team-signed app. The archive filename includes `OWNER-TEST-ONLY`; a signed/sealed `Contents/Resources/TallyBowlBuild.json` records its version, build, non-distribution warning and exact signing/runtime policy. Production entitlements retain library validation; proper Apple signing of the app and its embedded code, plus notarization, remains required.
+The strict release build enables hardened runtime and disables Xcode's injected `get-task-allow`. Ad hoc apps/frameworks have no Team ID: the strict build failed the runtime library check during smoke launch. `tool/package_macos_local.sh` therefore signs a **copy** with only the local `disable-library-validation` exception, retaining sandbox/runtime protections and no JIT/debug entitlement. It refuses to change a team-signed app. The archive filename includes `OWNER-TEST-ONLY`; a signed/sealed `Contents/Resources/TallyBowlBuild.json` records its version, build, non-distribution warning and exact signing/runtime policy. Production entitlements retain library validation. TestFlight/App Store distribution requires its own correct signing and Apple validation; a separate direct Mac download would use Developer ID signing and notarization.
 
 `build/releases/checksums.json` records SHA-256 values, code revision and owner-only distribution policy for the packaged Mac and Android builds. The current Mac archive is built from the normal `lib/main.dart` entry point. Package signature/ZIP integrity and Android APK signature/version checks are recorded with each build; previous smoke-launch evidence is labeled by build above.
 

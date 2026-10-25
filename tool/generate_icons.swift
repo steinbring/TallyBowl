@@ -63,4 +63,12 @@ for (density, size) in [
     size: size, mac: false,
     path: root.appendingPathComponent("android/app/src/main/res/mipmap-\(density)/ic_launcher.png"))
 }
-print("Generated TallyBowl bowler icons for macOS, iPadOS and Android from \(master.path).")
+for (scale, filename) in [
+  (1, "LaunchImage.png"), (2, "LaunchImage@2x.png"), (3, "LaunchImage@3x.png"),
+] {
+  try write(
+    size: 128 * scale, mac: false,
+    path: root.appendingPathComponent(
+      "ios/Runner/Assets.xcassets/LaunchImage.imageset/\(filename)"))
+}
+print("Generated TallyBowl icons and iPad launch artwork from \(master.path).")
