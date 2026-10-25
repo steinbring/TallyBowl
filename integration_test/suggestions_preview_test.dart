@@ -135,6 +135,7 @@ void main() {
           child: TallyBowlApp(controller: controller),
         ),
       );
+      await tester.pumpAndSettle();
       await precacheImage(
         const AssetImage(TallyBowlLogo.asset),
         tester.element(find.byType(TallyBowlLogo).first),
