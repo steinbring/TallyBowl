@@ -318,6 +318,12 @@ class BowlData {
           tags.any((v) => v is! String || !knownBallIds.contains(v)) ||
           tags.toSet().length != tags.length ||
           (d['primaryBallId'] != null && !tags.contains(d['primaryBallId'])) ||
+          (d['sourceCumulative'] != null &&
+              (d['sourceCumulative'] is! List ||
+                  (d['sourceCumulative'] as List).length != 10 ||
+                  (d['sourceCumulative'] as List).any(
+                    (v) => v is! int || v < 0 || v > 300,
+                  ))) ||
           (d['displayedTotal'] != null &&
               (d['displayedTotal'] is! int ||
                   (d['displayedTotal'] as int) < 0 ||

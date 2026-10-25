@@ -1,48 +1,26 @@
 import '../domain/models.dart';
 import '../domain/scoring.dart';
 
-class RecognizedLine {
-  const RecognizedLine({
-    required this.text,
-    required this.x,
-    required this.y,
-    required this.width,
-    required this.height,
-    this.confidence,
-  });
-  final String text;
-  final double x, y, width, height;
-  final double? confidence;
-  factory RecognizedLine.fromJson(Map<dynamic, dynamic> j) => RecognizedLine(
-    text: j['text'] as String,
-    x: (j['x'] as num).toDouble(),
-    y: (j['y'] as num).toDouble(),
-    width: (j['width'] as num).toDouble(),
-    height: (j['height'] as num).toDouble(),
-    confidence: (j['confidence'] as num?)?.toDouble(),
-  );
-}
+import 'recognized_text.dart';
+import 'scoreboard_grid.dart';
 
-class ScoreRow {
-  const ScoreRow({
-    required this.text,
-    required this.frames,
-    required this.suggested,
-    required this.y,
-    required this.height,
-    this.displayedTotal,
-  });
-  final String text;
-  final List<String> frames;
-  final bool suggested;
-  final double y, height;
-  final int? displayedTotal;
-  bool get extracted => TenPinScorer.score(frames).complete;
-}
+export 'recognized_text.dart';
 
-/// Conservative first parser for clearly separated, horizontally aligned rows.
+/// Parse observed deliveries from text rows or scoreboard grid geometry.
 /// Never solves missing rolls by guessing a combination that matches a total.
 abstract final class ScoreSheetParser {
+  static ScoreRow? automaticRow(List<ScoreRow> rows) {
+    final candidates = rows
+        .where(
+          (row) =>
+              row.suggested && (row.cumulativeTotals != null || row.extracted),
+        )
+        .toList();
+    return candidates.length == 1 && candidates.single.canAutoSelect
+        ? candidates.single
+        : null;
+  }
+
   static List<ScoreRow> rows(
     List<RecognizedLine> lines,
     BowlerProfile profile,
@@ -67,11 +45,20 @@ abstract final class ScoreSheetParser {
       profile.name,
       ...profile.aliases,
     ].map(_normalized).where((v) => v.isNotEmpty).toList();
-    final result = <ScoreRow>[];
+    final gridRows = ScoreboardGrid.rows(lines, profile);
+    final result = <ScoreRow>[...gridRows];
     for (final group in groups) {
       group.sort((a, b) => a.x.compareTo(b.x));
       final text = group.map((l) => l.text).join(' ');
       if (text.trim().isEmpty) continue;
+      // A grid row already associates this name with both mark/total bands.
+      if (gridRows.any(
+        (row) => group.any(
+          (line) => line.centerY >= row.y && line.centerY <= row.y + row.height,
+        ),
+      )) {
+        continue;
+      }
       final extraction = _extract(text);
       // Include name-like rows and complete mark rows, excluding numeric totals.
       final hasName = RegExp(
