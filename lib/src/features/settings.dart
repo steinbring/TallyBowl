@@ -293,7 +293,7 @@ class _ProfileSettingsState extends State<ProfileSettings> {
                         ),
                         const SizedBox(height: 12),
                         Text(
-                          'Your bowling records are stored locally on this device. Image recognition runs on the device. Original scoreboard photos stay with unfinished drafts and are removed after saving or discarding them. Maps download tiles from the map service. An alley search sends only the search words to Photon, using OpenStreetMap data. Saved alleys and game recording work offline.',
+                          'Your bowling records are stored locally on this device. Image recognition runs on the device. Android uses bundled Google ML Kit, which may send SDK diagnostics such as device details, image dimensions, timing, and errors to Google. TallyBowl does not upload your photos or bowling records for recognition. Original scoreboard photos stay with unfinished drafts and are removed after saving or discarding them. Maps download tiles from the map service. An alley search sends only the search words to Photon, using OpenStreetMap data. Saved alleys and game recording work offline.',
                           style: TextStyle(
                             height: 1.7,
                             color: Theme.of(context)

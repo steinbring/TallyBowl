@@ -34,3 +34,9 @@ Name-only starter references checked October 23, 2026 (no automated collection o
 - [Radical](https://radicalbowling.com/) and [Columbia 300](https://columbia300.com/): brand suggestions; no bundled models yet.
 
 Manufacturer suggestions are derived from the starter models plus explicit brand-only entries. Tests check that brands/models are nonempty, unique, and consistent. Keep this reference list and `BallCatalog.starter` in sync when adding manually verified names. Do not imply endorsement or manufacturer affiliation.
+
+## On-device recognition SDKs
+
+Apple platforms use the system Vision framework. Android bundles ML Kit Text Recognition 16.0.1; recognition works without a model download or an AI server. TallyBowl does not upload scoreboard images or extracted bowling records for recognition.
+
+Google's bundled SDK can send diagnostic metadata independently of application API calls: device/application information and installation identifiers, input format/dimensions, processing performance, configuration and errors. This was also observed as queued `FIREBASE_ML_SDK` events during emulator verification. See Google's [ML Kit Android data disclosure](https://developers.google.com/ml-kit/android-data-disclosure). Do not describe the Android SDK as network-silent or claim an unsupported telemetry opt-out. The Settings privacy text distinguishes local image processing from these SDK diagnostics.
