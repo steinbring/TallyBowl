@@ -40,6 +40,7 @@ Features are committed on `codex/` branches and merged locally into `main`. The 
 | `codex/recap-handoff-validation` | Camera URI handler visibility, SDK diagnostic disclosure and PNG recipient verification |
 | `codex/owner-build-0-1-5` | AndroidX EXIF format compatibility, owner packages and in-place installation verification |
 | `codex/bowler-branding` | Pointing bowler master, matching app/recap/launcher identity, three-hole bowling-ball navigation and theme checks |
+| `codex/owner-build-0-1-6` | Branding preview timing, verified owner packages and data-preserving updates |
 
 The completed stack is integrated into local `main` after verification. Feature branches are retained. All work is local until explicitly pushed to the remote repository.
 
@@ -110,6 +111,15 @@ Run `flutter test integration_test/on_device_recognition_test.dart -d <device>` 
 The 27-finding first audit disposition is in [AUDIT_RESOLUTION.md](AUDIT_RESOLUTION.md). [AUDIT_ROUND2_RESOLUTION.md](AUDIT_ROUND2_RESOLUTION.md) covers the five follow-up findings, signing history and current verification. Release signing setup is documented in [ANDROID_SIGNING.md](ANDROID_SIGNING.md). The next owner-testing phase follows [DEVICE_TESTING.md](DEVICE_TESTING.md), beginning with the Samsung Galaxy Z Fold 8.
 
 Before release, test actual camera permission/capture flows, platform photo formats/orientations, native share destinations and file import/export, interrupted Android picking, and app lifecycle recovery on physical iPad and Android devices and supported Macs. A successful native build is not evidence that these hardware flows have been tested.
+
+## Verified build 0.1.6 (7) branding results
+
+- `flutter analyze`: no issues. `flutter test`: 103 passed, including large-text light/dark navigation and editor layouts, theme-invariant recap rendering, actual PNG export and privacy behavior.
+- The committed bowler master was inspected at 128-pixel Mac icon size and in the recap golden. A synthetic live Mac preview rendered the production shell side by side in light and dark themes; the new mark and three-hole navigation symbol were visually checked in both. The optional form-preview integration runner stalled before its branding stage on a rerun, so it is not counted as passed; the isolated live preview was used for visual verification.
+- All configured iPad, Mac and Android launcher sizes are regenerated from the same committed master. No image generation API, new network dependency or cloud AI feature was added to the app.
+- `tool/verify_native.sh` passed: normal Android debug, universal Mac release, iPad simulator debug and Android Lint (0 errors, 10 existing/style advisories). Package versions, signatures, normal entry points and the exact bundled master PNG were verified.
+- Installed version 0.1.6/build 7 on the Samsung and this Mac. The installed Mac header and My Bag navigation/empty state were visually checked. Before/after database comparisons verified all records, profile and draft unchanged on both devices; Samsung retained 3 alleys, 2 balls, 1 session and its unsaved complete photo draft. The previous Mac bundle and private safety snapshots are retained in ignored build output.
+
 
 ## Verified build 0.1.5 (6) results
 

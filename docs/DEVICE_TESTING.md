@@ -2,6 +2,12 @@
 
 Start with the Samsung Galaxy Z Fold 8, then repeat the camera, import, sharing, and accessibility checks on a physical iPad and a supported Mac. Current automated checks are described in [development status](DEVELOPMENT.md). The Samsung was installed with build 0.1.4 (5) and supplied the first real-photo regression. This checklist separates further hardware checks from automated evidence.
 
+## Verified branding update — October 25, 2026
+
+Version 0.1.6 (7) is installed on the Samsung and Mac. The pointing bowler is used in launcher icons, app headers/navigation, Settings and recap images. My Bag symbols and ball illustrations show three finger holes with no seam. A live native preview showed the production shell in light and dark themes; the installed Mac header and My Bag empty state were inspected. All 103 unit/widget checks and normal native builds passed.
+
+Before/after comparisons verified unchanged records, profile and draft on both devices. Samsung still has 3 alleys, 2 balls, 1 session, no saved games and its complete unsaved photo draft. No user result was saved or shared during this branding update. Camera/recognition and recipient integration coverage below remains labeled by its original build.
+
 ## Verified update evidence — October 25, 2026
 
 Build 0.1.5 (6) was installed in place on the Samsung (Android 17 / SM_F971U1) and this Mac. Read-only before/after phone snapshots verified unchanged alleys, balls, session, profile and saved history. Resume of the owner's retained blank draft produced all ten correct deliveries and score 90 while preserving lane, ball selection, primary ball and notes. The game was left unsaved for the owner. Original photos and snapshots are private ignored build output.
