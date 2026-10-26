@@ -17,10 +17,11 @@ Verified October 25, 2026 against the actual source after TestFlight account set
 - `flutter analyze`: **no issues**.
 - `flutter test integration_test/dash_stroke_test.dart -d macos`: **10 passed** through Apple Vision.
 - The same command with isolated Android `emulator-5554`: **10 passed** through bundled ML Kit. No populated owner installation was replaced with the harness.
+- The original private monitor photo was rerun through the updated Apple Vision helper plus Dart orchestration and the updated bundled ML Kit pipeline on the isolated emulator: both retained the exact ten frames, all checkpoints, total **90**, and automatic selection. The photo and host-only diagnostic harnesses remain ignored local output.
 - Native cases cover both polarities: isolated dash, blank crop, grid lines, out-of-band marks and largest-three candidate limit, with returned stroke geometry asserted.
 
 Logs are ignored under `build/audit3-*`. Controlled raster tests do not replace permissioned real paper/monitor photos, physical camera/recipient sharing, VoiceOver, backup/upgrade and interruption acceptance. Those remain tracked in [device testing](DEVICE_TESTING.md).
 
 ## Separate Apple delivery issue
 
-Apple's processing email for Mac **0.1.7 (8)** reported **ITMS-90284** for five Swift Package resource bundles retaining a different certificate from the app's provisioning profile. Xcode's successful upload and a valid deep signature did not establish certificate consistency across nested resources. The iPad build processed and the owner was invited. The next Mac export must fix this packaging issue, check nested certificate/profile consistency, and actually appear in TestFlight before it is called available. Final rebuilt version, checks and availability are recorded in [the release runbook](TESTFLIGHT.md).
+Apple's processing email for Mac **0.1.7 (8)** reported **ITMS-90284** for five Swift Package resource bundles retaining a different certificate from the app's provisioning profile. Xcode's successful upload and a valid deep signature did not establish certificate consistency across nested resources. The iPad build processed and the owner was invited. Mac **0.1.8 (9)** fixes it using app-target signing overrides. The new preflight reproduces all five old mismatches and passes both new exports. Apple processed the corrected Mac build successfully; both build-9 platform builds cleared compliance and are assigned to the private owner group. Final rebuilt version, checks and availability are recorded in [the release runbook](TESTFLIGHT.md).

@@ -1,6 +1,6 @@
 # TallyBowl! development status
 
-Updated October 25, 2026. Candidate source is **0.1.8 (9)**; installed Mac/iPad/Samsung owner builds remain **0.1.7 (8)**. All three updates launched and preserved existing journal data; see [device testing](DEVICE_TESTING.md). See [TestFlight readiness](TESTFLIGHT.md) for candidate checks and remaining account, hosting, signing and hardware gates. The results below retain their original build labels; App Store distribution signatures and successful uploads were verified during TestFlight setup; physical TestFlight acceptance remains separate.
+Updated October 25, 2026. Candidate source is **0.1.8 (9)**; installed Mac/iPad/Samsung owner builds remain **0.1.7 (8)**. All three updates launched and preserved existing journal data; see [device testing](DEVICE_TESTING.md). Both Apple 0.1.8 (9) builds have processed and are assigned to private owner TestFlight; see [TestFlight readiness](TESTFLIGHT.md) for checks, installation steps and external-beta/physical-acceptance gates. The results below retain their original build labels; App Store distribution signatures and successful uploads were verified during TestFlight setup; physical TestFlight acceptance remains separate.
 
 ## Feature branches
 

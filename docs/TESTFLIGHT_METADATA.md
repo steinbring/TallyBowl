@@ -1,6 +1,6 @@
 # TestFlight metadata
 
-Candidate: **0.1.7 (8)**. Beta description, feedback email and private reviewer contact/instructions were saved in App Store Connect on October 25, 2026. Both platform uploads succeeded. Per-build testing instructions and availability are tracked in the runbook.
+Candidate: **0.1.8 (9)**. Beta description, feedback email and private reviewer contact/instructions were saved in App Store Connect on October 25, 2026. Both 0.1.8 (9) platform uploads succeeded; the earlier Mac 0.1.7 (8) delivery was rejected and superseded. What to Test is saved for both build-9 platforms, and the owner group lists both as Testing. Installation steps and external-beta gates are in the runbook.
 
 ## Public contact and remaining account fields
 
@@ -20,6 +20,8 @@ TallyBowl! records how you bowled, tonight. Keep a personal ten-pin journal with
 This beta stores your journal locally, has no login or subscription, and includes backup/restore. Map/search requests need internet; saved alleys and recording work offline. Recognition still needs testing on additional scoreboard layouts. Compare every delivery with the source before saving.
 
 ## What to test
+
+Build 0.1.8 (9) adds dark-mark recovery on light scorecards and fixes grid recognition of names such as FOX/FX. Native dark/light raster cases pass on both Apple and Android; the original monitor regression still gives 90. The native Mac package also fixes resource-bundle distribution signing.
 
 - Add scoreboard aliases, two balls and an alley; try both suggestions and manual entry.
 - Start practice or league, capture/import a final scoreboard, verify the correct bowler and all ten frames, select balls/primary ball, lane and notes, then save.
