@@ -33,7 +33,7 @@ There is no cloud AI fallback, account, automatic sync, or iPhone target. Real-p
 | Inspect previous implementation/test evidence | [Development history](docs/DEVELOPMENT.md), [share handoff](docs/SHARING_VERIFICATION.md) |
 | Prepare Android store signing | [Android signing](docs/ANDROID_SIGNING.md) |
 
-Historical audit dispositions remain in `docs/AUDIT_RESOLUTION.md`, `docs/AUDIT_ROUND2_RESOLUTION.md`, and `docs/REVIEW.md`. Their older test counts and build numbers describe those revisions.
+Audit dispositions are in `docs/AUDIT_RESOLUTION.md`, `docs/AUDIT_ROUND2_RESOLUTION.md`, [round-three verification](docs/AUDIT_ROUND3_RESOLUTION.md), and `docs/REVIEW.md`. Their test counts and build numbers describe those revisions.
 
 ## Develop and verify
 

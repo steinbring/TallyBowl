@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import '../domain/models.dart';
 import '../domain/scoring.dart';
 import 'recognized_text.dart';
+import 'scoreboard_name.dart';
 
 /// Associates the delivery band with the bowler's cumulative-score band.
 /// Displayed checkpoints validate observed marks; they never generate rolls.
@@ -85,14 +86,7 @@ abstract final class ScoreboardGrid {
               (w) =>
                   w.x + w.width < left &&
                   (w.centerY - cells.first.centerY).abs() < height * 1.2 &&
-                  RegExp(
-                    r'[A-EG-WYZ]{2,}',
-                    caseSensitive: false,
-                  ).hasMatch(w.text) &&
-                  !RegExp(
-                    r'^(fr\.?\d*|tot\.?|total|player|mph)$',
-                    caseSensitive: false,
-                  ).hasMatch(w.text),
+                  isBowlerNameCandidate(w.text),
             )
             .toList();
         if (names.isEmpty) continue;

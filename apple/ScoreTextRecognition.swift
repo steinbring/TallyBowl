@@ -155,75 +155,80 @@ enum ScoreTextRecognition {
       return true
     }
     guard rendered else { return [] }
-    func foreground(_ i: Int) -> Bool {
-      let r = Int(pixels[i * 4])
-      let g = Int(pixels[i * 4 + 1])
-      let b = Int(pixels[i * 4 + 2])
-      return min(r, g, b) >= 165 && max(r, g, b) - min(r, g, b) <= 80
-    }
-    var horizontal = [Bool](repeating: false, count: w * h)
-    for y in 0..<h {
-      var x = 0
-      while x < w {
-        if !foreground(y * w + x) {
-          x += 1
-          continue
-        }
-        let begin = x
-        while x < w && foreground(y * w + x) { x += 1 }
-        if x - begin >= max(5, Int(Double(w) * 0.06)) {
-          for mark in begin..<x { horizontal[y * w + mark] = true }
-        }
-      }
-    }
-    var seen = [Bool](repeating: false, count: w * h)
-    var queue = [Int](repeating: 0, count: w * h)
     var found: [CGRect] = []
-    for seed in 0..<w * h {
-      if seen[seed] || !horizontal[seed] { continue }
-      var head = 0
-      var tail = 1
-      var left = w
-      var right = 0
-      var top = h
-      var bottom = 0
-      queue[0] = seed
-      seen[seed] = true
-      while head < tail {
-        let position = queue[head]
-        head += 1
-        let x = position % w
-        let y = position / w
-        left = min(left, x)
-        right = max(right, x)
-        top = min(top, y)
-        bottom = max(bottom, y)
-        for dy in -1...1 {
-          for dx in -1...1 {
-            let nx = x + dx
-            let ny = y + dy
-            if nx < 0 || nx >= w || ny < 0 || ny >= h { continue }
-            let next = ny * w + nx
-            if !seen[next] && horizontal[next] {
-              seen[next] = true
-              queue[tail] = next
-              tail += 1
-            }
+    // Run both polarities separately; shared behavior/fixtures are documented
+    // in docs/RECOGNITION_STROKES.md and integration_test/dash_stroke_test.dart.
+    for lightStroke in [true, false] {
+      func foreground(_ i: Int) -> Bool {
+        let r = Int(pixels[i * 4])
+        let g = Int(pixels[i * 4 + 1])
+        let b = Int(pixels[i * 4 + 2])
+        return pixels[i * 4 + 3] >= 165 && max(r, g, b) - min(r, g, b) <= 80
+          && (lightStroke ? min(r, g, b) >= 165 : max(r, g, b) <= 90)
+      }
+      var horizontal = [Bool](repeating: false, count: w * h)
+      for y in 0..<h {
+        var x = 0
+        while x < w {
+          if !foreground(y * w + x) {
+            x += 1
+            continue
+          }
+          let begin = x
+          while x < w && foreground(y * w + x) { x += 1 }
+          if x - begin >= max(5, Int(Double(w) * 0.06)) {
+            for mark in begin..<x { horizontal[y * w + mark] = true }
           }
         }
       }
-      let width = right - left + 1
-      let height = bottom - top + 1
-      let ratio = Double(width) / Double(height)
-      let middle = Double(top + bottom) / 2 / Double(h)
-      if Double(width) >= max(5, Double(w) * 0.06) && height >= 2
-        && Double(height) <= Double(h) * 0.20 && (1.6...8).contains(ratio)
-        && (0.25...0.75).contains(middle) && Double(tail) >= Double(width * height) * 0.45
-      {
-        found.append(
-          CGRect(
-            x: Double(left) / scale, y: Double(top) / scale, width: Double(width) / scale,
-            height: Double(height) / scale))
+      var seen = [Bool](repeating: false, count: w * h)
+      var queue = [Int](repeating: 0, count: w * h)
+      for seed in 0..<w * h {
+        if seen[seed] || !horizontal[seed] { continue }
+        var head = 0
+        var tail = 1
+        var left = w
+        var right = 0
+        var top = h
+        var bottom = 0
+        queue[0] = seed
+        seen[seed] = true
+        while head < tail {
+          let position = queue[head]
+          head += 1
+          let x = position % w
+          let y = position / w
+          left = min(left, x)
+          right = max(right, x)
+          top = min(top, y)
+          bottom = max(bottom, y)
+          for dy in -1...1 {
+            for dx in -1...1 {
+              let nx = x + dx
+              let ny = y + dy
+              if nx < 0 || nx >= w || ny < 0 || ny >= h { continue }
+              let next = ny * w + nx
+              if !seen[next] && horizontal[next] {
+                seen[next] = true
+                queue[tail] = next
+                tail += 1
+              }
+            }
+          }
+        }
+        let width = right - left + 1
+        let height = bottom - top + 1
+        let ratio = Double(width) / Double(height)
+        let middle = Double(top + bottom) / 2 / Double(h)
+        if Double(width) >= max(5, Double(w) * 0.06) && height >= 2
+          && Double(height) <= Double(h) * 0.20 && (1.6...8).contains(ratio)
+          && (0.25...0.75).contains(middle) && Double(tail) >= Double(width * height) * 0.45
+        {
+          found.append(
+            CGRect(
+              x: Double(left) / scale, y: Double(top) / scale, width: Double(width) / scale,
+              height: Double(height) / scale))
+        }
       }
     }
     var merged: [CGRect] = []

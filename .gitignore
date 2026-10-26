@@ -11,3 +11,6 @@
 /coverage/
 *.iml
 .idea/
+
+# Local App Store Connect state may later contain private account fields.
+/release/apple/app-record.json

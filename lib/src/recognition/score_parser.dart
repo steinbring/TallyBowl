@@ -3,6 +3,7 @@ import '../domain/scoring.dart';
 
 import 'recognized_text.dart';
 import 'scoreboard_grid.dart';
+import 'scoreboard_name.dart';
 
 export 'recognized_text.dart';
 
@@ -61,10 +62,7 @@ abstract final class ScoreSheetParser {
       }
       final extraction = _extract(text);
       // Include name-like rows and complete mark rows, excluding numeric totals.
-      final hasName = RegExp(
-        r'[A-EG-WYZ]{2,}',
-        caseSensitive: false,
-      ).hasMatch(text);
+      final hasName = text.split(RegExp(r'\s+')).any(isBowlerNameCandidate);
       if (!hasName && extraction.$1 == null) continue;
       final words = text.split(RegExp(r'\s+')).map(_normalized).toList();
       final suggested = aliases.any(
