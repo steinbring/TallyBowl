@@ -2,7 +2,7 @@
 
 **How you bowled, tonight.** A Flutter bowling journal for native macOS, iPadOS, and Android. Planned website: [tallybowl.jws.app](https://tallybowl.jws.app).
 
-The beta candidate is **0.1.7 (8)**, developed and published by **Joe Steinbring**. [Contact Joe for support](https://jws.dev/contact). Owner build 0.1.7 (8) is installed on the Mac, iPad, and Samsung. Signed iPad and native Mac builds have been uploaded to App Store Connect app **6826931962**. Processing, owner-group availability, the hosted privacy page, and physical Apple acceptance checks are tracked in [TestFlight readiness](docs/TESTFLIGHT.md). An upload does not establish that Apple review or a TestFlight installation has passed.
+The beta candidate is **0.1.7 (8)**, developed and published by **Joe Steinbring**. [Contact Joe for support](https://jws.dev/contact). Owner build 0.1.7 (8) is installed on the Mac, iPad, and Samsung. Signed iPad and native Mac builds have been uploaded to App Store Connect app **6826931962**. The iPad build is assigned to the private owner group with an invitation; Mac processing, the hosted privacy page, and physical Apple acceptance checks are tracked in [TestFlight readiness](docs/TESTFLIGHT.md). An upload does not establish that Apple review or a TestFlight installation has passed.
 
 ## What works
 
@@ -25,7 +25,7 @@ There is no cloud AI fallback, account, automatic sync, or iPhone target. Real-p
 | --- | --- |
 | Learn recording, sharing, backup and recovery | [User guide](docs/USER_GUIDE.md), also available offline in Settings |
 | Prepare an Apple beta and understand remaining gates | [TestFlight readiness and release runbook](docs/TESTFLIGHT.md) |
-| Fill in beta/reviewer information | [TestFlight metadata draft](docs/TESTFLIGHT_METADATA.md) |
+| Fill in beta/reviewer information | [TestFlight metadata](docs/TESTFLIGHT_METADATA.md) |
 | Understand architecture and change it safely | [Architecture and maintenance](docs/ARCHITECTURE.md) |
 | Verify hardware workflows | [Device testing](docs/DEVICE_TESTING.md) |
 | Understand scope and what comes next | [Roadmap](docs/ROADMAP.md) |

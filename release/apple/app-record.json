@@ -1,0 +1,22 @@
+{
+  "app_name": "TallyBowl!",
+  "bundle_id": "app.jws.tallybowl",
+  "app_store_connect_id": "6826931962",
+  "team_id": "R9DBX89RA5",
+  "sku": "app.jws.tallybowl",
+  "primary_language": "en-US",
+  "platforms": [
+    "iOS (iPad only)",
+    "macOS (native)"
+  ],
+  "internal_group": {
+    "name": "Owner testing",
+    "id": "64f368ef-293c-488f-8643-f423c89ba49c",
+    "distribution": "manual",
+    "audience": "account owner only"
+  },
+  "initial_beta_excludes_france": true,
+  "app_store_connect_url": "https://appstoreconnect.apple.com/apps/6826931962/distribution",
+  "source_revision_for_uploaded_build_0_1_7_8": "9e042cd",
+  "next_changed_binary_build_minimum": 9
+}
