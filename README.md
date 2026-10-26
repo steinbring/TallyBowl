@@ -2,7 +2,7 @@
 
 **How you bowled, tonight.** A Flutter bowling journal for native macOS, iPadOS, and Android. Planned website: [tallybowl.jws.app](https://tallybowl.jws.app).
 
-The beta candidate is **0.1.7 (8)**, developed and published by **Joe Steinbring**. [Contact Joe for support](https://jws.dev/contact). Owner build 0.1.7 (8) is installed on the Mac, iPad, and Samsung. TestFlight account setup, the hosted privacy page, distribution signing, and physical Apple acceptance checks are tracked in [TestFlight readiness](docs/TESTFLIGHT.md). A passing local build does not establish that an upload or Apple review has passed.
+The beta candidate is **0.1.8 (9)**, developed and published by **Joe Steinbring**. [Contact Joe for support](https://jws.dev/contact). Owner build 0.1.7 (8) is installed on the Mac, iPad, and Samsung. Signed **0.1.8 (9)** iPad and native Mac builds have processed successfully in App Store Connect app **6826931962** and are assigned to the private **Owner testing** group. Accept your invitation in TestFlight to install them. Android's rebuilt owner APK is available locally. [TestFlight readiness](docs/TESTFLIGHT.md) records verification, installation steps and the hosted-policy/physical-acceptance gates before external testing.
 
 ## What works
 
@@ -25,7 +25,7 @@ There is no cloud AI fallback, account, automatic sync, or iPhone target. Real-p
 | --- | --- |
 | Learn recording, sharing, backup and recovery | [User guide](docs/USER_GUIDE.md), also available offline in Settings |
 | Prepare an Apple beta and understand remaining gates | [TestFlight readiness and release runbook](docs/TESTFLIGHT.md) |
-| Fill in beta/reviewer information | [TestFlight metadata draft](docs/TESTFLIGHT_METADATA.md) |
+| Fill in beta/reviewer information | [TestFlight metadata](docs/TESTFLIGHT_METADATA.md) |
 | Understand architecture and change it safely | [Architecture and maintenance](docs/ARCHITECTURE.md) |
 | Verify hardware workflows | [Device testing](docs/DEVICE_TESTING.md) |
 | Understand scope and what comes next | [Roadmap](docs/ROADMAP.md) |
@@ -33,7 +33,7 @@ There is no cloud AI fallback, account, automatic sync, or iPhone target. Real-p
 | Inspect previous implementation/test evidence | [Development history](docs/DEVELOPMENT.md), [share handoff](docs/SHARING_VERIFICATION.md) |
 | Prepare Android store signing | [Android signing](docs/ANDROID_SIGNING.md) |
 
-Historical audit dispositions remain in `docs/AUDIT_RESOLUTION.md`, `docs/AUDIT_ROUND2_RESOLUTION.md`, and `docs/REVIEW.md`. Their older test counts and build numbers describe those revisions.
+Audit dispositions are in `docs/AUDIT_RESOLUTION.md`, `docs/AUDIT_ROUND2_RESOLUTION.md`, [round-three verification](docs/AUDIT_ROUND3_RESOLUTION.md), and `docs/REVIEW.md`. Their test counts and build numbers describe those revisions.
 
 ## Develop and verify
 

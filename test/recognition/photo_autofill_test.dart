@@ -48,6 +48,7 @@ void main() {
         expect(row.frames, practiceFrames);
         expect(row.cumulativeTotals, checkpoints);
         expect(ScoreSheetParser.automaticRow(rows), same(row));
+        expect(calls.length, lessThanOrEqualTo(4));
         expect(
           calls.where((c) => c['regions'] != null).single['regions'],
           hasLength(apple ? 7 : 2),

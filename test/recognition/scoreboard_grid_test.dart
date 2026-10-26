@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tallybowl/src/domain/models.dart';
 import 'package:tallybowl/src/domain/scoring.dart';
 import 'package:tallybowl/src/recognition/score_parser.dart';
+import 'package:tallybowl/src/recognition/scoreboard_grid.dart';
 
 const practiceFrames = [
   '53',
@@ -66,6 +67,38 @@ List<RecognizedLine> board({
 ];
 void main() {
   const profile = BowlerProfile(name: 'Joe', aliases: ['JWS']);
+  for (final name in ['FOX', 'FX', 'FELIX', 'XAVIER']) {
+    test('F and X inside the name $name do not suppress its grid row', () {
+      final rows = ScoreboardGrid.rows(
+        board(name: name),
+        BowlerProfile(name: name),
+      );
+      final row = ScoreSheetParser.automaticRow(rows);
+      expect(row, isNotNull);
+      expect(row!.frames, practiceFrames);
+      expect(row.cumulativeTotals, checkpoints);
+      expect(row.displayedTotal, 90);
+    });
+  }
+  for (final label in [
+    'F',
+    'X',
+    'FR',
+    'Fr.10',
+    'TOT',
+    'TOTAL',
+    'PLAYER',
+    'MPH',
+  ]) {
+    test('scoreboard label $label cannot anchor a bowler grid', () {
+      final rows = ScoreboardGrid.rows(
+        board(name: label),
+        BowlerProfile(name: label),
+      );
+      expect(rows.where((r) => r.cumulativeTotals != null), isEmpty);
+      expect(ScoreSheetParser.automaticRow(rows), isNull);
+    });
+  }
   for (final symbols in [true, false]) {
     test(
       'reads separate mark/cumulative bands with ${symbols ? 'symbol' : 'word'} geometry',
