@@ -12,3 +12,12 @@ PRODUCT_BUNDLE_IDENTIFIER = app.jws.tallybowl
 
 // The copyright displayed in application information
 PRODUCT_COPYRIGHT = Copyright © 2026 app.jws. All rights reserved.
+
+// Target-scoped overrides for an App Store archive. Passing CODE_SIGN_IDENTITY
+// globally also signs Swift Package resource bundles with the development key;
+// Xcode's distribution export does not replace those signatures (ITMS-90284).
+// Keep normal local builds ad hoc, and leave package targets' signing alone.
+TALLYBOWL_APP_SIGNING_IDENTITY = -
+TALLYBOWL_APP_SIGNING_TEAM =
+CODE_SIGN_IDENTITY = $(TALLYBOWL_APP_SIGNING_IDENTITY)
+DEVELOPMENT_TEAM = $(TALLYBOWL_APP_SIGNING_TEAM)

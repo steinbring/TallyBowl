@@ -1,6 +1,6 @@
 # TallyBowl! development status
 
-Updated October 25, 2026. Candidate source and installed Mac/iPad/Samsung owner builds are **0.1.7 (8)**. All three updates launched and preserved existing journal data; see [device testing](DEVICE_TESTING.md). See [TestFlight readiness](TESTFLIGHT.md) for candidate checks and remaining account, hosting, signing and hardware gates. The results below retain their original build labels; App Store distribution signatures and successful uploads were verified during TestFlight setup; physical TestFlight acceptance remains separate.
+Updated October 25, 2026. Candidate source is **0.1.8 (9)**; installed Mac/iPad/Samsung owner builds remain **0.1.7 (8)**. All three updates launched and preserved existing journal data; see [device testing](DEVICE_TESTING.md). See [TestFlight readiness](TESTFLIGHT.md) for candidate checks and remaining account, hosting, signing and hardware gates. The results below retain their original build labels; App Store distribution signatures and successful uploads were verified during TestFlight setup; physical TestFlight acceptance remains separate.
 
 ## Feature branches
 
@@ -46,6 +46,8 @@ Features are committed on `codex/` branches and merged locally into `main`. The 
 | `codex/owner-install-0-1-7` | Verified 0.1.7 Mac/iPad owner installations, protected backups and unchanged-journal comparisons |
 | `codex/samsung-owner-install-0-1-7` | Matching-signer 0.1.7 Samsung update, final bundled documents, protected APK/data backups and unchanged-journal comparison |
 | `codex/testflight-setup` | Explicit Apple ID/app record, signed iPad/Mac exports and uploads, private owner testing group and release runbook |
+| `codex/audit3-recognition` | Verified round-three dispositions, light/dark native stroke recovery, shared native fixtures and F/X name parsing |
+| `codex/testflight-distribution-fix` | App-target Mac signing overrides, nested certificate/profile preflight and candidate 0.1.8 (9) |
 
 The completed stack is integrated into local `main` after verification. Feature branches are retained. All work is local until explicitly pushed to the remote repository.
 

@@ -1,6 +1,6 @@
 # TestFlight readiness and release runbook
 
-Assessed October 25, 2026. Candidate **0.1.7 (8)**, bundle ID **app.jws.tallybowl**, existing Apple team **R9DBX89RA5**. Owner build **0.1.7 (8)** is installed on the Mac, iPad, and Samsung. Both platform builds were signed for App Store distribution and uploaded successfully on October 25, 2026. Apple processing, export compliance and tester availability are tracked below; an upload is not a completed installation.
+Assessed October 25, 2026. Current candidate **0.1.8 (9)**, bundle ID **app.jws.tallybowl**, existing Apple team **R9DBX89RA5**. Owner build **0.1.7 (8)** is installed on the Mac, iPad, and Samsung. Build **0.1.7 (8)** uploaded successfully for both platforms on October 25, 2026; iPad processing succeeded, but Apple rejected the Mac package for nested resource-bundle certificate mismatches (ITMS-90284). A successful upload and deep signature verification alone are insufficient. Build **0.1.8 (9)** includes verified round-three recognition fixes and a corrected Mac signing configuration; its distribution checks and availability are tracked below.
 
 ## Readiness decision
 
@@ -16,7 +16,7 @@ The source is prepared for a **small internal owner beta**, with account setup, 
 | Privacy website | **Open:** planned home and `/privacy` on `tallybowl.jws.app` fail DNS lookup on this Mac. Publish `PRIVACY_POLICY.md`; a separate TallyBowl `/support` page is no longer required for the selected public contact |
 | Apple account and app records | **Verified:** explicit bundle registration and App Store Connect app **6826931962**, with iOS and native macOS platforms, team **R9DBX89RA5**. Xcode automatic distribution signing/export succeeded |
 | Store privacy/export answers | iPad build 8 export questionnaire cleared with standard encryption/no France. Mac answer and external-listing provider/privacy review remain open; see below |
-| Upload and Apple validation | **Uploaded:** iPad and Mac **0.1.7 (8)**; both Xcode uploads ended `EXPORT SUCCEEDED`. iPad processing is **Complete**, export compliance cleared, What to Test saved, build assigned to **Owner testing**, and the owner status is **Invited**. Mac processing and actual TestFlight installations remain pending |
+| Upload and Apple validation | **Uploaded:** iPad and Mac **0.1.7 (8)**; both Xcode uploads ended `EXPORT SUCCEEDED`. iPad processing is **Complete**, export compliance cleared, What to Test saved, build assigned to **Owner testing**, and the owner status is **Invited**. Apple rejected Mac build 8 (ITMS-90284); corrected build 9 and actual TestFlight installations remain pending |
 | Physical Apple workflows | **Open for this candidate:** iPad camera/import, denied permission recovery, offline recognition, correct populated frames, popover sharing to real recipients, VoiceOver, backup/restore, upgrade/migration and interruption; repeat critical flows on native Mac |
 | Recognition breadth | One real monitor regression plus synthetic fixtures; expand the permissioned corpus during internal beta. No broad accuracy claim |
 | External beta | After internal acceptance: beta metadata/contact and Apple's review, invited group, support process and service-capacity/privacy decision. This preparation does not invite anyone |
@@ -49,24 +49,27 @@ Created internal **Owner testing**, with only the account owner and **manual dis
 
 Xcode 27 exported an Apple Distribution-signed iPad IPA and an App Store installer-signed Mac package, then uploaded both successfully. Strict/deep app signature checks passed against the Apple trust store. Archive preflight was also rerun on both signed archives and passed. Both apps have the correct team/bundle identifiers and no debugging/JIT/library-validation exception; Mac sandbox/camera/selected-file/network-client entitlements remain intact. iPad has `beta-reports-active=true` and `get-task-allow=false`. Private artifacts, upload logs, checksums and entitlement evidence are under ignored `build/testflight/setup/`; do not commit profiles, credentials, populated backups or distribution logs.
 
-The following signed archive commands were used (normal `lib/main.dart`; they require an authorized Xcode account). The Mac command overrides the local project's ad hoc default without changing owner-package behavior:
+The following signed archive commands were used (normal `lib/main.dart`; they require an authorized Xcode account). The corrected Mac command uses **app-target-scoped** overrides. Do not pass `CODE_SIGN_IDENTITY` or `DEVELOPMENT_TEAM` globally: that signed Swift Package privacy resource bundles with the development certificate, which Xcode did not replace during build 8 export:
 
 ```sh
 flutter build ipa --release --target lib/main.dart \
   --export-options-plist release/apple/ExportOptions.plist
 xcodebuild -workspace macos/Runner.xcworkspace -scheme Runner \
   -configuration Release -destination 'generic/platform=macOS' \
-  -archivePath build/testflight/setup/TallyBowl-macOS.xcarchive \
-  DEVELOPMENT_TEAM=R9DBX89RA5 CODE_SIGN_IDENTITY='Apple Development' \
-  CODE_SIGN_STYLE=Automatic -allowProvisioningUpdates archive
+  -archivePath build/testflight/build-9/TallyBowl-macOS.xcarchive \
+  TALLYBOWL_APP_SIGNING_TEAM=R9DBX89RA5 \
+  TALLYBOWL_APP_SIGNING_IDENTITY='Apple Development' \
+  FLUTTER_TARGET=lib/main.dart -allowProvisioningUpdates archive
 xcodebuild -exportArchive \
-  -archivePath build/testflight/setup/TallyBowl-macOS.xcarchive \
-  -exportPath build/testflight/setup/macos-export \
+  -archivePath build/testflight/build-9/TallyBowl-macOS.xcarchive \
+  -exportPath build/testflight/build-9/macos-export \
   -exportOptionsPlist release/apple/ExportOptions.plist \
   -allowProvisioningUpdates
 ```
 
-The committed options export locally. For these authorized uploads, an ignored copy at `build/testflight/setup/UploadOptions.plist` set `destination=upload`, leaving the committed template unchanged. Each platform used `xcodebuild -exportArchive` with its signed archive, separate export directory, upload options and `-allowProvisioningUpdates`. Never repeat a successful upload to check processing; inspect the existing build in App Store Connect instead. The signed iPad archive now occupies `build/ios/archive/Runner.xcarchive`, replacing the earlier unsigned rehearsal.
+After export, expand the Mac package with `pkgutil --expand-full` (or unzip the IPA), then run `python3 tool/apple_distribution_preflight.py <exported.app> --output <ignored-report.json>`. This checks App Store profile/team/identifier, root protections and the distribution certificate on every signed nested bundle/framework. Resource-only bundles can be unsigned and remain sealed by the app signature. The check reproduced exactly the five ITMS-90284 mismatches in the rejected Mac export, and passed the known-good iPad export. Keep `tool/testflight_preflight.py --archive ...` for source/archive contents as a separate check.
+
+The committed options export locally. For these authorized uploads, an ignored copy at `build/testflight/setup/UploadOptions.plist` set `destination=upload`, leaving the committed template unchanged. Each platform used `xcodebuild -exportArchive` with its signed archive, separate export directory, upload options and `-allowProvisioningUpdates`. Never repeat a successful upload to check processing; inspect the existing build in App Store Connect instead. The build-8 iPad archive/IPA were preserved under ignored `build/testflight/setup/` before rebuilding build 9. Flutter replaces `build/ios/archive/Runner.xcarchive`; label retained artifacts by version/build.
 
 ## Upload preparation and external-beta checklist
 
@@ -75,7 +78,7 @@ The committed options export locally. For these authorized uploads, an ignored c
 3. Public contact is finalized as **Joe Steinbring**, https://jws.dev/contact. Before onboarding external testers, publish the HTTPS privacy policy from `PRIVACY_POLICY.md` at `https://tallybowl.jws.app/privacy`. Keep the bundled policy/help and generated Markdown in sync with `python3 tool/render_documents.py`. Verify actual policy/contact content without login. Set TestFlight's separate Feedback Email and private reviewer contact fields in App Store Connect; a website URL does not fill an email field. Feedback email and the private reviewer contact/instructions are now saved in App Store Connect with owner approval. Hosting is not yet configured. An owner-only internal install can proceed while the hosted policy is completed.
 4. Review app privacy for the actual providers/platform. No journal/photos go to a developer server or cloud AI. OSM/Photon receive IP and request/query metadata and may retain logs. Android has Google ML Kit SDK diagnostics; it is absent from the Apple app. Do not automatically select “Data Not Collected” solely because OCR is local. Complete Apple's definitions/third-party review before external review or a public listing; the required-reason manifest is a different declaration.
 5. Complete Apple's export questionnaire. Technical inventory: standard HTTPS through Dart/Flutter networking and SHA-256 photo filenames; no proprietary cipher, VPN, encrypted messaging or app-level journal encryption. Dart TLS is not necessarily OS URLSession. `ITSAppUsesNonExemptEncryption` is deliberately unset pending the final determination. For build 8, the iPad questionnaire was answered **standard algorithms in addition to OS encryption**, then **no France distribution**, as approved by the owner. Apple cleared Missing Compliance. Recheck this answer before including France or changing libraries. Encode a Boolean/compliance code in future binaries only if the determination supports it. An unset key is answered in App Store Connect; it is not an assertion of exemption.
-6. Choose the next unused build number for each platform. Build **8** has now been uploaded for iOS and macOS. Use **9 or later** for the next changed binary; inspect App Store Connect history first. Increment `pubspec.yaml` and regenerate/recheck archives. Never overwrite evidence with a different build number silently.
+6. Choose the next unused build number for each platform. Build **8** has now been uploaded for iOS and macOS. Current changed candidate is **9**; use **10 or later** after its successful upload for another changed binary; inspect App Store Connect history first. Increment `pubspec.yaml` and regenerate/recheck archives. Never overwrite evidence with a different build number silently.
 
 ## Local checks and unsigned archive rehearsal
 
