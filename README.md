@@ -2,7 +2,7 @@
 
 **How you bowled, tonight.** A Flutter bowling journal for native macOS, iPadOS, and Android. Planned website: [tallybowl.jws.app](https://tallybowl.jws.app).
 
-The current candidate is **0.1.9 (10)**, developed and published by **Joe Steinbring**. [Contact Joe for support](https://jws.dev/contact). It fixes real-photo frame filling, adds session deletion, and improves Android recap attachment grants. The prior **0.1.8 (9)** iPad and Mac builds remain in the private owner TestFlight group while the new artifacts are prepared. [TestFlight readiness](docs/TESTFLIGHT.md) records current distribution and device-verification status.
+The current beta is **0.1.9 (10)**, developed and published by **Joe Steinbring**. [Contact Joe for support](https://jws.dev/contact). It fixes real-photo frame filling, adds session deletion, and improves Android recap attachment grants. Both iPad and native Mac builds are available in the owner TestFlight group and submitted for external beta review. [TestFlight readiness](docs/TESTFLIGHT.md) records current distribution and device-verification status.
 
 ## What works
 

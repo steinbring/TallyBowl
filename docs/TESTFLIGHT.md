@@ -4,9 +4,27 @@
 
 Candidate source includes `22a3d2d` (local frame-glyph recovery), `cc3e2fd` (session deletion) and `9dcfc82` (Android PNG handoff). **137 Dart/widget tests pass**, static analysis has no issues, and **three Android instrumentation tests pass**, including a receiving app under a separate UID reading the image while being denied write access. Original 89- and 109-pin photos produce the exact ten observed frames through local Vision and the Android pipeline; anonymized real-photo fixtures exercise import/resume through filled editor inputs and saving. See [recognition](FRAME_RECOGNITION.md) and [sharing](ANDROID_SHARING.md).
 
-Apple archives, signing validation, upload, processing, internal-group assignment and the requested external group are being prepared. The prior build-9 owner beta remains available. Physical Google Chat composer verification is pending a connected Samsung; neither the chooser nor the separate test receiver proves that a specific installed Chat version accepted an attachment. The planned public privacy URL still fails DNS; the current policy is bundled offline and available in this repository. No broad recognition-accuracy or physical TestFlight-installation claim is made.
+**Both iPad and native Mac 0.1.9 (10) are available through the internal Owner testing group.** Both uploads processed successfully, export compliance is cleared using the previously approved standard-encryption answer and France exclusion, and What to Test is saved. The group's Builds tab shows **Testing** for both new platforms. The prior working builds remain available.
 
-The sections below preserve the historical 0.1.8 preparation and signing runbook.
+External **External testing** was created with two email testers and no public link. Both platform builds were submitted to Beta App Review on October 27 and show **Waiting for Review**. Both requested addresses are present; their current status is **No Builds Available** until approval. Automatic tester notification is enabled for approval. External installation depends on Apple's approval; submitting a build is not approval. The tester addresses are maintained privately in App Store Connect rather than this repository.
+
+| Evidence | Result |
+| --- | --- |
+| iPad App Store Connect build | `730e456b-9ccf-4bdb-b2df-55b77d2dd4e5`, 0.1.9 (10), internal Testing; external Waiting for Review |
+| Native Mac App Store Connect build | `86479074-582c-440f-93f3-950830570ef1`, 0.1.9 (10), internal Testing; external Waiting for Review |
+| External group | `6e6419e3-7a50-4c52-ad98-6303af5a58e1`, both new builds, email-only invitations |
+| Apple artifacts | iPad release IPA and universal native Mac App Store package, normal `lib/main.dart`, source `7c4a815`; both archive/content and exported distribution-signature/profile checks pass |
+| Android artifact | `build/releases/TallyBowl-0.1.9-android-debug.apk`, source `e3793ca`, normal `lib/main.dart`, same owner development signer and permissions as the prior APK; private probes/test receiver excluded |
+| Android native verification | Three instrumentation tests passed; Lint has zero errors and ten advisory warnings. The debug-only test helper's task-reordering permission is explicitly excluded |
+| Release evidence | Logs, signature reports and artifact hashes in ignored `build/testflight/build-10/` |
+
+Physical Google Chat composer verification is pending; the owner chose emulator checks for this pass. Neither the chooser nor the separate test receiver proves that a specific installed Chat version accepted an attachment. The planned public privacy URL still fails DNS; the current policy is bundled offline and available in this repository. Public policy hosting and physical Apple/Android workflow acceptance remain open. No broad recognition-accuracy or physical TestFlight installation claim is made.
+
+To install the Apple update, accept the existing owner invitation and choose **0.1.9 (10)** in TestFlight on each device. Export a journal backup first. Android is distributed separately using the APK above. At the owner's request, the Samsung was updated in place from 0.1.7 (8) to this exact APK and launched; the complete journal remained unchanged. See [device evidence](DEVICE_TESTING.md). No app was uninstalled or had its data cleared.
+
+## Historical 0.1.8 preparation and signing runbook
+
+The sections below preserve the October 25 release record. Their candidate numbers, tester counts and remaining-work decisions describe that earlier release; the section above is the current status.
 
 
 Assessed October 25, 2026. Current candidate **0.1.8 (9)**, bundle ID **app.jws.tallybowl**, existing Apple team **R9DBX89RA5**. Owner build **0.1.7 (8)** is installed on the Mac, iPad, and Samsung. Build **0.1.7 (8)** uploaded successfully for both platforms on October 25, 2026; iPad processing succeeded, but Apple rejected the Mac package for nested resource-bundle certificate mismatches (ITMS-90284). A successful upload and deep signature verification alone are insufficient. Build **0.1.8 (9)** includes verified round-three recognition fixes and a corrected Mac signing configuration; both platforms have now processed successfully, cleared export compliance and been assigned to the private owner group.
