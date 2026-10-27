@@ -1,6 +1,6 @@
 # Privacy policy
 
-Updated 2026-10-25.
+Updated 2026-10-27.
 
 ## Your journal on your device
 
@@ -10,7 +10,7 @@ The local database is not separately encrypted by TallyBowl. Device security and
 
 ## Photos and recognition
 
-Camera and photo/file access are used when you choose to capture or import a scoreboard. Recognition runs on this device using Apple Vision on iPad and Mac, or bundled Google ML Kit on Android. No cloud AI service receives your photos or extracted scores for recognition.
+Camera and photo/file access are used when you choose to capture or import a scoreboard. Recognition runs on this device using Apple Vision on iPad and Mac, or bundled Google ML Kit on Android, with a small bundled glyph-template fallback for monitor cells. No cloud AI service receives your photos or extracted scores for recognition.
 
 Android’s Google ML Kit may send SDK diagnostics to Google, including device/app identifiers, input image dimensions and format, processing timing, and errors. On-device recognition does not mean this third-party SDK is network silent. Google’s ML Kit disclosure explains these diagnostics. Apple builds do not include the Android ML Kit SDK.
 
@@ -32,7 +32,7 @@ Private temporary exports older than one day are cleaned up when a later export 
 
 ## Your choices and deleting data
 
-You can decline camera access and enter frames manually, use saved or manually entered alleys offline, edit your profile, delete games, and discard an unfinished draft. Retiring a ball or archiving an alley preserves its historical references and does not erase those records.
+You can decline camera access and enter frames manually, use saved or manually entered alleys offline, edit your profile, delete sessions and their games, and discard an unfinished draft. Retiring a ball or archiving an alley preserves its historical references and does not erase those records.
 
 For a full local reset, export anything you want to keep first. On Android, use the system’s Clear storage action for TallyBowl. On iPad, Delete App removes its local app data; Offload App keeps data. On Mac, quitting and deleting the app alone can leave its sandbox container behind; see the user guide for the container location. Copies in device backups, exported files, or recipient services require separate removal.
 

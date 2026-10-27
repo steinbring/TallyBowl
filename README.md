@@ -2,7 +2,7 @@
 
 **How you bowled, tonight.** A Flutter bowling journal for native macOS, iPadOS, and Android. Planned website: [tallybowl.jws.app](https://tallybowl.jws.app).
 
-The beta candidate is **0.1.8 (9)**, developed and published by **Joe Steinbring**. [Contact Joe for support](https://jws.dev/contact). Owner build 0.1.7 (8) is installed on the Mac, iPad, and Samsung. Signed **0.1.8 (9)** iPad and native Mac builds have processed successfully in App Store Connect app **6826931962** and are assigned to the private **Owner testing** group. Accept your invitation in TestFlight to install them. Android's rebuilt owner APK is available locally. [TestFlight readiness](docs/TESTFLIGHT.md) records verification, installation steps and the hosted-policy/physical-acceptance gates before external testing.
+The current beta is **0.1.9 (10)**, developed and published by **Joe Steinbring**. [Contact Joe for support](https://jws.dev/contact). It fixes real-photo frame filling, adds session deletion, and improves Android recap attachment grants. Both iPad and native Mac builds are available in the owner TestFlight group and submitted for external beta review. [TestFlight readiness](docs/TESTFLIGHT.md) records current distribution and device-verification status.
 
 ## What works
 
@@ -12,12 +12,13 @@ The beta candidate is **0.1.8 (9)**, developed and published by **Joe Steinbring
 - Practice/league sessions, date and lane/pair, per-game ball tags, optional primary ball, and notes.
 - Camera/photo import with on-device Apple Vision or bundled Android ML Kit; geometry-based frame parsing, editable frames, deterministic scoring, and recoverable drafts.
 - Automatic frame filling for a unique matching row only when the complete delivery sequence validates against available cumulative checkpoints. Ambiguous results open review; missing deliveries are never invented from totals.
+- Session deletion with confirmation, cascading games/draft removal, and transactional failure recovery.
 - History and statistics with sample counts, alley visits, ball usage, strike/spare rates, and scoring trends.
 - Branded PNG recaps, privacy switches, native image sharing and export.
 - Local SQLite storage, versioned JSON backups with before-restore recovery, and game/delivery CSV exports.
 - System light/dark appearance, scalable layouts, accessible scorecard labels, offline help/privacy pages, and installed version/build in Settings.
 
-There is no cloud AI fallback, account, automatic sync, or iPhone target. Real-photo verification currently covers **one monitor layout** plus synthetic fixtures; always compare every delivery before saving. Multi-photo combining, crop/rotation tools, handicap scoring, and per-delivery ball assignment are deferred. Android ML Kit may send SDK diagnostics to Google; map/search providers receive requests. See the [privacy policy](docs/PRIVACY_POLICY.md).
+There is no cloud AI fallback, account, automatic sync, or iPhone target. Real-photo verification currently covers **three permissioned monitor photos across two layouts** plus synthetic fixtures; always compare every delivery before saving. Multi-photo combining, crop/rotation tools, handicap scoring, and per-delivery ball assignment are deferred. Android ML Kit may send SDK diagnostics to Google; map/search providers receive requests. See the [privacy policy](docs/PRIVACY_POLICY.md).
 
 ## Documentation
 
@@ -27,6 +28,8 @@ There is no cloud AI fallback, account, automatic sync, or iPhone target. Real-p
 | Prepare an Apple beta and understand remaining gates | [TestFlight readiness and release runbook](docs/TESTFLIGHT.md) |
 | Fill in beta/reviewer information | [TestFlight metadata](docs/TESTFLIGHT_METADATA.md) |
 | Understand architecture and change it safely | [Architecture and maintenance](docs/ARCHITECTURE.md) |
+| Investigate score-photo recognition | [Shared frame recognition](docs/FRAME_RECOGNITION.md) |
+| Verify Android image handoff | [Android sharing](docs/ANDROID_SHARING.md) |
 | Verify hardware workflows | [Device testing](docs/DEVICE_TESTING.md) |
 | Understand scope and what comes next | [Roadmap](docs/ROADMAP.md) |
 | Review service policies and attribution | [Data sources](docs/DATA_SOURCES.md) |

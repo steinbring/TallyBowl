@@ -2,7 +2,6 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:share_plus/share_plus.dart';
 
 import '../app_controller.dart';
 import '../config.dart';
@@ -62,13 +61,7 @@ class _SessionSharePageState extends State<SessionSharePage> {
           : 'tallybowl-recap.png';
       if (share) {
         final file = await BowlExports.temporaryFile(name, bytes);
-        await SharePlus.instance.share(
-          ShareParams(
-            files: [XFile(file.path, mimeType: 'image/png')],
-            fileNameOverrides: [name],
-            sharePositionOrigin: anchor,
-          ),
-        );
+        await BowlExports.shareImage(file, name, anchor);
       } else if (buttonContext.mounted) {
         await BowlExports.exportFile(
           buttonContext,
@@ -78,7 +71,7 @@ class _SessionSharePageState extends State<SessionSharePage> {
         );
       }
     } catch (e) {
-      if (mounted) message(context, 'Could not create the recap image. $e');
+      if (mounted) message(context, 'Could not share or export the recap. $e');
     } finally {
       if (mounted) setState(() => _busy = false);
     }

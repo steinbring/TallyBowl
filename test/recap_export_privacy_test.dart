@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:path/path.dart' as p;
@@ -19,8 +20,9 @@ class _ExportPaths extends PathProviderPlatform {
 
 void main() {
   testWidgets(
-    'hiding the date also hides it from the actual shared attachment name',
+    'image handoff hides the date from the attachment name',
     (tester) async {
+      final android = defaultTargetPlatform == TargetPlatform.android;
       await tester.runAsync(() async {
         tester.view.physicalSize = const Size(1440, 2800);
         tester.view.devicePixelRatio = 1;
@@ -35,7 +37,11 @@ void main() {
         addTearDown(() => directory.delete(recursive: true));
         final shared = Completer<Map<dynamic, dynamic>>();
         final dismissed = Completer<String>();
-        const channel = MethodChannel('dev.fluttercommunity.plus/share');
+        final channel = MethodChannel(
+          android
+              ? 'app.jws.tallybowl/share'
+              : 'dev.fluttercommunity.plus/share',
+        );
         tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
           channel,
           (call) {
@@ -84,9 +90,12 @@ void main() {
         }
         final args = await shared.future.timeout(const Duration(seconds: 10));
         try {
-          final path = (args['paths'] as List).single as String;
+          final path = android
+              ? args['path'] as String
+              : (args['paths'] as List).single as String;
           expect(await File(path).exists(), isTrue);
-          expect(args['mimeTypes'], ['image/png']);
+          if (!android) expect(args['mimeTypes'], ['image/png']);
+          expect(args.containsKey('text'), isFalse);
           final png = await File(path).readAsBytes();
           expect(png.take(8).toList(), [137, 80, 78, 71, 13, 10, 26, 10]);
           final codec = await ui.instantiateImageCodec(png);
@@ -107,5 +116,10 @@ void main() {
         }
       });
     },
+    variant: TargetPlatformVariant({
+      TargetPlatform.android,
+      TargetPlatform.iOS,
+      TargetPlatform.macOS,
+    }),
   );
 }

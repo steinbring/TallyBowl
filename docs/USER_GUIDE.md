@@ -1,6 +1,6 @@
 # User guide
 
-Updated 2026-10-25.
+Updated 2026-10-27.
 
 ## Set up your journal
 
@@ -24,11 +24,13 @@ Your unfinished game is saved as a draft. Return to Tonight to resume it. A reta
 
 Save each game, then finish the session when you are done. History lets you review and correct games and revisit the session recap. Insights compares saved games and shows sample sizes. Drafts are excluded. An alley visit is a session; ball usage counts games tagged with that ball, so one game can count for several balls. These comparisons describe your recorded results; they cannot prove a ball or alley caused a score change.
 
+To remove an entire session, open it in History and choose Delete session (the trash icon). Tonight also has Delete session for the current visit. Confirm to permanently remove the session, all its saved games, and its unfinished draft from history and statistics. Export a backup first if you want a copy; your alley and ball collections are retained.
+
 ## Share a branded recap
 
 Open the session recap and check the preview. Your name, alley/lane, balls, and date each have a privacy switch. Choose Share image to send a PNG attachment using the system share sheet, or use the export/save action to keep a copy. Hiding the date also removes it from the attachment filename.
 
-Choose AeroSloth, Messages, Mail, or another installed image-compatible app when the system offers it. Recipient availability depends on that app’s platform share support and setup. If it is absent, save the PNG and attach it from the recipient app. Canceling the sheet does not delete the session. TallyBowl never posts to an account automatically.
+Choose Google Chat, AeroSloth, Messages, Mail, or another installed image-compatible app when the system offers it. Recipient availability depends on that app’s platform share support and setup. If it is absent, save the PNG and attach it from the recipient app. Canceling the sheet does not delete the session. TallyBowl never posts to an account automatically.
 
 ## Back up before you experiment
 
@@ -38,7 +40,7 @@ Restore backup replaces this device’s whole journal after confirmation; it doe
 
 ## Remove local data
 
-You can delete individual games and discard a draft. Retiring balls and archiving alleys keeps their history. For a complete reset, first export any records you want to keep, then use Android’s app Clear storage or iPad’s Delete App (not Offload App).
+You can delete a whole session with its games, delete individual games, or discard a draft. Retiring balls and archiving alleys keeps their history. For a complete reset, first export any records you want to keep, then use Android’s app Clear storage or iPad’s Delete App (not Offload App).
 
 On Mac, quit TallyBowl and back up the journal first. The sandbox container is at ~/Library/Containers/app.jws.tallybowl; Finder’s Go to Folder can open it. Removing this container removes the journal, draft, and recovery copy. Deleting the app from Applications alone may leave these files behind. Separately manage exported copies, recipient attachments, and system backups.
 
@@ -46,7 +48,7 @@ On Mac, quit TallyBowl and back up the journal first. The sandbox container is a
 
 TallyBowl is developed and published by Joe Steinbring. Contact Joe for help through https://jws.dev/contact. Settings shows the installed version and build number. Include those, your device and OS, the steps taken, what you expected, and what happened. Note whether you were offline, using large text or a screen reader, or had just rotated, folded, or resized the app. TestFlight feedback can attach screenshots and diagnostics.
 
-For a recognition error, record the expected delivery marks for all ten frames and whether the selected name was correct. Share only photos you have permission to send, and hide other bowlers’ information. Keep your original backup. This beta has been checked against one real monitor layout and synthetic fixtures; additional scoreboards need evaluation.
+For a recognition error, record the expected delivery marks for all ten frames and whether the selected name was correct. Share only photos you have permission to send, and hide other bowlers’ information. Keep your original backup. This beta has been checked against multiple permissioned monitor photos and synthetic fixtures; additional scoreboards need evaluation.
 
 ## Links
 

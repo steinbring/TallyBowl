@@ -7,6 +7,14 @@
         android:label="TallyBowl!"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
+        <provider
+            android:name=".RecapFileProvider"
+            android:authorities="${applicationId}.recap_provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/recap_file_paths" />
+        </provider>
         <activity
             android:name=".MainActivity"
             android:exported="true"

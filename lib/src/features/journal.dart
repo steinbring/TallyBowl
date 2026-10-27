@@ -225,6 +225,7 @@ class TonightPage extends StatelessWidget {
                 icon: const Icon(Icons.flag_outlined),
                 label: const Text('Finish session'),
               ),
+              _DeleteSessionButton(controller: controller, session: session),
             ],
           ),
           const SizedBox(height: 16),
@@ -331,6 +332,12 @@ Future<void> showSession(
                       openSessionShare(context, controller, session),
                   icon: const Icon(Icons.ios_share_rounded),
                 ),
+              _DeleteSessionButton(
+                controller: controller,
+                session: session,
+                iconOnly: true,
+                closePage: true,
+              ),
             ],
           ),
           body: SingleChildScrollView(
@@ -450,6 +457,76 @@ Future<void> showSession(
     ),
   ),
 );
+
+class _DeleteSessionButton extends StatefulWidget {
+  const _DeleteSessionButton({
+    required this.controller,
+    required this.session,
+    this.iconOnly = false,
+    this.closePage = false,
+  });
+  final BowlController controller;
+  final BowlingSession session;
+  final bool iconOnly, closePage;
+  @override
+  State<_DeleteSessionButton> createState() => _DeleteSessionButtonState();
+}
+
+class _DeleteSessionButtonState extends State<_DeleteSessionButton> {
+  bool busy = false;
+  Future<void> remove() async {
+    setState(() => busy = true);
+    try {
+      final controller = widget.controller;
+      final id = widget.session.id;
+      final count = controller.journal.gamesForSession(id).length;
+      final draft = controller.data.draft?['sessionId'] == id;
+      final accepted = await confirm(
+        context,
+        'Delete session?',
+        'Permanently remove this session${count == 0 ? '' : ', $count saved ${count == 1 ? 'game' : 'games'}'}${draft ? ', and its unfinished game' : ''} from your history and statistics? This cannot be undone.',
+        action: 'Delete session',
+      );
+      if (!accepted || !mounted) return;
+      final messenger = ScaffoldMessenger.of(context);
+      final source = await controller.deleteSession(id);
+      if (mounted && widget.closePage) Navigator.of(context).pop();
+      try {
+        await PhotoService.remove(source);
+      } catch (_) {
+        messenger.showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Session deleted. Its retained photo will be cleaned up when the app restarts.',
+            ),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) message(context, 'Could not delete the session. $e');
+    } finally {
+      if (mounted) setState(() => busy = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final onPressed = busy || widget.controller.isAcquiringPhoto
+        ? null
+        : remove;
+    return widget.iconOnly
+        ? IconButton(
+            tooltip: 'Delete session',
+            onPressed: onPressed,
+            icon: const Icon(Icons.delete_outline_rounded),
+          )
+        : TextButton.icon(
+            onPressed: onPressed,
+            icon: const Icon(Icons.delete_outline_rounded),
+            label: const Text('Delete session'),
+          );
+  }
+}
 
 class HistoryPage extends StatefulWidget {
   const HistoryPage({super.key, required this.controller});

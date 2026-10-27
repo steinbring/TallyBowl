@@ -1,6 +1,8 @@
 # TallyBowl! development status
 
-Updated October 25, 2026. Candidate source is **0.1.8 (9)**; installed Mac/iPad/Samsung owner builds remain **0.1.7 (8)**. All three updates launched and preserved existing journal data; see [device testing](DEVICE_TESTING.md). Both Apple 0.1.8 (9) builds have processed and are assigned to private owner TestFlight; see [TestFlight readiness](TESTFLIGHT.md) for checks, installation steps and external-beta/physical-acceptance gates. The results below retain their original build labels; App Store distribution signatures and successful uploads were verified during TestFlight setup; physical TestFlight acceptance remains separate.
+Updated October 27, 2026. Current beta **0.1.9 (10)** fixes photographed frame filling, session deletion and Android PNG handoff. **137 Dart/widget tests and three Android instrumentation tests pass**, static analysis is clean, and original 89/109 photos produce the exact observed deliveries through the local Apple and Android pipelines. See [recognition](FRAME_RECOGNITION.md) and [sharing](ANDROID_SHARING.md) for contracts and limits.
+
+Both Apple builds processed, cleared compliance, and show **Testing** in Owner testing. Both are **Waiting for Review** in External testing, with two requested email testers added and automatic notification enabled. Samsung was updated in place to 0.1.9 (10), launched, and its full journal verified unchanged; the last verified local Mac/iPad installations remain 0.1.7 (8). See [device testing](DEVICE_TESTING.md) and the [TestFlight release record](TESTFLIGHT.md). Physical Google Chat acceptance, Apple TestFlight installation and public privacy-policy hosting remain open. Results below retain their original build labels.
 
 ## Feature branches
 
@@ -48,6 +50,10 @@ Features are committed on `codex/` branches and merged locally into `main`. The 
 | `codex/testflight-setup` | Explicit Apple ID/app record, signed iPad/Mac exports and uploads, private owner testing group and release runbook |
 | `codex/audit3-recognition` | Verified round-three dispositions, light/dark native stroke recovery, shared native fixtures and F/X name parsing |
 | `codex/testflight-distribution-fix` | App-target Mac signing overrides, nested certificate/profile preflight and candidate 0.1.8 (9) |
+| `codex/scoreboard-photo-autofill` | Shared local glyph recovery, EXIF-aware real-photo fixtures and editor auto-fill/resume regressions |
+| `codex/delete-sessions` | Confirmed session removal, transactional games/draft cascade, retained-photo cleanup and retry tests |
+| `codex/android-image-sharing` | Scoped PNG provider, ClipData/read grants and separate-UID receiver instrumentation |
+| `codex/testflight-0-1-9` | Build 10 packages, helper-permission exclusion, Apple owner/external beta configuration and Samsung update evidence |
 
 The completed stack is integrated into local `main` after verification. Feature branches are retained. All work is local until explicitly pushed to the remote repository.
 

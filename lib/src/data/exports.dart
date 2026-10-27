@@ -1,9 +1,10 @@
 import 'dart:convert';
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
@@ -52,6 +53,23 @@ abstract final class BowlExports {
         : box.localToGlobal(Offset.zero) & box.size;
   }
 
+  static const imageShareChannel = MethodChannel('app.jws.tallybowl/share');
+  static Future<void> shareImage(File file, String name, Rect anchor) async {
+    if (defaultTargetPlatform == TargetPlatform.android) {
+      await imageShareChannel.invokeMethod<void>('shareImage', {
+        'path': file.path,
+      });
+    } else {
+      await SharePlus.instance.share(
+        ShareParams(
+          files: [XFile(file.path, mimeType: 'image/png')],
+          fileNameOverrides: [name],
+          sharePositionOrigin: anchor,
+        ),
+      );
+    }
+  }
+
   static Future<void> exportFile(
     BuildContext context, {
     required String name,
@@ -70,6 +88,10 @@ abstract final class BowlExports {
     } else {
       final anchor = origin(context);
       final file = await temporaryFile(name, bytes);
+      if (mime == 'image/png') {
+        await shareImage(file, name, anchor);
+        return;
+      }
       await SharePlus.instance.share(
         ShareParams(
           files: [XFile(file.path, mimeType: mime)],
