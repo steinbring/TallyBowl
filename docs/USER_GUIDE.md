@@ -1,6 +1,6 @@
 # User guide
 
-Updated 2026-10-25.
+Updated 2026-10-27.
 
 ## Set up your journal
 
@@ -46,7 +46,7 @@ On Mac, quit TallyBowl and back up the journal first. The sandbox container is a
 
 TallyBowl is developed and published by Joe Steinbring. Contact Joe for help through https://jws.dev/contact. Settings shows the installed version and build number. Include those, your device and OS, the steps taken, what you expected, and what happened. Note whether you were offline, using large text or a screen reader, or had just rotated, folded, or resized the app. TestFlight feedback can attach screenshots and diagnostics.
 
-For a recognition error, record the expected delivery marks for all ten frames and whether the selected name was correct. Share only photos you have permission to send, and hide other bowlers’ information. Keep your original backup. This beta has been checked against one real monitor layout and synthetic fixtures; additional scoreboards need evaluation.
+For a recognition error, record the expected delivery marks for all ten frames and whether the selected name was correct. Share only photos you have permission to send, and hide other bowlers’ information. Keep your original backup. This beta has been checked against multiple permissioned monitor photos and synthetic fixtures; additional scoreboards need evaluation.
 
 ## Links
 

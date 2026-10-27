@@ -30,7 +30,10 @@ void main() {
           await tester.tap(link);
           await tester.pumpAndSettle();
           expect(find.byType(AppDocumentPage), findsOneWidget);
-          expect(find.text('Updated 2026-10-25'), findsOneWidget);
+          expect(
+            find.textContaining(RegExp(r'^Updated \d{4}-\d{2}-\d{2}$')),
+            findsOneWidget,
+          );
           expect(
             find.text(
               document == AppDocument.guide

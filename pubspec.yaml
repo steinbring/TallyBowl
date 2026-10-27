@@ -76,6 +76,8 @@ flutter:
   # the material Icons class.
   uses-material-design: true
   assets:
+    - assets/recognition/glyphs.json
+    - assets/recognition/OFL-Roboto.txt
     - assets/branding/tallybowl-logo.png
     - assets/documents/privacy.json
     - assets/documents/guide.json

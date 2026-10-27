@@ -10,7 +10,9 @@ class RecognizedLine {
     this.confidence,
     this.isStroke = false,
     this.elements = const [],
+    this.frameRow,
   });
+  final ScoreRow? frameRow;
   final String text;
   final double x, y, width, height;
   final double? confidence;

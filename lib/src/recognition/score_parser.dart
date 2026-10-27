@@ -46,7 +46,19 @@ abstract final class ScoreSheetParser {
       profile.name,
       ...profile.aliases,
     ].map(_normalized).where((v) => v.isNotEmpty).toList();
-    final gridRows = ScoreboardGrid.rows(lines, profile);
+    final glyphRows = lines
+        .map((l) => l.frameRow)
+        .whereType<ScoreRow>()
+        .toList();
+    bool covered(double y) =>
+        glyphRows.any((r) => y >= r.y && y <= r.y + r.height);
+    final gridRows = [
+      ...glyphRows,
+      ...ScoreboardGrid.rows(
+        lines.where((l) => l.frameRow == null).toList(),
+        profile,
+      ).where((r) => !covered(r.y + r.height / 2)),
+    ];
     final result = <ScoreRow>[...gridRows];
     for (final group in groups) {
       group.sort((a, b) => a.x.compareTo(b.x));

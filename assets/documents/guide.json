@@ -1,6 +1,6 @@
 {
   "title": "User guide",
-  "updated": "2026-10-25",
+  "updated": "2026-10-27",
   "sections": [
     {
       "heading": "Set up your journal",
@@ -20,7 +20,7 @@
       "heading": "Read and correct frames",
       "paragraphs": [
         "Use X for a strike, / for a spare, - for a miss, and F for a foul. Open-frame examples are 81 and 9-. A tenth-frame example is X7/. The scoring engine checks rack resets, fill deliveries, and strike/spare bonuses. A missing or uncertain mark needs your correction; the app does not invent deliveries from the final total.",
-        "Your unfinished game is saved as a draft. Return to Tonight to resume it. A retained photo can be reanalyzed when its draft resumes. Saving or discarding a draft removes the app’s private photo copy. The current version has no multi-photo combining, crop/rotation editor, handicap scoring, or per-delivery ball assignment."
+        "Your unfinished game is saved as a draft. Return to Tonight to resume it. A retained photo can be reanalyzed when its draft resumes. Saving or discarding a draft removes the app\u2019s private photo copy. The current version has no multi-photo combining, crop/rotation editor, handicap scoring, or per-delivery ball assignment."
       ]
     },
     {
@@ -33,32 +33,35 @@
       "heading": "Share a branded recap",
       "paragraphs": [
         "Open the session recap and check the preview. Your name, alley/lane, balls, and date each have a privacy switch. Choose Share image to send a PNG attachment using the system share sheet, or use the export/save action to keep a copy. Hiding the date also removes it from the attachment filename.",
-        "Choose AeroSloth, Messages, Mail, or another installed image-compatible app when the system offers it. Recipient availability depends on that app’s platform share support and setup. If it is absent, save the PNG and attach it from the recipient app. Canceling the sheet does not delete the session. TallyBowl never posts to an account automatically."
+        "Choose AeroSloth, Messages, Mail, or another installed image-compatible app when the system offers it. Recipient availability depends on that app\u2019s platform share support and setup. If it is absent, save the PNG and attach it from the recipient app. Canceling the sheet does not delete the session. TallyBowl never posts to an account automatically."
       ]
     },
     {
       "heading": "Back up before you experiment",
       "paragraphs": [
         "In Settings, Export backup creates a versioned JSON copy of the journal and unfinished frame draft. Original photos are excluded. Save it outside TallyBowl and check that the file exists. CSV exports are for analysis and cannot restore a journal. There is no automatic cross-device sync.",
-        "Restore backup replaces this device’s whole journal after confirmation; it does not merge journals. One recovery copy of the journal from before the restore is kept locally. Use Recover journal from before last restore if needed. Back up both devices first when moving a journal between Mac, iPad, and Android. Do not uninstall an owner-test build just to fix an update-signing error."
+        "Restore backup replaces this device\u2019s whole journal after confirmation; it does not merge journals. One recovery copy of the journal from before the restore is kept locally. Use Recover journal from before last restore if needed. Back up both devices first when moving a journal between Mac, iPad, and Android. Do not uninstall an owner-test build just to fix an update-signing error."
       ]
     },
     {
       "heading": "Remove local data",
       "paragraphs": [
-        "You can delete individual games and discard a draft. Retiring balls and archiving alleys keeps their history. For a complete reset, first export any records you want to keep, then use Android’s app Clear storage or iPad’s Delete App (not Offload App).",
-        "On Mac, quit TallyBowl and back up the journal first. The sandbox container is at ~/Library/Containers/app.jws.tallybowl; Finder’s Go to Folder can open it. Removing this container removes the journal, draft, and recovery copy. Deleting the app from Applications alone may leave these files behind. Separately manage exported copies, recipient attachments, and system backups."
+        "You can delete individual games and discard a draft. Retiring balls and archiving alleys keeps their history. For a complete reset, first export any records you want to keep, then use Android\u2019s app Clear storage or iPad\u2019s Delete App (not Offload App).",
+        "On Mac, quit TallyBowl and back up the journal first. The sandbox container is at ~/Library/Containers/app.jws.tallybowl; Finder\u2019s Go to Folder can open it. Removing this container removes the journal, draft, and recovery copy. Deleting the app from Applications alone may leave these files behind. Separately manage exported copies, recipient attachments, and system backups."
       ]
     },
     {
       "heading": "Report a beta problem",
       "paragraphs": [
         "TallyBowl is developed and published by Joe Steinbring. Contact Joe for help through https://jws.dev/contact. Settings shows the installed version and build number. Include those, your device and OS, the steps taken, what you expected, and what happened. Note whether you were offline, using large text or a screen reader, or had just rotated, folded, or resized the app. TestFlight feedback can attach screenshots and diagnostics.",
-        "For a recognition error, record the expected delivery marks for all ten frames and whether the selected name was correct. Share only photos you have permission to send, and hide other bowlers’ information. Keep your original backup. This beta has been checked against one real monitor layout and synthetic fixtures; additional scoreboards need evaluation."
+        "For a recognition error, record the expected delivery marks for all ten frames and whether the selected name was correct. Share only photos you have permission to send, and hide other bowlers\u2019 information. Keep your original backup. This beta has been checked against multiple permissioned monitor photos and synthetic fixtures; additional scoreboards need evaluation."
       ]
     }
   ],
   "links": [
-    {"label": "Contact Joe Steinbring", "url": "https://jws.dev/contact"}
+    {
+      "label": "Contact Joe Steinbring",
+      "url": "https://jws.dev/contact"
+    }
   ]
 }

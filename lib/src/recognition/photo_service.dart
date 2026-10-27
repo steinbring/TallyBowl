@@ -11,6 +11,7 @@ import '../data/bounded_file.dart';
 import '../domain/models.dart';
 import '../domain/scoring.dart';
 import 'scoreboard_grid.dart';
+import 'frame_glyph_reader.dart';
 import 'score_parser.dart';
 
 abstract final class PhotoService {
@@ -83,7 +84,35 @@ abstract final class PhotoService {
           .toList();
     }
 
-    var lines = await read();
+    final originalLines = await _recognizeText(profile, read);
+    if (profile == null ||
+        ScoreSheetParser.automaticRow(
+              ScoreSheetParser.rows(originalLines, profile),
+            ) !=
+            null) {
+      return originalLines;
+    }
+    try {
+      final glyphRows = await FrameGlyphReader.read(
+        bytes,
+        originalLines,
+        profile,
+      );
+      return [...originalLines, ...glyphRows];
+    } catch (_) {
+      return originalLines;
+    }
+  }
+
+  static Future<List<RecognizedLine>> _recognizeText(
+    BowlerProfile? profile,
+    Future<List<RecognizedLine>> Function({
+      List<RecognitionRegion>? regions,
+      double aspect,
+    })
+    read,
+  ) async {
+    var lines = await read(aspect: 1);
     if (profile == null ||
         ScoreSheetParser.automaticRow(ScoreSheetParser.rows(lines, profile)) !=
             null) {
@@ -120,7 +149,7 @@ abstract final class PhotoService {
     final regions = ScoreboardGrid.regions(lines, profile);
     if (regions.isEmpty) return lines;
     try {
-      final refined = await read(regions: regions);
+      final refined = await read(regions: regions, aspect: 1);
       // Apple Vision reports word bounds, so retain a full-row contextual
       // reading for sparse cells that remain incomplete in isolated crops.
       var contextLines = <RecognizedLine>[];
