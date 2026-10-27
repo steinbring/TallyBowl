@@ -9,6 +9,21 @@ class MainActivity : FlutterActivity() {
     private val imageExecutor = Executors.newSingleThreadExecutor()
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "app.jws.tallybowl/share").setMethodCallHandler { call, result ->
+            if (call.method != "shareImage") {
+                result.notImplemented()
+            } else {
+                try {
+                    val path = requireNotNull(call.argument<String>("path"))
+                    val send = RecapSharing.intent(this, path)
+                    startActivity(android.content.Intent.createChooser(send, "Share bowling recap"))
+                    // This reports handoff only, never that a message was sent.
+                    result.success(null)
+                } catch (_: Exception) {
+                    result.error("share_image", "Could not open the image share sheet. Export the recap and attach it from the receiving app.", null)
+                }
+            }
+        }
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "app.jws.tallybowl/vision").setMethodCallHandler { call, result ->
             if (call.method != "recognizeText") {
                 result.notImplemented()

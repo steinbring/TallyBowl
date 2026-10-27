@@ -30,7 +30,7 @@ To remove an entire session, open it in History and choose Delete session (the t
 
 Open the session recap and check the preview. Your name, alley/lane, balls, and date each have a privacy switch. Choose Share image to send a PNG attachment using the system share sheet, or use the export/save action to keep a copy. Hiding the date also removes it from the attachment filename.
 
-Choose AeroSloth, Messages, Mail, or another installed image-compatible app when the system offers it. Recipient availability depends on that app’s platform share support and setup. If it is absent, save the PNG and attach it from the recipient app. Canceling the sheet does not delete the session. TallyBowl never posts to an account automatically.
+Choose Google Chat, AeroSloth, Messages, Mail, or another installed image-compatible app when the system offers it. Recipient availability depends on that app’s platform share support and setup. If it is absent, save the PNG and attach it from the recipient app. Canceling the sheet does not delete the session. TallyBowl never posts to an account automatically.
 
 ## Back up before you experiment
 

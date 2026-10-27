@@ -46,6 +46,7 @@ android {
 
     defaultConfig {
         applicationId = "app.jws.tallybowl"
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion
@@ -93,6 +94,12 @@ flutter {
 
 // Bundled model: recognition is available without downloading a model.
 dependencies {
+    // AGP resolves tests consistently with Flutter integration_test's debug
+    // runtime; align its runner/core with instrumentation on current Android.
+    debugImplementation("androidx.test:runner:1.7.0")
+    debugImplementation("androidx.test.ext:junit:1.3.0")
+    androidTestImplementation("androidx.test:runner:1.7.0")
+    androidTestImplementation("androidx.test.ext:junit:1.3.0")
     implementation("com.google.mlkit:text-recognition:16.0.1")
     implementation("androidx.exifinterface:exifinterface:1.4.2")
 }

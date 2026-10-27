@@ -1,26 +1,26 @@
 {
   "title": "Privacy policy",
-  "updated": "2026-10-25",
+  "updated": "2026-10-27",
   "sections": [
     {
       "heading": "Your journal on your device",
       "paragraphs": [
-        "TallyBowl! is a personal bowling journal. It has no accounts, advertising, developer-operated analytics, or automatic journal synchronization. Your profile and scoreboard aliases, balls, saved alleys, sessions, scores, notes, and unfinished draft are stored in the app’s private local storage. TallyBowl does not operate a service that receives these records or your scoreboard photos.",
+        "TallyBowl! is a personal bowling journal. It has no accounts, advertising, developer-operated analytics, or automatic journal synchronization. Your profile and scoreboard aliases, balls, saved alleys, sessions, scores, notes, and unfinished draft are stored in the app\u2019s private local storage. TallyBowl does not operate a service that receives these records or your scoreboard photos.",
         "The local database is not separately encrypted by TallyBowl. Device security and operating-system protection apply. System or computer backups may include app data according to your device settings, independently of TallyBowl."
       ]
     },
     {
       "heading": "Photos and recognition",
       "paragraphs": [
-        "Camera and photo/file access are used when you choose to capture or import a scoreboard. Recognition runs on this device using Apple Vision on iPad and Mac, or bundled Google ML Kit on Android. No cloud AI service receives your photos or extracted scores for recognition.",
-        "Android’s Google ML Kit may send SDK diagnostics to Google, including device/app identifiers, input image dimensions and format, processing timing, and errors. On-device recognition does not mean this third-party SDK is network silent. Google’s ML Kit disclosure explains these diagnostics. Apple builds do not include the Android ML Kit SDK.",
+        "Camera and photo/file access are used when you choose to capture or import a scoreboard. Recognition runs on this device using Apple Vision on iPad and Mac, or bundled Google ML Kit on Android, with a small bundled glyph-template fallback for monitor cells. No cloud AI service receives your photos or extracted scores for recognition.",
+        "Android\u2019s Google ML Kit may send SDK diagnostics to Google, including device/app identifiers, input image dimensions and format, processing timing, and errors. On-device recognition does not mean this third-party SDK is network silent. Google\u2019s ML Kit disclosure explains these diagnostics. Apple builds do not include the Android ML Kit SDK.",
         "An imported copy is retained privately with an unfinished photo draft so it can resume after interruption. TallyBowl removes that copy after saving or discarding the draft, with orphan cleanup on a later launch if interrupted. The original in your camera roll or selected file location is unaffected. Portable JSON backups omit source photos and their file paths."
       ]
     },
     {
       "heading": "Maps and alley suggestions",
       "paragraphs": [
-        "Opening a map requests tiles for the area you view from OpenStreetMap’s tile service by default. Submitting an alley search sends the words you entered to the public Photon service operated by komoot. These services receive your IP address, normal connection metadata, and an identifying TallyBowl version/User-Agent; tile requests reveal the map area viewed. Their policies govern logging and retention. TallyBowl does not request your device’s GPS location.",
+        "Opening a map requests tiles for the area you view from OpenStreetMap\u2019s tile service by default. Submitting an alley search sends the words you entered to the public Photon service operated by komoot. These services receive your IP address, normal connection metadata, and an identifying TallyBowl version/User-Agent; tile requests reveal the map area viewed. Their policies govern logging and retention. TallyBowl does not request your device\u2019s GPS location.",
         "Avoid putting private notes or other sensitive information into alley searches. Saved alleys, manual entry, bowling records, and recognition work without these services. A build configured to use another map/search provider requires an updated policy and disclosure review before distribution."
       ]
     },
@@ -35,23 +35,38 @@
     {
       "heading": "Your choices and deleting data",
       "paragraphs": [
-        "You can decline camera access and enter frames manually, use saved or manually entered alleys offline, edit your profile, delete games, and discard an unfinished draft. Retiring a ball or archiving an alley preserves its historical references and does not erase those records.",
-        "For a full local reset, export anything you want to keep first. On Android, use the system’s Clear storage action for TallyBowl. On iPad, Delete App removes its local app data; Offload App keeps data. On Mac, quitting and deleting the app alone can leave its sandbox container behind; see the user guide for the container location. Copies in device backups, exported files, or recipient services require separate removal."
+        "You can decline camera access and enter frames manually, use saved or manually entered alleys offline, edit your profile, delete sessions and their games, and discard an unfinished draft. Retiring a ball or archiving an alley preserves its historical references and does not erase those records.",
+        "For a full local reset, export anything you want to keep first. On Android, use the system\u2019s Clear storage action for TallyBowl. On iPad, Delete App removes its local app data; Offload App keeps data. On Mac, quitting and deleting the app alone can leave its sandbox container behind; see the user guide for the container location. Copies in device backups, exported files, or recipient services require separate removal."
       ]
     },
     {
       "heading": "Beta feedback and contact",
       "paragraphs": [
-        "TestFlight is operated by Apple. If you send beta feedback, crash reports, screenshots, or diagnostic attachments through TestFlight, Apple and the developer may receive that information. Include only information you intend to share. For a recognition report, use a photo you have permission to send and remove other bowlers’ names.",
+        "TestFlight is operated by Apple. If you send beta feedback, crash reports, screenshots, or diagnostic attachments through TestFlight, Apple and the developer may receive that information. Include only information you intend to share. For a recognition report, use a photo you have permission to send and remove other bowlers\u2019 names.",
         "TallyBowl is developed and published by Joe Steinbring. For privacy questions or app support, contact Joe through https://jws.dev/contact. This policy will be updated when relevant app behavior or service providers change."
       ]
     }
   ],
   "links": [
-    {"label": "Contact Joe Steinbring", "url": "https://jws.dev/contact"},
-    {"label": "OpenStreetMap Foundation privacy policy", "url": "https://osmfoundation.org/wiki/Privacy_Policy"},
-    {"label": "komoot privacy policy", "url": "https://www.komoot.com/privacy"},
-    {"label": "Google ML Kit Android data disclosure", "url": "https://developers.google.com/ml-kit/android-data-disclosure"},
-    {"label": "Apple TestFlight privacy", "url": "https://www.apple.com/legal/privacy/data/en/test-flight/"}
+    {
+      "label": "Contact Joe Steinbring",
+      "url": "https://jws.dev/contact"
+    },
+    {
+      "label": "OpenStreetMap Foundation privacy policy",
+      "url": "https://osmfoundation.org/wiki/Privacy_Policy"
+    },
+    {
+      "label": "komoot privacy policy",
+      "url": "https://www.komoot.com/privacy"
+    },
+    {
+      "label": "Google ML Kit Android data disclosure",
+      "url": "https://developers.google.com/ml-kit/android-data-disclosure"
+    },
+    {
+      "label": "Apple TestFlight privacy",
+      "url": "https://www.apple.com/legal/privacy/data/en/test-flight/"
+    }
   ]
 }
