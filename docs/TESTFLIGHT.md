@@ -1,5 +1,14 @@
 # TestFlight readiness and release runbook
 
+## 0.1.9 (10): October 27, 2026
+
+Candidate source includes `22a3d2d` (local frame-glyph recovery), `cc3e2fd` (session deletion) and `9dcfc82` (Android PNG handoff). **137 Dart/widget tests pass**, static analysis has no issues, and **three Android instrumentation tests pass**, including a receiving app under a separate UID reading the image while being denied write access. Original 89- and 109-pin photos produce the exact ten observed frames through local Vision and the Android pipeline; anonymized real-photo fixtures exercise import/resume through filled editor inputs and saving. See [recognition](FRAME_RECOGNITION.md) and [sharing](ANDROID_SHARING.md).
+
+Apple archives, signing validation, upload, processing, internal-group assignment and the requested external group are being prepared. The prior build-9 owner beta remains available. Physical Google Chat composer verification is pending a connected Samsung; neither the chooser nor the separate test receiver proves that a specific installed Chat version accepted an attachment. The planned public privacy URL still fails DNS; the current policy is bundled offline and available in this repository. No broad recognition-accuracy or physical TestFlight-installation claim is made.
+
+The sections below preserve the historical 0.1.8 preparation and signing runbook.
+
+
 Assessed October 25, 2026. Current candidate **0.1.8 (9)**, bundle ID **app.jws.tallybowl**, existing Apple team **R9DBX89RA5**. Owner build **0.1.7 (8)** is installed on the Mac, iPad, and Samsung. Build **0.1.7 (8)** uploaded successfully for both platforms on October 25, 2026; iPad processing succeeded, but Apple rejected the Mac package for nested resource-bundle certificate mismatches (ITMS-90284). A successful upload and deep signature verification alone are insufficient. Build **0.1.8 (9)** includes verified round-three recognition fixes and a corrected Mac signing configuration; both platforms have now processed successfully, cleared export compliance and been assigned to the private owner group.
 
 ## Readiness decision
