@@ -26,7 +26,8 @@
     {
       "heading": "History and comparisons",
       "paragraphs": [
-        "Save each game, then finish the session when you are done. History lets you review and correct games and revisit the session recap. Insights compares saved games and shows sample sizes. Drafts are excluded. An alley visit is a session; ball usage counts games tagged with that ball, so one game can count for several balls. These comparisons describe your recorded results; they cannot prove a ball or alley caused a score change."
+        "Save each game, then finish the session when you are done. History lets you review and correct games and revisit the session recap. Insights compares saved games and shows sample sizes. Drafts are excluded. An alley visit is a session; ball usage counts games tagged with that ball, so one game can count for several balls. These comparisons describe your recorded results; they cannot prove a ball or alley caused a score change.",
+        "To remove an entire session, open it in History and choose Delete session (the trash icon). Tonight also has Delete session for the current visit. Confirm to permanently remove the session, all its saved games, and its unfinished draft from history and statistics. Export a backup first if you want a copy; your alley and ball collections are retained."
       ]
     },
     {
@@ -46,7 +47,7 @@
     {
       "heading": "Remove local data",
       "paragraphs": [
-        "You can delete individual games and discard a draft. Retiring balls and archiving alleys keeps their history. For a complete reset, first export any records you want to keep, then use Android\u2019s app Clear storage or iPad\u2019s Delete App (not Offload App).",
+        "You can delete a whole session with its games, delete individual games, or discard a draft. Retiring balls and archiving alleys keeps their history. For a complete reset, first export any records you want to keep, then use Android\u2019s app Clear storage or iPad\u2019s Delete App (not Offload App).",
         "On Mac, quit TallyBowl and back up the journal first. The sandbox container is at ~/Library/Containers/app.jws.tallybowl; Finder\u2019s Go to Folder can open it. Removing this container removes the journal, draft, and recovery copy. Deleting the app from Applications alone may leave these files behind. Separately manage exported copies, recipient attachments, and system backups."
       ]
     },

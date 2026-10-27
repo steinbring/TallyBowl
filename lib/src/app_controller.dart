@@ -151,5 +151,25 @@ class BowlController extends ChangeNotifier {
   Future<void> deleteGame(String id) => _updateJournal(
     (d) => d.copyWith(games: d.games.where((g) => g.id != id).toList()),
   );
+
+  /// Commit the session, games, and matching draft as one snapshot. Return the
+  /// removed draft's private photo only after persistence succeeds, for cleanup.
+  Future<String?> deleteSession(String id) async {
+    String? source;
+    await _updateJournal((d) {
+      if (!d.sessions.any((s) => s.id == id)) {
+        throw StateError('This session has already been removed.');
+      }
+      final ownsDraft = d.draft?['sessionId'] == id;
+      if (ownsDraft) source = d.draft?['sourcePath'] as String?;
+      return d.copyWith(
+        sessions: d.sessions.where((s) => s.id != id).toList(),
+        games: d.games.where((g) => g.sessionId != id).toList(),
+        clearDraft: ownsDraft,
+      );
+    });
+    return source;
+  }
+
   Future<void> restore(BowlData restored) => _updateJournal((_) => restored);
 }
