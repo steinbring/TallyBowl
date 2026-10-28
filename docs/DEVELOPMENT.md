@@ -1,8 +1,8 @@
 # TallyBowl! development status
 
-Updated October 27, 2026. Current beta **0.1.9 (10)** fixes photographed frame filling, session deletion and Android PNG handoff. **137 Dart/widget tests and three Android instrumentation tests pass**, static analysis is clean, and original 89/109 photos produce the exact observed deliveries through the local Apple and Android pipelines. See [recognition](FRAME_RECOGNITION.md) and [sharing](ANDROID_SHARING.md) for contracts and limits.
+Updated October 27, 2026. Candidate **0.1.10 (11)** fixes angled multi-bowler league boards, right-aligned headers, rounded misses, duplicate OCR blocks and separate scratch/handicap totals. **155 Flutter tests pass**, static analysis is clean, and all four original league photos produce exact observed deliveries and scratch totals 104/80 through local Apple Vision and actual Android ML Kit. Anonymized fixtures retain two rows and both engines' observations; import/resume tests cover ten filled inputs and saved metadata. See [recognition](FRAME_RECOGNITION.md) for validation rules and limits.
 
-Both Apple builds processed, cleared compliance, and show **Testing** in Owner testing. Both are **Waiting for Review** in External testing, with two requested email testers added and automatic notification enabled. Samsung was updated in place to 0.1.9 (10), launched, and its full journal verified unchanged; the last verified local Mac/iPad installations remain 0.1.7 (8). See [device testing](DEVICE_TESTING.md) and the [TestFlight release record](TESTFLIGHT.md). Physical Google Chat acceptance, Apple TestFlight installation and public privacy-policy hosting remain open. Results below retain their original build labels.
+Signed build-11 iPad and native Mac uploads processed successfully; both are Testing in the owner group and submitted for external review. The last verified Samsung installation is 0.1.9 (10); the last verified local Mac/iPad installations are 0.1.7 (8). Build 11 is available in the Apple owner group; current external/owner build assignment is recorded in the [TestFlight release record](TESTFLIGHT.md). Physical Google Chat acceptance, Apple TestFlight installation and public privacy-policy hosting remain open. Results below retain their original build labels.
 
 ## Feature branches
 
@@ -54,6 +54,8 @@ Features are committed on `codex/` branches and merged locally into `main`. The 
 | `codex/delete-sessions` | Confirmed session removal, transactional games/draft cascade, retained-photo cleanup and retry tests |
 | `codex/android-image-sharing` | Scoped PNG provider, ClipData/read grants and separate-UID receiver instrumentation |
 | `codex/testflight-0-1-9` | Build 10 packages, helper-permission exclusion, Apple owner/external beta configuration and Samsung update evidence |
+| `codex/league-scoreboard-recognition` | Perspective-aware grid alignment, league totals, rounded misses, overlapping OCR blocks and four-photo native regressions |
+| `codex/testflight-0-1-10` | Build 11 packages, signing verification and owner/external TestFlight update |
 
 The completed stack is integrated into local `main` after verification. Feature branches are retained. All work is local until explicitly pushed to the remote repository.
 

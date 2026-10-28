@@ -4,9 +4,19 @@
 
 Recognition source **4e2d258** fixes right-aligned frame headers, sloping multi-bowler rows, short rounded misses, duplicate native text blocks, and separate scratch/handicap totals. All four October 27 original league photos produce the exact observed frames and scratch totals (104 and 80) through actual Apple Vision and bundled Android ML Kit. Anonymized two-row fixtures preserve native observations from both engines; import/resume editor tests cover the new games. **155 Flutter tests pass; static analysis is clean.** See [frame recognition](FRAME_RECOGNITION.md) for validation rules and limits.
 
-New signed archives, exports, preflight checks and TestFlight assignments are being prepared for iPad and native Mac. The prior build-10 owner beta remains available. Logs and release evidence are kept under ignored `build/testflight/build-11/` and `build/league-fix/`; original photos and personal OCR logs are excluded from Git and app packages. No new physical device installation is claimed for build 11.
+**Both iPad and native Mac 0.1.10 (11) are Testing in Owner testing.** Both uploads processed successfully, export compliance is cleared using standard encryption and the approved France exclusion, testing notes are saved, and both builds are assigned to External testing with automatic notification enabled. Both show **Waiting for Review** in the external group; external availability awaits Apple approval. Prior working builds remain available.
 
-The build-10 record below is historical. Its Apple review state describes the last recorded check for that version.
+| Evidence | Result |
+| --- | --- |
+| iPad ASC build | `91eddf09-b8d7-47ce-bae0-5a650ba9b547`, owner Testing; external Waiting for Review |
+| Native Mac ASC build | `8e85fc2a-7931-4787-9318-6753d20c66d0`, owner Testing; external Waiting for Review |
+| Apple artifacts | Source `9cbf0ce`, normal `lib/main.dart`; archive/content and exported distribution signing/profile checks pass; Mac installer chain verified |
+| Android artifact | `build/releases/TallyBowl-0.1.10-android-debug.apk`, same owner development signer; normal build installed/launched on isolated emulator only |
+| Release evidence | Private logs, preflight reports, release record and SHA-256 hashes under ignored `build/testflight/build-11/` |
+
+ Logs and release evidence are kept under ignored `build/testflight/build-11/` and `build/league-fix/`; original photos and personal OCR logs are excluded from Git and app packages. No new physical device installation is claimed for build 11.
+
+The build-10 record below is historical. Both build-10 platforms were observed as Testing for external testers on October 27 before submitting build 11.
 
 ## 0.1.9 (10): October 27, 2026
 

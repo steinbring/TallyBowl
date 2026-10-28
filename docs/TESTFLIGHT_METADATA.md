@@ -1,6 +1,6 @@
 # TestFlight metadata
 
-Candidate: **0.1.10 (11)**. Build preparation is in progress; the prior build-10 platform uploads and owner TestFlight assignments succeeded. The existing external group contains the two requested email testers. Beta description, feedback email and private reviewer contact/instructions are configured in App Store Connect; sign-in is marked as not required. See the [runbook](TESTFLIGHT.md) for current external-review and installation status.
+Candidate: **0.1.10 (11)**. Both platform uploads processed successfully, owner TestFlight shows Testing, and both builds are submitted for external review. The existing external group contains the two requested email testers. Beta description, feedback email and private reviewer contact/instructions are configured in App Store Connect; sign-in is marked as not required. See the [runbook](TESTFLIGHT.md) for current external-review and installation status.
 
 ## Public contact and remaining account fields
 

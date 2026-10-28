@@ -1,6 +1,6 @@
 # Device testing and owner installations
 
-The Samsung has owner build **0.1.9 (10)**; the last verified local Mac/iPad installations are **0.1.7 (8)**. Both Apple 0.1.9 (10) builds are available in owner TestFlight and waiting for external beta review. A physical TestFlight installation has not been verified. Repeat this checklist on the distribution-signed candidate and record its exact version. Current distribution gates and archive evidence are in [TESTFLIGHT.md](TESTFLIGHT.md).
+The Samsung has owner build **0.1.9 (10)**; the last verified local Mac/iPad installations are **0.1.7 (8)**. Both Apple 0.1.10 (11) builds are available in owner TestFlight and submitted for external beta review. A physical TestFlight installation has not been verified. Repeat this checklist on the distribution-signed candidate and record its exact version. Current distribution gates and archive evidence are in [TESTFLIGHT.md](TESTFLIGHT.md).
 
 Start with the Samsung Galaxy Z Fold 8, then repeat the camera, import, sharing, and accessibility checks on a physical iPad and a supported Mac. Current automated checks are described in [development status](DEVELOPMENT.md). The Samsung was installed with build 0.1.4 (5) and supplied the first real-photo regression. This checklist separates further hardware checks from automated evidence.
 
