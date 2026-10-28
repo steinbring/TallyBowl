@@ -36,3 +36,5 @@ The build-11 baseline recovered **4/10 complete images on each engine**. The upd
 **179 Dart/widget tests pass; static analysis is clean.** Earlier 80/104 league, 89/109 practice, 90-pin monitor, editor import/resume, scoring, sharing, persistence and accessibility regressions remain covered. Actual original-image checks use the production shared Swift Vision helper on this Mac and the bundled native ML Kit bridge on an isolated Android emulator. These checks do not establish physical iPad/Samsung camera, recipient-app sharing or TestFlight installation acceptance. Vision results can vary by OS/device; glare, unusual fonts, extreme perspective and occlusion still require review.
 
 Private per-photo results, native observations, timings and diagnostics are under ignored `build/corpus12/`. TestFlight distribution status is recorded in [TESTFLIGHT.md](TESTFLIGHT.md).
+
+The [October 28 five-photo evaluation](FIVE_PHOTO_EVALUATION.md) tests build 12 on four additional unseen photos and the repeated 115-pin view. Both engines recover only the repeated view automatically; it records further recognition gaps separately from this development corpus.
