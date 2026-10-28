@@ -4,7 +4,18 @@
 
 Recognition source **d7236e6** adds slanted ruling calibration, a bounded retry for missing text grids, same-position native corroboration and physical delivery ordering. **179 tests pass; static analysis is clean.** The twelve added originals recover every delivery in 9/10 complete Apple examples and 7/10 Android examples. Both incomplete-game photos require review; no incorrect automatic original-image result was observed. See [the exact per-photo results and limitations](PHOTO_CORPUS_RESULTS.md).
 
-Build-12 iPad and native Mac packages, signing checks and TestFlight assignments are being prepared. Prior working builds remain available. Release evidence is retained under ignored `build/testflight/build-12/`; private photo diagnostics are in `build/corpus12/`. No new physical owner installation is claimed.
+**Both iPad and native Mac 0.1.11 (12) are Testing in Owner testing.** Both uploads processed successfully, export compliance is cleared using the previously approved standard-encryption answer and France exclusion, and build-specific testing notes are saved. Both are assigned to External testing and show **Waiting for Review**, with automatic tester notification enabled. External access to build 12 awaits Apple's approval; prior working builds remain available. Verified in App Store Connect on October 27, 2026, at approximately 10:51 PM Central.
+
+| Evidence | Result |
+| --- | --- |
+| iPad ASC build | `4b43633a-5361-42a1-a20c-20674a8bb21e`, owner Testing; external Waiting for Review |
+| Native Mac ASC build | `2be043dd-ca5b-4b0c-8fd5-e43aebd1f7e6`, owner Testing; external Waiting for Review |
+| Source | Recognition `d7236e6`; version `c03be78`; later documentation-only revisions do not change the binaries |
+| Apple artifacts | Normal `lib/main.dart`, iPad release IPA and universal native Mac package; archive/content and exported distribution certificate/profile checks pass; Mac installer chain verified |
+| Android artifact | `build/releases/TallyBowl-0.1.11-android-debug.apk`, same owner development signer; normal build installed/launched on isolated emulator only |
+| Regression evidence | 179 Dart/widget tests, clean static analysis, actual native original-photo checks and 24 added anonymized engine fixtures |
+
+Release logs, SHA-256 hashes, preflight reports and the private release record are retained under ignored `build/testflight/build-12/`; private photo diagnostics are in `build/corpus12/`. Private probes and test photos are excluded from distributed binaries. No new physical owner installation or recipient-app acceptance is claimed.
 
 ## 0.1.10 (11): league-board recognition
 

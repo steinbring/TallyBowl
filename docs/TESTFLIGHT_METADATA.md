@@ -1,6 +1,6 @@
 # TestFlight metadata
 
-Candidate: **0.1.11 (12)**. Build-12 distribution is being prepared. Prior build-11 status follows: Both platform uploads processed successfully, owner TestFlight shows Testing, and both builds are submitted for external review. The existing external group contains the two requested email testers. Beta description, feedback email and private reviewer contact/instructions are configured in App Store Connect; sign-in is marked as not required. See the [runbook](TESTFLIGHT.md) for current external-review and installation status.
+Current beta: **0.1.11 (12)**. Both iPad and native Mac uploads processed successfully. Both show **Testing** in Owner testing and **Waiting for Review** in External testing; automatic tester notification is enabled. The existing external group contains the two requested email testers. Build-specific testing notes, beta description, feedback email and private reviewer contact/instructions are saved in App Store Connect; sign-in is marked as not required. See the [runbook](TESTFLIGHT.md) for current external-review and installation status.
 
 ## Public contact and remaining account fields
 
@@ -43,4 +43,4 @@ The iOS target is iPad-only. macOS uses a separate native Flutter target, not th
 
 ## Known beta limitations
 
-Seven permissioned monitor photos across three layouts have regression evidence. Sparse, distorted or unfamiliar layouts may need manual marks. One image is processed at a time. There is no sync, iPhone support, handicap scoring or retained photo library. JSON backups omit original photos. Public map/search services have no availability guarantee; manual alley entry remains available. Android ML Kit diagnostics apply to Android builds, not Apple builds. The Android PNG transport passes separate-UID receiver tests; Google Chat composer verification on the Samsung remains pending.
+The [twelve-photo evaluation](PHOTO_CORPUS_RESULTS.md) and earlier monitor regressions provide development evidence, not general recognition accuracy. Sparse, distorted or unfamiliar layouts may need manual marks. One image is processed at a time. There is no sync, iPhone support, handicap scoring or retained photo library. JSON backups omit original photos. Public map/search services have no availability guarantee; manual alley entry remains available. Android ML Kit diagnostics apply to Android builds, not Apple builds. The Android PNG transport passes separate-UID receiver tests; Google Chat composer verification on the Samsung remains pending.
