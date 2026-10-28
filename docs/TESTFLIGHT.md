@@ -1,5 +1,11 @@
 # TestFlight readiness and release runbook
 
+## 0.1.11 (12): expanded photo corpus
+
+Recognition source **d7236e6** adds slanted ruling calibration, a bounded retry for missing text grids, same-position native corroboration and physical delivery ordering. **179 tests pass; static analysis is clean.** The twelve added originals recover every delivery in 9/10 complete Apple examples and 8/10 Android examples. Both incomplete-game photos require review; no incorrect automatic original-image result was observed. See [the exact per-photo results and limitations](PHOTO_CORPUS_RESULTS.md).
+
+Build-12 iPad and native Mac packages, signing checks and TestFlight assignments are being prepared. Prior working builds remain available. Release evidence is retained under ignored `build/testflight/build-12/`; private photo diagnostics are in `build/corpus12/`. No new physical owner installation is claimed.
+
 ## 0.1.10 (11): league-board recognition
 
 Recognition source **4e2d258** fixes right-aligned frame headers, sloping multi-bowler rows, short rounded misses, duplicate native text blocks, and separate scratch/handicap totals. All four October 27 original league photos produce the exact observed frames and scratch totals (104 and 80) through actual Apple Vision and bundled Android ML Kit. Anonymized two-row fixtures preserve native observations from both engines; import/resume editor tests cover the new games. **155 Flutter tests pass; static analysis is clean.** See [frame recognition](FRAME_RECOGNITION.md) for validation rules and limits.

@@ -1,6 +1,6 @@
 # TestFlight metadata
 
-Candidate: **0.1.10 (11)**. Both platform uploads processed successfully, owner TestFlight shows Testing, and both builds are submitted for external review. The existing external group contains the two requested email testers. Beta description, feedback email and private reviewer contact/instructions are configured in App Store Connect; sign-in is marked as not required. See the [runbook](TESTFLIGHT.md) for current external-review and installation status.
+Candidate: **0.1.11 (12)**. Build-12 distribution is being prepared. Prior build-11 status follows: Both platform uploads processed successfully, owner TestFlight shows Testing, and both builds are submitted for external review. The existing external group contains the two requested email testers. Beta description, feedback email and private reviewer contact/instructions are configured in App Store Connect; sign-in is marked as not required. See the [runbook](TESTFLIGHT.md) for current external-review and installation status.
 
 ## Public contact and remaining account fields
 
@@ -21,7 +21,7 @@ This beta stores your journal locally, has no login or subscription, and include
 
 ## What to test
 
-Build 0.1.10 (11) improves angled league-board recognition, right-aligned headers, rounded misses, overlapping OCR blocks and scratch/handicap separation. Four original league photos produce every exact frame and scratch totals 104 and 80 through both local Apple Vision and Android ML Kit. Earlier practice regressions remain covered. These examples do not establish general recognition accuracy.
+Build 0.1.11 (12) additionally improves tilted rulings, missing-grid retries, native corroboration and physical delivery order. The twelve added originals recover 9/10 complete images on Apple and 8/10 on Android; the remainder and two incomplete games require review. Four original league photos produce every exact frame and scratch totals 104 and 80 through both local Apple Vision and Android ML Kit. Earlier practice regressions remain covered. These examples do not establish general recognition accuracy.
 
 - Add scoreboard aliases, two balls and an alley; try both suggestions and manual entry.
 - Start practice or league, capture/import a final scoreboard, verify the correct bowler and all ten frames, select balls/primary ball, lane and notes, then save.
