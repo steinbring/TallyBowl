@@ -13,13 +13,13 @@ Ten photographs show complete owner games; two show an unfinished game. The ten 
 | 20261005_180009.jpg | 115, second view | Exact | Exact |
 | 20261011_181327.jpg | 87 | Exact | Exact |
 | 20261011_184225.jpg | 76 | Exact | Review |
-| 20261020_190226.jpg | 103 | Exact | Exact |
+| 20261020_190226.jpg | 103 | Exact | Review |
 | 20261020_192009.jpg | Five visible frames; 68 resolved | Review; no completed game | Review; no completed game |
 | 20261020_194604.jpg | 152 | Exact | Exact |
 | 20261020_194606.jpg | 152, second view | Exact | Exact |
 | 20261020_203145.jpg | 114 | Review | Exact |
 
-The build-11 baseline recovered **4/10 complete images on each engine**. The update recovers **9/10 on Apple and 8/10 on Android**. No incorrect automatic result was observed in these original-image runs. Both incomplete examples remain in review; future deliveries are never fabricated. The Apple 114-pin image still lacks sufficient independent evidence for its eighth-frame digit. Android's 112- and 76-pin images lose important native text/header context; they remain review cases.
+The build-11 baseline recovered **4/10 complete images on each engine**. The update recovers **9/10 on Apple and 7/10 on Android**. No incorrect automatic result was observed in these original-image runs. Both incomplete examples remain in review; future deliveries are never fabricated. The Apple 114-pin image still lacks sufficient independent evidence for its eighth-frame digit. Android's 112-, 76- and 103-pin images remain review cases; lost native header/context and small raster differences affect recovery. A diagnostic using the same native ML Kit bridge with host Dart/raster processing recovered the 103-pin photo, but the final production Flutter Android run did not. The device-runtime result governs the reported 7/10.
 
 ## Changes and safeguards
 

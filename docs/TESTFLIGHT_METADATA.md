@@ -21,7 +21,7 @@ This beta stores your journal locally, has no login or subscription, and include
 
 ## What to test
 
-Build 0.1.11 (12) additionally improves tilted rulings, missing-grid retries, native corroboration and physical delivery order. The twelve added originals recover 9/10 complete images on Apple and 8/10 on Android; the remainder and two incomplete games require review. Four original league photos produce every exact frame and scratch totals 104 and 80 through both local Apple Vision and Android ML Kit. Earlier practice regressions remain covered. These examples do not establish general recognition accuracy.
+Build 0.1.11 (12) additionally improves tilted rulings, missing-grid retries, native corroboration and physical delivery order. The twelve added originals recover 9/10 complete images on Apple and 7/10 on Android; the remainder and two incomplete games require review. Four original league photos produce every exact frame and scratch totals 104 and 80 through both local Apple Vision and Android ML Kit. Earlier practice regressions remain covered. These examples do not establish general recognition accuracy.
 
 - Add scoreboard aliases, two balls and an alley; try both suggestions and manual entry.
 - Start practice or league, capture/import a final scoreboard, verify the correct bowler and all ten frames, select balls/primary ball, lane and notes, then save.

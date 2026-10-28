@@ -2,7 +2,7 @@
 
 **How you bowled, tonight.** A Flutter bowling journal for native macOS, iPadOS, and Android. Planned website: [tallybowl.jws.app](https://tallybowl.jws.app).
 
-The current candidate is **0.1.11 (12)**, developed and published by **Joe Steinbring**. [Contact Joe for support](https://jws.dev/contact). It improves tilted-grid recognition, same-position OCR corroboration and photographed delivery order. The additional photo corpus recovers 9/10 complete images on Apple and 8/10 on Android; remaining cases require review. Both iPad and native Mac build 11 remain in TestFlight while build 12 is prepared. [TestFlight readiness](docs/TESTFLIGHT.md) records current distribution and device-verification status.
+The current candidate is **0.1.11 (12)**, developed and published by **Joe Steinbring**. [Contact Joe for support](https://jws.dev/contact). It improves tilted-grid recognition, same-position OCR corroboration and photographed delivery order. The additional photo corpus recovers 9/10 complete images on Apple and 7/10 on Android; remaining cases require review. Both iPad and native Mac build 11 remain in TestFlight while build 12 is prepared. [TestFlight readiness](docs/TESTFLIGHT.md) records current distribution and device-verification status.
 
 ## What works
 
