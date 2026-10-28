@@ -67,6 +67,7 @@ abstract final class PhotoService {
   }) async {
     final bytes = await readPhoto(XFile(path));
     final fullReadings = <List<RecognizedLine>>[];
+    var regionalReading = <RecognizedLine>[];
     Future<List<RecognizedLine>> read({
       List<RecognitionRegion>? regions,
       double aspect = 1,
@@ -84,10 +85,16 @@ abstract final class PhotoService {
           .map((v) => RecognizedLine.fromJson(v as Map))
           .toList();
       if (regions == null) fullReadings.add(lines);
+      if (regions != null) regionalReading = lines;
       return lines;
     }
 
-    final originalLines = await _recognizeText(profile, read);
+    final originalLines = await _recognizeText(
+      profile,
+      read,
+      bytes,
+      fullReadings,
+    );
     if (profile == null ||
         ScoreSheetParser.automaticRow(
               ScoreSheetParser.rows(originalLines, profile),
@@ -101,6 +108,7 @@ abstract final class PhotoService {
         originalLines,
         profile,
         alternatives: fullReadings,
+        supplemental: regionalReading,
       );
       return [...originalLines, ...glyphRows];
     } catch (_) {
@@ -115,6 +123,8 @@ abstract final class PhotoService {
       double aspect,
     })
     read,
+    Uint8List bytes,
+    List<List<RecognizedLine>> fullReadings,
   ) async {
     var lines = await read(aspect: 1);
     if (profile == null ||
@@ -150,8 +160,53 @@ abstract final class PhotoService {
         null) {
       return lines;
     }
-    final regions = ScoreboardGrid.regions(lines, profile);
-    if (regions.isEmpty) return lines;
+    var regions = ScoreboardGrid.regions(lines, profile);
+    if (regions.isNotEmpty) {
+      try {
+        final calibrated = await FrameGlyphReader.regions(
+          bytes,
+          fullReadings,
+          profile,
+        );
+        if (calibrated.isNotEmpty) regions = calibrated;
+      } catch (_) {
+        /* Text-only regions remain useful when pixel calibration fails. */
+      }
+    }
+    if (regions.isEmpty) {
+      // A pass can omit the bowler name or several headers, so a missing grid
+      // is also a reason to try the remaining bounded full-image aspect pass.
+      try {
+        final context = await read(aspect: 1.5);
+        if (ScoreSheetParser.automaticRow(
+              ScoreSheetParser.rows(context, profile),
+            ) !=
+            null) {
+          return context;
+        }
+      } catch (_) {
+        /* Keep the earlier observations available for manual review. */
+      }
+      try {
+        final cells = await FrameGlyphReader.regions(
+          bytes,
+          fullReadings,
+          profile,
+        );
+        if (cells.isNotEmpty) {
+          final refined = await read(regions: cells, aspect: 1);
+          return [
+            for (final line in lines)
+              for (final word in ScoreboardGrid.words(line))
+                if (!cells.any((r) => r.contains(word))) word,
+            ...refined,
+          ];
+        }
+      } catch (_) {
+        /* The conservative glyph fallback and manual review remain available. */
+      }
+      return lines;
+    }
     try {
       final refined = await read(regions: regions, aspect: 1);
       // Retain full-row context for sparse cells and omitted headers/totals.

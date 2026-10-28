@@ -22,179 +22,249 @@ abstract final class FrameGlyphReader {
     List<RecognizedLine> lines,
     BowlerProfile profile, {
     List<List<RecognizedLine>> alternatives = const [],
+    List<RecognizedLine> supplemental = const [],
   }) async {
     final sources = [
       lines,
       ...alternatives.where((s) => !identical(s, lines)).take(3),
     ];
-    final candidates = [
-      for (final source in sources)
-        for (final table in _tables(source, profile)) (source, table),
-    ];
-    if (candidates.isEmpty) return [];
+    final layouts = [for (final source in sources) ..._tables(source, profile)];
+    if (layouts.isEmpty) return [];
+    final supportingWords = _distinctWords([
+      ...sources.expand((s) => s),
+      ...supplemental,
+    ]);
     final templates = await (_templates ??= _loadTemplates());
     // Flutter's codec applies EXIF orientation, matching both native bridges.
-    final buffer = await ui.ImmutableBuffer.fromUint8List(bytes);
-    ui.ImageDescriptor? descriptor;
-    ui.Codec? codec;
-    ui.Image? image;
+    final image = await _decode(bytes);
     try {
-      descriptor = await ui.ImageDescriptor.encoded(buffer);
-      final longest = math.max(descriptor.width, descriptor.height);
-      final scale = math.min(1.0, 4096 / longest);
-      codec = await descriptor.instantiateCodec(
-        targetWidth: (descriptor.width * scale).round(),
-        targetHeight: (descriptor.height * scale).round(),
-      );
-      image = (await codec.getNextFrame()).image;
       final rgba = (await image.toByteData(format: ui.ImageByteFormat.rawRgba))!
           .buffer
           .asUint8List();
       final output = <RecognizedLine>[];
-      for (final candidate in candidates) {
-        final source = candidate.$1, table = candidate.$2;
-        final words = _distinctWords(source);
-        final imageWidth = image.width, imageHeight = image.height;
+      final wordReadings = sources.map(_distinctWords).toList();
+      final imageWidth = image.width, imageHeight = image.height;
+      for (final table in layouts) {
+        // Align once per observed layout and transfer the raster only once
+        // for all text passes. At most eight layouts and four readings exist.
         final reading = await Isolate.run(() {
           final aligned = _alignColumns(rgba, imageWidth, imageHeight, table);
           return (
             aligned,
-            _readFrames(
-              rgba,
-              imageWidth,
-              imageHeight,
-              aligned,
-              words,
-              templates,
-            ),
+            [
+              for (final words in wordReadings)
+                _readFrames(
+                  rgba,
+                  imageWidth,
+                  imageHeight,
+                  aligned,
+                  words,
+                  templates,
+                  supportingWords,
+                ),
+            ],
           );
         });
         final aligned = reading.$1;
-        final frames = reading.$2;
-        if (frames.length != 10 || !TenPinScorer.score(frames).complete) {
-          continue;
-        }
-        final last = aligned.first + 9 * aligned.pitch;
-        final directTotals = _scratchTotals(words, aligned);
-        final checkpoints = ScoreboardGrid.rows(source, profile)
-            .where(
-              (r) =>
-                  r.suggested &&
-                  r.cumulativeTotals != null &&
-                  table.name.centerY >= r.y &&
-                  table.name.centerY <= r.y + r.height,
-            )
-            .firstOrNull
-            ?.cumulativeTotals;
-        final score = TenPinScorer.score(frames);
-        var checkpointConflict = false;
-        final observedCheckpoints = <int?>[];
-        for (var i = 0; i < 10; i++) {
-          final center = aligned.first + i * aligned.pitch;
-          final rowY = aligned.rowY(center);
-          final gap = rowY - (aligned.y + i * aligned.slope);
-          final values = words
+        for (var sourceIndex = 0; sourceIndex < sources.length; sourceIndex++) {
+          final source = sources[sourceIndex],
+              words = wordReadings[sourceIndex];
+          final frames = reading.$2[sourceIndex];
+          if (frames.length != 10 || !TenPinScorer.score(frames).complete) {
+            continue;
+          }
+          final last = aligned.first + 9 * aligned.pitch;
+          final directTotals = _scratchTotals(words, aligned);
+          final checkpoints = ScoreboardGrid.rows(source, profile)
               .where(
-                (w) =>
-                    (w.centerX - center).abs() < table.pitch * .45 &&
-                    w.centerY > rowY - gap * .2 &&
-                    w.centerY < rowY + gap * .65 &&
-                    RegExp(r'^\d{1,3}$').hasMatch(w.text),
+                (r) =>
+                    r.suggested &&
+                    r.cumulativeTotals != null &&
+                    table.name.centerY >= r.y &&
+                    table.name.centerY <= r.y + r.height,
               )
-              .toList();
-          if (values.length > 1) checkpointConflict = true;
-          final value = values.length == 1
-              ? int.parse(values.single.text)
-              : null;
-          observedCheckpoints.add(value);
-          if (value != null && value != score.cumulative[i]) {
-            checkpointConflict = true;
+              .firstOrNull
+              ?.cumulativeTotals;
+          final score = TenPinScorer.score(frames);
+          var checkpointConflict = false;
+          final observedCheckpoints = <int?>[];
+          for (var i = 0; i < 10; i++) {
+            final center = aligned.first + i * aligned.pitch;
+            final rowY = aligned.rowY(center);
+            final gap = rowY - (aligned.y + i * aligned.slope);
+            final values = words
+                .where(
+                  (w) =>
+                      (w.centerX - center).abs() < table.pitch * .45 &&
+                      w.centerY > rowY - gap * .2 &&
+                      w.centerY < rowY + gap * .65 &&
+                      RegExp(r'^\d{1,3}$').hasMatch(w.text),
+                )
+                .toList();
+            if (values.length > 1) checkpointConflict = true;
+            final value = values.length == 1
+                ? int.parse(values.single.text)
+                : null;
+            observedCheckpoints.add(value);
+            if (value != null && value != score.cumulative[i]) {
+              checkpointConflict = true;
+            }
           }
-        }
-        if (checkpointConflict) continue;
-        if (checkpoints != null &&
-            List.generate(
-              10,
-              (i) => i,
-            ).any((i) => score.cumulative[i] != checkpoints[i])) {
-          continue;
-        }
-        int? total = directTotals.where((v) => v == score.total).firstOrNull;
-        // A full-image aspect pass can omit the large total while reading
-        // every frame correctly. Complement only this same, name-anchored row
-        // with an independently observed scratch total in another pass, and
-        // require six agreeing checkpoints including the actual tenth total.
-        if (total == null &&
-            observedCheckpoints.whereType<int>().length >= 6 &&
-            observedCheckpoints.last == score.total) {
-          for (final other in sources) {
-            final otherWords = _distinctWords(other);
-            final sameName = otherWords.any(
-              (w) =>
-                  _name(w.text) == _name(table.name.text) &&
-                  (w.centerX - table.name.centerX).abs() <
-                      table.name.width * .5 &&
-                  (w.centerY - table.name.centerY).abs() <
-                      table.name.height * .75,
-            );
-            if (!sameName) continue;
-            total = _scratchTotals(
-              otherWords,
-              aligned,
-            ).where((v) => v == score.total).firstOrNull;
-            if (total != null) break;
+          if (checkpointConflict) continue;
+          if (checkpoints != null &&
+              List.generate(
+                10,
+                (i) => i,
+              ).any((i) => score.cumulative[i] != checkpoints[i])) {
+            continue;
           }
-        }
-        if (total == null) continue;
-        // Alternative OCR passes can recover different omissions, but must
-        // agree on the observed deliveries. Retain conflicting valid readings
-        // as separate candidates so automatic selection remains disabled.
-        if (output.any(
-          (r) =>
-              (r.x - table.name.x).abs() < table.pitch * .5 &&
-              (r.frameRow!.frames.join('|') == frames.join('|')) &&
-              (r.y -
-                          math.min(aligned.y, aligned.y + 9 * aligned.slope) -
-                          table.height * .5)
-                      .abs() <
-                  table.name.height * .5,
-        )) {
-          continue;
-        }
-        final top =
-            math.min(aligned.y, aligned.y + 9 * aligned.slope) +
-            table.height * .5;
-        final bottom =
-            math.max(aligned.rowY(aligned.first), aligned.rowY(last)) +
-            table.name.height * .65;
-        output.add(
-          RecognizedLine(
-            text: table.name.text,
-            x: table.name.x,
-            y: top,
-            width: last - table.name.x + table.pitch,
-            height: bottom - top,
-            frameRow: ScoreRow(
-              text: '${table.name.text} · $total',
-              frames: frames,
-              suggested: true,
+          int? total = directTotals.where((v) => v == score.total).firstOrNull;
+          // A full-image aspect pass can omit the large total while reading
+          // every frame correctly. Complement only this same, name-anchored row
+          // with an independently observed scratch total in another pass, and
+          // require six agreeing checkpoints including the actual tenth total.
+          if (total == null &&
+              observedCheckpoints.whereType<int>().length >= 6 &&
+              observedCheckpoints.last == score.total) {
+            for (final other in sources) {
+              final otherWords = _distinctWords(other);
+              final sameName = otherWords.any(
+                (w) =>
+                    _name(w.text) == _name(table.name.text) &&
+                    (w.centerX - table.name.centerX).abs() <
+                        table.name.width * .5 &&
+                    (w.centerY - table.name.centerY).abs() <
+                        table.name.height * .75,
+              );
+              if (!sameName) continue;
+              total = _scratchTotals(
+                otherWords,
+                aligned,
+              ).where((v) => v == score.total).firstOrNull;
+              if (total != null) break;
+            }
+          }
+          if (total == null) continue;
+          // Alternative OCR passes can recover different omissions, but must
+          // agree on the observed deliveries. Retain conflicting valid readings
+          // as separate candidates so automatic selection remains disabled.
+          if (output.any(
+            (r) =>
+                (r.x - table.name.x).abs() < table.pitch * .5 &&
+                (r.frameRow!.frames.join('|') == frames.join('|')) &&
+                (r.y -
+                            math.min(aligned.y, aligned.y + 9 * aligned.slope) -
+                            table.height * .5)
+                        .abs() <
+                    table.name.height * .5,
+          )) {
+            continue;
+          }
+          final top =
+              math.min(aligned.y, aligned.y + 9 * aligned.slope) +
+              table.height * .5;
+          final bottom =
+              math.max(aligned.rowY(aligned.first), aligned.rowY(last)) +
+              table.name.height * .65;
+          output.add(
+            RecognizedLine(
+              text: table.name.text,
+              x: table.name.x,
               y: top,
+              width: last - table.name.x + table.pitch,
               height: bottom - top,
-              displayedTotal: total,
-              cumulativeTotals: observedCheckpoints.every((v) => v != null)
-                  ? observedCheckpoints.cast<int>()
-                  : checkpoints,
+              frameRow: ScoreRow(
+                text: '${table.name.text} · $total',
+                frames: frames,
+                suggested: true,
+                y: top,
+                height: bottom - top,
+                displayedTotal: total,
+                cumulativeTotals: observedCheckpoints.every((v) => v != null)
+                    ? observedCheckpoints.cast<int>()
+                    : checkpoints,
+              ),
             ),
-          ),
-        );
+          );
+        }
       }
       return output;
     } finally {
-      image?.dispose();
+      image.dispose();
+    }
+  }
+
+  /// Last bounded native retry when text alone cannot locate delivery cells.
+  static Future<List<RecognitionRegion>> regions(
+    Uint8List bytes,
+    List<List<RecognizedLine>> readings,
+    BowlerProfile profile,
+  ) async {
+    final tables = [for (final source in readings) ..._tables(source, profile)]
+      ..sort((a, b) => b.headers.compareTo(a.headers));
+    if (tables.isEmpty) return [];
+    final image = await _decode(bytes);
+    try {
+      final rgba = (await image.toByteData(format: ui.ImageByteFormat.rawRgba))!
+          .buffer
+          .asUint8List();
+      final width = image.width, height = image.height, table = tables.first;
+      return await Isolate.run(() {
+        final aligned = _alignColumns(rgba, width, height, table);
+        if (identical(aligned, table)) return <RecognitionRegion>[];
+        return [for (var i = 0; i < 10; i++) _region(aligned, i)]
+            .where(
+              (r) =>
+                  r.width > 0 &&
+                  r.height > 0 &&
+                  r.x >= 0 &&
+                  r.y >= 0 &&
+                  r.x + r.width <= 1 &&
+                  r.y + r.height <= 1,
+            )
+            .toList();
+      });
+    } finally {
+      image.dispose();
+    }
+  }
+
+  static Future<ui.Image> _decode(Uint8List bytes) async {
+    final buffer = await ui.ImmutableBuffer.fromUint8List(bytes);
+    ui.ImageDescriptor? descriptor;
+    ui.Codec? codec;
+    try {
+      descriptor = await ui.ImageDescriptor.encoded(buffer);
+      final scale = math.min(
+        1.0,
+        4096 / math.max(descriptor.width, descriptor.height),
+      );
+      codec = await descriptor.instantiateCodec(
+        targetWidth: (descriptor.width * scale).round(),
+        targetHeight: (descriptor.height * scale).round(),
+      );
+      return (await codec.getNextFrame()).image;
+    } finally {
       codec?.dispose();
       descriptor?.dispose();
       buffer.dispose();
     }
+  }
+
+  static RecognitionRegion _region(_Table table, int i) {
+    final center = table.first + i * table.pitch;
+    final headerY = table.y + i * table.slope;
+    final gap = table.rowY(center) - headerY;
+    // Native header boxes can include extra vertical whitespace. Keep them
+    // from cutting the top off a delivery immediately beneath the header.
+    final inset = math.min(table.height * .55, gap * .2);
+    return RecognitionRegion(
+      center - table.pitch * .47,
+      headerY + inset,
+      table.pitch * .94,
+      gap * .9 - inset,
+      tenth: i == 9,
+    );
   }
 
   static List<_Table> _tables(
@@ -323,19 +393,11 @@ abstract final class FrameGlyphReader {
     _Table table,
     List<RecognizedLine> words,
     List<_Template> templates,
+    List<RecognizedLine> supportingWords,
   ) {
     final frames = <String>[];
     for (var i = 0; i < 10; i++) {
-      final center = table.first + i * table.pitch;
-      final headerY = table.y + i * table.slope;
-      final gap = table.rowY(center) - headerY;
-      final region = RecognitionRegion(
-        center - table.pitch * .47,
-        headerY + table.height * .55,
-        table.pitch * .94,
-        gap * .9 - table.height * .55,
-        tenth: i == 9,
-      );
+      final region = _region(table, i);
       if (region.x < 0 ||
           region.y < 0 ||
           region.x + region.width > 1 ||
@@ -360,6 +422,9 @@ abstract final class FrameGlyphReader {
       final observations = [
         for (final word in words) ...ScoreboardGrid.symbols(word),
       ].where(region.contains).toList();
+      final supporting = [
+        for (final word in supportingWords) ...ScoreboardGrid.symbols(word),
+      ].where((s) => !s.isStroke && region.contains(s)).toList();
       final nativeMarks =
           observations
               .where(
@@ -379,29 +444,49 @@ abstract final class FrameGlyphReader {
           .replaceAll('×', 'X')
           .replaceAll('–', '-')
           .replaceAll('—', '-');
-      if (TenPinScorer.parseFrame(nativeFrame, tenth: i == 9).complete) {
-        frames.add(nativeFrame);
-        continue;
-      }
+      // Determine delivery order from photographed components. Word-level
+      // OCR can spread a merged token across frame boundaries and reverse a
+      // miss and digit while preserving the same cumulative and final score.
+      final classified = _classify(
+        mask,
+        w,
+        h,
+        templates,
+        observed: (l, t, r, b) =>
+            _inside(observations, imageWidth, imageHeight, x, y, l, t, r, b),
+        supporting: (l, t, r, b) =>
+            _inside(supporting, imageWidth, imageHeight, x, y, l, t, r, b),
+      );
+      // Prefer a complete physical ordering when available. A complete native
+      // reading can still preserve ink obscured by a monitor graphic when the
+      // raster classifier cannot complete the cell.
       frames.add(
-        _classify(
-          mask,
-          w,
-          h,
-          templates,
-          observed: (l, t, r, b) => observations
-              .where((o) {
-                final ox = o.centerX * imageWidth - x,
-                    oy = o.centerY * imageHeight - y;
-                return ox >= l - 3 && ox <= r + 3 && oy >= t - 3 && oy <= b + 3;
-              })
-              .map((o) => o.text.toUpperCase())
-              .toSet(),
-        ),
+        TenPinScorer.parseFrame(classified, tenth: i == 9).complete ||
+                !TenPinScorer.parseFrame(nativeFrame, tenth: i == 9).complete
+            ? classified
+            : nativeFrame,
       );
     }
     return frames;
   }
+
+  static Set<String> _inside(
+    List<RecognizedLine> input,
+    int imageWidth,
+    int imageHeight,
+    int x,
+    int y,
+    int l,
+    int t,
+    int r,
+    int b,
+  ) => input
+      .where((o) {
+        final ox = o.centerX * imageWidth - x, oy = o.centerY * imageHeight - y;
+        return ox >= l - 3 && ox <= r + 3 && oy >= t - 3 && oy <= b + 3;
+      })
+      .map((o) => o.text.toUpperCase())
+      .toSet();
 
   /// Header numerals may be right-aligned rather than centered in their cells.
   /// Locate repeated dark rulings in the photographed row before reading ink.
@@ -420,8 +505,8 @@ abstract final class FrameGlyphReader {
       final gap = table.rowY(center) - headerY;
       final left = ((center + table.pitch * .05) * width).round();
       final right = ((center + table.pitch * .9) * width).round();
-      final top = ((headerY - table.height * .1) * height).round();
-      final bottom = ((headerY + gap) * height).round();
+      final top = ((headerY + table.height * .65) * height).round();
+      final bottom = ((headerY + gap * 1.3) * height).round();
       if (left < 0 ||
           right >= width ||
           top < 0 ||
@@ -429,22 +514,29 @@ abstract final class FrameGlyphReader {
           bottom <= top) {
         continue;
       }
+      // A photographed vertical ruling can lean. Score a bounded family of
+      // straight lines, anchored at the delivery band's middle, rather than
+      // requiring every ruling to remain in one image column.
+      final anchor = headerY * height + gap * height * .5;
       final values = <int>[];
       for (var x = left; x < right; x++) {
-        final histogram = List.filled(256, 0);
-        for (var y = top; y < bottom; y++) {
-          final p = (y * width + x) * 4;
-          histogram[math.max(rgba[p], math.max(rgba[p + 1], rgba[p + 2]))]++;
-        }
-        var count = 0, quantile = 255;
-        for (var v = 0; v < histogram.length; v++) {
-          count += histogram[v];
-          if (count >= (bottom - top) * .85) {
-            quantile = v;
-            break;
+        var darkest = 255;
+        for (final shear in [-.15, -.1, -.05, 0.0, .05, .1, .15]) {
+          final samples = <int>[];
+          for (var sample = 0; sample < 32; sample++) {
+            final y = top + ((bottom - top - 1) * sample / 31).round();
+            final xx = (x + (y - anchor) * shear).round();
+            if (xx < 0 || xx >= width) {
+              samples.add(255);
+              continue;
+            }
+            final p = (y * width + xx) * 4;
+            samples.add(math.max(rgba[p], math.max(rgba[p + 1], rgba[p + 2])));
           }
+          samples.sort();
+          darkest = math.min(darkest, samples[27]);
         }
-        values.add(quantile);
+        values.add(darkest);
       }
       if (values.isEmpty) continue;
       final sorted = [...values]..sort();
@@ -493,6 +585,7 @@ abstract final class FrameGlyphReader {
     int h,
     List<_Template> templates, {
     Set<String> Function(int, int, int, int)? observed,
+    Set<String> Function(int, int, int, int)? supporting,
   }) {
     final seen = Uint8List(mask.length), components = <_Component>[];
     for (var seed = 0; seed < mask.length; seed++) {
@@ -604,6 +697,33 @@ abstract final class FrameGlyphReader {
       // this component even when thresholding has broken its photographed ink.
       if (known.length == 1) {
         result.write(known.single);
+        continue;
+      }
+      // Native OCR occasionally emits lookalike Cyrillic letters in a numeric
+      // cell. Use this only as independent corroboration of the pixel winner,
+      // never as a global name/text substitution or a score-derived guess.
+      final corroborated = native
+          .map((s) => const {'З': '3', 'Х': 'X'}[s])
+          .whereType<String>()
+          .toSet();
+      if (known.isEmpty &&
+          corroborated.length == 1 &&
+          corroborated.single == best.key &&
+          best.value >= .68) {
+        result.write(best.key);
+        continue;
+      }
+      final support = (supporting?.call(c.l, c.t, c.r, c.b) ?? <String>{})
+          .map((s) => const {'З': '3', 'Х': 'X'}[s] ?? s)
+          .where((s) => RegExp(r'^[0-9XF/]$').hasMatch(s))
+          .toSet();
+      // A secondary pass can corroborate the pixel winner, but cannot replace
+      // a different pixel winner or any character in the primary reading.
+      if (known.isEmpty &&
+          support.length == 1 &&
+          support.single == best.key &&
+          best.value >= .6) {
+        result.write(best.key);
         continue;
       }
       if (known.length > 1 ||
