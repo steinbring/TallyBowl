@@ -2,7 +2,7 @@
 
 **How you bowled, tonight.** A Flutter bowling journal for native macOS, iPadOS, and Android. Planned website: [tallybowl.jws.app](https://tallybowl.jws.app).
 
-The current beta is **0.1.9 (10)**, developed and published by **Joe Steinbring**. [Contact Joe for support](https://jws.dev/contact). It fixes real-photo frame filling, adds session deletion, and improves Android recap attachment grants. Both iPad and native Mac builds are available in the owner TestFlight group and submitted for external beta review. [TestFlight readiness](docs/TESTFLIGHT.md) records current distribution and device-verification status.
+The current candidate is **0.1.10 (11)**, developed and published by **Joe Steinbring**. [Contact Joe for support](https://jws.dev/contact). It improves frame filling on angled multi-bowler league boards, including rounded misses and separate scratch/handicap columns. The prior iPad and native Mac 0.1.9 builds remain in TestFlight while the update is prepared. [TestFlight readiness](docs/TESTFLIGHT.md) records current distribution and device-verification status.
 
 ## What works
 
@@ -18,7 +18,7 @@ The current beta is **0.1.9 (10)**, developed and published by **Joe Steinbring*
 - Local SQLite storage, versioned JSON backups with before-restore recovery, and game/delivery CSV exports.
 - System light/dark appearance, scalable layouts, accessible scorecard labels, offline help/privacy pages, and installed version/build in Settings.
 
-There is no cloud AI fallback, account, automatic sync, or iPhone target. Real-photo verification currently covers **three permissioned monitor photos across two layouts** plus synthetic fixtures; always compare every delivery before saving. Multi-photo combining, crop/rotation tools, handicap scoring, and per-delivery ball assignment are deferred. Android ML Kit may send SDK diagnostics to Google; map/search providers receive requests. See the [privacy policy](docs/PRIVACY_POLICY.md).
+There is no cloud AI fallback, account, automatic sync, or iPhone target. Real-photo regression coverage now includes **seven permissioned monitor photos across three layouts**, with all four new league photos verified through actual local Apple Vision and Android ML Kit. Always compare every delivery before saving. Multi-photo combining, crop/rotation tools, handicap scoring, and per-delivery ball assignment are deferred. Android ML Kit may send SDK diagnostics to Google; map/search providers receive requests. See the [privacy policy](docs/PRIVACY_POLICY.md).
 
 ## Documentation
 

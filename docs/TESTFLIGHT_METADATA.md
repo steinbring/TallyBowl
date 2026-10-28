@@ -1,6 +1,6 @@
 # TestFlight metadata
 
-Candidate: **0.1.9 (10)**. Both platform uploads processed successfully, export compliance is cleared, testing notes are saved, and the owner group lists both as **Testing**. Both builds are **Waiting for Review** in the external group, which contains the two requested email testers with automatic notification enabled. Beta description, feedback email and private reviewer contact/instructions are configured in App Store Connect; sign-in is marked as not required. The earlier Mac 0.1.7 (8) signing rejection is superseded. See the [runbook](TESTFLIGHT.md) for current external-review and installation status.
+Candidate: **0.1.10 (11)**. Build preparation is in progress; the prior build-10 platform uploads and owner TestFlight assignments succeeded. The existing external group contains the two requested email testers. Beta description, feedback email and private reviewer contact/instructions are configured in App Store Connect; sign-in is marked as not required. See the [runbook](TESTFLIGHT.md) for current external-review and installation status.
 
 ## Public contact and remaining account fields
 
@@ -21,7 +21,7 @@ This beta stores your journal locally, has no login or subscription, and include
 
 ## What to test
 
-Build 0.1.9 (10) adds local delivery-glyph recovery for photographed monitor scorecards, session deletion, and explicit Android image attachment grants. The original 89- and 109-pin photos produce all ten exact frames through both local Apple Vision and Android recognition pipelines. These cases supplement the earlier 90-pin regression; they do not establish general recognition accuracy.
+Build 0.1.10 (11) improves angled league-board recognition, right-aligned headers, rounded misses, overlapping OCR blocks and scratch/handicap separation. Four original league photos produce every exact frame and scratch totals 104 and 80 through both local Apple Vision and Android ML Kit. Earlier practice regressions remain covered. These examples do not establish general recognition accuracy.
 
 - Add scoreboard aliases, two balls and an alley; try both suggestions and manual entry.
 - Start practice or league, capture/import a final scoreboard, verify the correct bowler and all ten frames, select balls/primary ball, lane and notes, then save.
@@ -43,4 +43,4 @@ The iOS target is iPad-only. macOS uses a separate native Flutter target, not th
 
 ## Known beta limitations
 
-Three permissioned monitor photos across two layouts have regression evidence. Sparse, distorted or unfamiliar layouts may need manual marks. One image is processed at a time. There is no sync, iPhone support, handicap scoring or retained photo library. JSON backups omit original photos. Public map/search services have no availability guarantee; manual alley entry remains available. Android ML Kit diagnostics apply to Android builds, not Apple builds. The new Android PNG transport passes separate-UID receiver tests; Google Chat composer verification on the Samsung remains pending.
+Seven permissioned monitor photos across three layouts have regression evidence. Sparse, distorted or unfamiliar layouts may need manual marks. One image is processed at a time. There is no sync, iPhone support, handicap scoring or retained photo library. JSON backups omit original photos. Public map/search services have no availability guarantee; manual alley entry remains available. Android ML Kit diagnostics apply to Android builds, not Apple builds. The Android PNG transport passes separate-UID receiver tests; Google Chat composer verification on the Samsung remains pending.

@@ -1,5 +1,13 @@
 # TestFlight readiness and release runbook
 
+## 0.1.10 (11): league-board recognition
+
+Recognition source **4e2d258** fixes right-aligned frame headers, sloping multi-bowler rows, short rounded misses, duplicate native text blocks, and separate scratch/handicap totals. All four October 27 original league photos produce the exact observed frames and scratch totals (104 and 80) through actual Apple Vision and bundled Android ML Kit. Anonymized two-row fixtures preserve native observations from both engines; import/resume editor tests cover the new games. **155 Flutter tests pass; static analysis is clean.** See [frame recognition](FRAME_RECOGNITION.md) for validation rules and limits.
+
+New signed archives, exports, preflight checks and TestFlight assignments are being prepared for iPad and native Mac. The prior build-10 owner beta remains available. Logs and release evidence are kept under ignored `build/testflight/build-11/` and `build/league-fix/`; original photos and personal OCR logs are excluded from Git and app packages. No new physical device installation is claimed for build 11.
+
+The build-10 record below is historical. Its Apple review state describes the last recorded check for that version.
+
 ## 0.1.9 (10): October 27, 2026
 
 Candidate source includes `22a3d2d` (local frame-glyph recovery), `cc3e2fd` (session deletion) and `9dcfc82` (Android PNG handoff). **137 Dart/widget tests pass**, static analysis has no issues, and **three Android instrumentation tests pass**, including a receiving app under a separate UID reading the image while being denied write access. Original 89- and 109-pin photos produce the exact ten observed frames through local Vision and the Android pipeline; anonymized real-photo fixtures exercise import/resume through filled editor inputs and saving. See [recognition](FRAME_RECOGNITION.md) and [sharing](ANDROID_SHARING.md).
