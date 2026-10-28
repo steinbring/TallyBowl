@@ -66,6 +66,7 @@ abstract final class PhotoService {
     BowlerProfile? profile,
   }) async {
     final bytes = await readPhoto(XFile(path));
+    final fullReadings = <List<RecognizedLine>>[];
     Future<List<RecognizedLine>> read({
       List<RecognitionRegion>? regions,
       double aspect = 1,
@@ -79,9 +80,11 @@ abstract final class PhotoService {
             'regions': regions.map((r) => r.toJson()).toList(),
         },
       );
-      return (output ?? [])
+      final lines = (output ?? [])
           .map((v) => RecognizedLine.fromJson(v as Map))
           .toList();
+      if (regions == null) fullReadings.add(lines);
+      return lines;
     }
 
     final originalLines = await _recognizeText(profile, read);
@@ -97,6 +100,7 @@ abstract final class PhotoService {
         bytes,
         originalLines,
         profile,
+        alternatives: fullReadings,
       );
       return [...originalLines, ...glyphRows];
     } catch (_) {
@@ -150,17 +154,13 @@ abstract final class PhotoService {
     if (regions.isEmpty) return lines;
     try {
       final refined = await read(regions: regions, aspect: 1);
-      // Apple Vision reports word bounds, so retain a full-row contextual
-      // reading for sparse cells that remain incomplete in isolated crops.
+      // Retain full-row context for sparse cells and omitted headers/totals.
+      // Both native engines can miss context that a bounded aspect pass keeps.
       var contextLines = <RecognizedLine>[];
-      if (!lines
-          .expand(ScoreboardGrid.words)
-          .any((w) => w.elements.isNotEmpty)) {
-        try {
-          contextLines = await read(aspect: 1.5);
-        } catch (_) {
-          /* Optional retry. */
-        }
+      try {
+        contextLines = await read(aspect: 1.5);
+      } catch (_) {
+        /* Optional retry. */
       }
       final replacements = <RecognizedLine>[];
       final active = <RecognitionRegion>[];

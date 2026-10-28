@@ -11,10 +11,11 @@ import 'package:tallybowl/src/recognition/photo_service.dart';
 import 'package:tallybowl/src/theme.dart';
 
 import 'recognition/frame_glyph_reader_test.dart' show game89, game109;
+import 'recognition/league_scoreboard_test.dart' show league80, league104;
 import 'recognition/scoreboard_grid_test.dart' show practiceFrames, checkpoints;
 
 void main() {
-  for (final score in [90, 89, 109]) {
+  for (final score in [90, 89, 109, 80, 104]) {
     for (final resume in [false, true]) {
       testWidgets(
         'game $score ${resume ? 'resumes photo draft' : 'imports photo'} with ten filled frame inputs and metadata',
@@ -28,9 +29,16 @@ void main() {
                 ? practiceFrames
                 : score == 89
                 ? game89
-                : game109;
+                : score == 109
+                ? game109
+                : score == 80
+                ? league80
+                : league104;
+            final leagueName = score == 80 ? 'league_80_angled' : 'league_104';
             final path = score == 90
                 ? '${Directory.current.path}/test/goldens/recap.png'
+                : score == 80 || score == 104
+                ? '${Directory.current.path}/test/fixtures/$leagueName.png'
                 : '${Directory.current.path}/test/fixtures/practice_$score.png';
             final session = BowlingSession(
               id: 's',
@@ -64,6 +72,18 @@ void main() {
               PhotoService.channel,
               (call) async {
                 final args = call.arguments as Map;
+                if (score == 80 || score == 104) {
+                  if (args['regions'] != null) return [];
+                  final data = jsonDecode(
+                    await File('test/fixtures/${leagueName}_android.json')
+                        .readAsString(),
+                  ) as Map;
+                  return (data['readings'] as List)[args['aspect'] == 2
+                      ? 1
+                      : args['aspect'] == 1.5
+                      ? 2
+                      : 0];
+                }
                 final name = score != 90
                     ? 'practice_${score}_android'
                     : args['regions'] == null

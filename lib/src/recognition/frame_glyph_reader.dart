@@ -20,9 +20,188 @@ abstract final class FrameGlyphReader {
   static Future<List<RecognizedLine>> read(
     Uint8List bytes,
     List<RecognizedLine> lines,
+    BowlerProfile profile, {
+    List<List<RecognizedLine>> alternatives = const [],
+  }) async {
+    final sources = [
+      lines,
+      ...alternatives.where((s) => !identical(s, lines)).take(3),
+    ];
+    final candidates = [
+      for (final source in sources)
+        for (final table in _tables(source, profile)) (source, table),
+    ];
+    if (candidates.isEmpty) return [];
+    final templates = await (_templates ??= _loadTemplates());
+    // Flutter's codec applies EXIF orientation, matching both native bridges.
+    final buffer = await ui.ImmutableBuffer.fromUint8List(bytes);
+    ui.ImageDescriptor? descriptor;
+    ui.Codec? codec;
+    ui.Image? image;
+    try {
+      descriptor = await ui.ImageDescriptor.encoded(buffer);
+      final longest = math.max(descriptor.width, descriptor.height);
+      final scale = math.min(1.0, 4096 / longest);
+      codec = await descriptor.instantiateCodec(
+        targetWidth: (descriptor.width * scale).round(),
+        targetHeight: (descriptor.height * scale).round(),
+      );
+      image = (await codec.getNextFrame()).image;
+      final rgba = (await image.toByteData(format: ui.ImageByteFormat.rawRgba))!
+          .buffer
+          .asUint8List();
+      final output = <RecognizedLine>[];
+      for (final candidate in candidates) {
+        final source = candidate.$1, table = candidate.$2;
+        final words = _distinctWords(source);
+        final imageWidth = image.width, imageHeight = image.height;
+        final reading = await Isolate.run(() {
+          final aligned = _alignColumns(rgba, imageWidth, imageHeight, table);
+          return (
+            aligned,
+            _readFrames(
+              rgba,
+              imageWidth,
+              imageHeight,
+              aligned,
+              words,
+              templates,
+            ),
+          );
+        });
+        final aligned = reading.$1;
+        final frames = reading.$2;
+        if (frames.length != 10 || !TenPinScorer.score(frames).complete) {
+          continue;
+        }
+        final last = aligned.first + 9 * aligned.pitch;
+        final directTotals = _scratchTotals(words, aligned);
+        final checkpoints = ScoreboardGrid.rows(source, profile)
+            .where(
+              (r) =>
+                  r.suggested &&
+                  r.cumulativeTotals != null &&
+                  table.name.centerY >= r.y &&
+                  table.name.centerY <= r.y + r.height,
+            )
+            .firstOrNull
+            ?.cumulativeTotals;
+        final score = TenPinScorer.score(frames);
+        var checkpointConflict = false;
+        final observedCheckpoints = <int?>[];
+        for (var i = 0; i < 10; i++) {
+          final center = aligned.first + i * aligned.pitch;
+          final rowY = aligned.rowY(center);
+          final gap = rowY - (aligned.y + i * aligned.slope);
+          final values = words
+              .where(
+                (w) =>
+                    (w.centerX - center).abs() < table.pitch * .45 &&
+                    w.centerY > rowY - gap * .2 &&
+                    w.centerY < rowY + gap * .65 &&
+                    RegExp(r'^\d{1,3}$').hasMatch(w.text),
+              )
+              .toList();
+          if (values.length > 1) checkpointConflict = true;
+          final value = values.length == 1
+              ? int.parse(values.single.text)
+              : null;
+          observedCheckpoints.add(value);
+          if (value != null && value != score.cumulative[i]) {
+            checkpointConflict = true;
+          }
+        }
+        if (checkpointConflict) continue;
+        if (checkpoints != null &&
+            List.generate(
+              10,
+              (i) => i,
+            ).any((i) => score.cumulative[i] != checkpoints[i])) {
+          continue;
+        }
+        int? total = directTotals.where((v) => v == score.total).firstOrNull;
+        // A full-image aspect pass can omit the large total while reading
+        // every frame correctly. Complement only this same, name-anchored row
+        // with an independently observed scratch total in another pass, and
+        // require six agreeing checkpoints including the actual tenth total.
+        if (total == null &&
+            observedCheckpoints.whereType<int>().length >= 6 &&
+            observedCheckpoints.last == score.total) {
+          for (final other in sources) {
+            final otherWords = _distinctWords(other);
+            final sameName = otherWords.any(
+              (w) =>
+                  _name(w.text) == _name(table.name.text) &&
+                  (w.centerX - table.name.centerX).abs() <
+                      table.name.width * .5 &&
+                  (w.centerY - table.name.centerY).abs() <
+                      table.name.height * .75,
+            );
+            if (!sameName) continue;
+            total = _scratchTotals(
+              otherWords,
+              aligned,
+            ).where((v) => v == score.total).firstOrNull;
+            if (total != null) break;
+          }
+        }
+        if (total == null) continue;
+        // Alternative OCR passes can recover different omissions, but must
+        // agree on the observed deliveries. Retain conflicting valid readings
+        // as separate candidates so automatic selection remains disabled.
+        if (output.any(
+          (r) =>
+              (r.x - table.name.x).abs() < table.pitch * .5 &&
+              (r.frameRow!.frames.join('|') == frames.join('|')) &&
+              (r.y -
+                          math.min(aligned.y, aligned.y + 9 * aligned.slope) -
+                          table.height * .5)
+                      .abs() <
+                  table.name.height * .5,
+        )) {
+          continue;
+        }
+        final top =
+            math.min(aligned.y, aligned.y + 9 * aligned.slope) +
+            table.height * .5;
+        final bottom =
+            math.max(aligned.rowY(aligned.first), aligned.rowY(last)) +
+            table.name.height * .65;
+        output.add(
+          RecognizedLine(
+            text: table.name.text,
+            x: table.name.x,
+            y: top,
+            width: last - table.name.x + table.pitch,
+            height: bottom - top,
+            frameRow: ScoreRow(
+              text: '${table.name.text} · $total',
+              frames: frames,
+              suggested: true,
+              y: top,
+              height: bottom - top,
+              displayedTotal: total,
+              cumulativeTotals: observedCheckpoints.every((v) => v != null)
+                  ? observedCheckpoints.cast<int>()
+                  : checkpoints,
+            ),
+          ),
+        );
+      }
+      return output;
+    } finally {
+      image?.dispose();
+      codec?.dispose();
+      descriptor?.dispose();
+      buffer.dispose();
+    }
+  }
+
+  static List<_Table> _tables(
+    List<RecognizedLine> lines,
     BowlerProfile profile,
-  ) async {
-    final words = lines.expand(ScoreboardGrid.words).toList();
+  ) {
+    final words = _distinctWords(lines);
     final aliases = [
       profile.name,
       ...profile.aliases,
@@ -36,7 +215,7 @@ abstract final class FrameGlyphReader {
             n >= 1 &&
             n <= 10 &&
             w.centerX > name.x + name.width &&
-            name.centerY - w.centerY > name.height &&
+            name.centerY - w.centerY > name.height * .35 &&
             name.centerY - w.centerY < name.height * 6;
       }).toList();
       _Table? table;
@@ -71,131 +250,70 @@ abstract final class FrameGlyphReader {
       }
       if (table != null) tables.add(table);
     }
-    if (tables.isEmpty || tables.length > 2) return [];
-    final templates = await (_templates ??= _loadTemplates());
-    // Flutter's codec applies EXIF orientation, matching both native bridges.
-    final buffer = await ui.ImmutableBuffer.fromUint8List(bytes);
-    ui.ImageDescriptor? descriptor;
-    ui.Codec? codec;
-    ui.Image? image;
-    try {
-      descriptor = await ui.ImageDescriptor.encoded(buffer);
-      final longest = math.max(descriptor.width, descriptor.height);
-      final scale = math.min(1.0, 4096 / longest);
-      codec = await descriptor.instantiateCodec(
-        targetWidth: (descriptor.width * scale).round(),
-        targetHeight: (descriptor.height * scale).round(),
-      );
-      image = (await codec.getNextFrame()).image;
-      final rgba = (await image.toByteData(format: ui.ImageByteFormat.rawRgba))!
-          .buffer
-          .asUint8List();
-      final output = <RecognizedLine>[];
-      for (final table in tables) {
-        final imageWidth = image.width, imageHeight = image.height;
-        final frames = await Isolate.run(
-          () => _readFrames(
-            rgba,
-            imageWidth,
-            imageHeight,
-            table,
-            words,
-            templates,
-          ),
+    return tables.length > 2 ? [] : tables;
+  }
+
+  static List<int> _scratchTotals(List<RecognizedLine> words, _Table table) {
+    final last = table.first + 9 * table.pitch;
+    final totals = words
+        .where(
+          (w) =>
+              w.centerX > last + table.pitch * .55 &&
+              w.centerX < last + table.pitch * 3 &&
+              (w.centerY - table.rowY(w.centerX)).abs() <
+                  table.name.height * .8 &&
+              RegExp(r'^\d{1,3}$').hasMatch(w.text),
+        )
+        .toList();
+    // A labeled handicap column is separate from the first, scratch column.
+    // Permit the common OCR c/e confusion in the label, never in score digits.
+    final handicapHeader = words.any(
+      (w) =>
+          w.x > last &&
+          RegExp(
+            r'h(?:[da][ce]p|andicap)$',
+            caseSensitive: false,
+          ).hasMatch(w.text) &&
+          (w.centerY - table.y - 9 * table.slope).abs() < table.height,
+    );
+    if (totals.length > 1 && !handicapHeader) return [];
+    final scratch = totals
+        .where((w) => w.centerX < last + table.pitch * 1.9)
+        .toList();
+    if (scratch.length != 1) return [];
+    final value = int.parse(scratch.single.text);
+    return value <= 300 ? [value] : [];
+  }
+
+  // ML Kit can report the same ink twice in overlapping text blocks. Collapse
+  // only matching words whose boxes substantially overlap; distinct values
+  // in a score cell must still trigger a conflict.
+  static List<RecognizedLine> _distinctWords(List<RecognizedLine> lines) {
+    final result = <RecognizedLine>[];
+    final byText = <String, List<RecognizedLine>>{};
+    for (final word in lines.expand(ScoreboardGrid.words)) {
+      final previous = byText.putIfAbsent(word.text, () => []);
+      if (previous.any((other) {
+        final w = math.max(
+          0.0,
+          math.min(word.x + word.width, other.x + other.width) -
+              math.max(word.x, other.x),
         );
-        if (frames.length != 10 || !TenPinScorer.score(frames).complete) {
-          continue;
-        }
-        final last = table.first + 9 * table.pitch;
-        final totals = words
-            .where(
-              (w) =>
-                  w.centerX > last + table.pitch * .55 &&
-                  w.centerX < last + table.pitch * 2.5 &&
-                  (w.centerY - table.name.centerY).abs() <
-                      table.name.height * 1.8 &&
-                  RegExp(r'^\d{1,3}$').hasMatch(w.text),
-            )
-            .toList();
-        if (totals.length != 1) continue;
-        final total = int.parse(totals.single.text);
-        if (total > 300 || TenPinScorer.score(frames).total != total) continue;
-        final checkpoints = ScoreboardGrid.rows(lines, profile)
-            .where(
-              (r) =>
-                  r.suggested &&
-                  r.cumulativeTotals != null &&
-                  table.name.centerY >= r.y &&
-                  table.name.centerY <= r.y + r.height,
-            )
-            .firstOrNull
-            ?.cumulativeTotals;
-        final score = TenPinScorer.score(frames);
-        var checkpointConflict = false;
-        final observedCheckpoints = <int?>[];
-        for (var i = 0; i < 10; i++) {
-          final center = table.first + i * table.pitch;
-          final gap = table.name.centerY - (table.y + i * table.slope);
-          final values = words
-              .where(
-                (w) =>
-                    (w.centerX - center).abs() < table.pitch * .45 &&
-                    w.centerY > table.name.centerY + gap * .15 &&
-                    w.centerY < table.name.centerY + gap * 1.2 &&
-                    RegExp(r'^\d{1,3}$').hasMatch(w.text),
-              )
-              .toList();
-          if (values.length > 1) checkpointConflict = true;
-          final value = values.length == 1
-              ? int.parse(values.single.text)
-              : null;
-          observedCheckpoints.add(value);
-          if (value != null && value != score.cumulative[i]) {
-            checkpointConflict = true;
-          }
-        }
-        if (checkpointConflict) continue;
-        if (checkpoints != null &&
-            List.generate(
-              10,
-              (i) => i,
-            ).any((i) => score.cumulative[i] != checkpoints[i])) {
-          continue;
-        }
-        final top = table.y + table.height;
-        final bottom = words
-            .where((w) => w.x > table.name.x && w.x < last + table.pitch)
-            .where((w) => w.y > top && w.y < top + table.name.height * 5)
-            .map((w) => w.y + w.height)
-            .fold(table.name.y + table.name.height, math.max);
-        output.add(
-          RecognizedLine(
-            text: table.name.text,
-            x: table.name.x,
-            y: top,
-            width: last - table.name.x + table.pitch,
-            height: bottom - top,
-            frameRow: ScoreRow(
-              text: '${table.name.text} · $total',
-              frames: frames,
-              suggested: true,
-              y: top,
-              height: bottom - top,
-              displayedTotal: total,
-              cumulativeTotals: observedCheckpoints.every((v) => v != null)
-                  ? observedCheckpoints.cast<int>()
-                  : checkpoints,
-            ),
-          ),
+        final h = math.max(
+          0.0,
+          math.min(word.y + word.height, other.y + other.height) -
+              math.max(word.y, other.y),
         );
+        return w * h >
+            math.min(word.width * word.height, other.width * other.height) *
+                .65;
+      })) {
+        continue;
       }
-      return output;
-    } finally {
-      image?.dispose();
-      codec?.dispose();
-      descriptor?.dispose();
-      buffer.dispose();
+      previous.add(word);
+      result.add(word);
     }
+    return result;
   }
 
   static List<String> _readFrames(
@@ -210,12 +328,12 @@ abstract final class FrameGlyphReader {
     for (var i = 0; i < 10; i++) {
       final center = table.first + i * table.pitch;
       final headerY = table.y + i * table.slope;
-      final gap = table.name.centerY - headerY;
+      final gap = table.rowY(center) - headerY;
       final region = RecognitionRegion(
-        center - table.pitch * .49,
-        headerY + gap * .30,
-        table.pitch * .98,
-        gap * .55,
+        center - table.pitch * .47,
+        headerY + table.height * .55,
+        table.pitch * .94,
+        gap * .9 - table.height * .55,
         tenth: i == 9,
       );
       if (region.x < 0 ||
@@ -283,6 +401,72 @@ abstract final class FrameGlyphReader {
       );
     }
     return frames;
+  }
+
+  /// Header numerals may be right-aligned rather than centered in their cells.
+  /// Locate repeated dark rulings in the photographed row before reading ink.
+  /// An 85th percentile rejects isolated character outlines and short misses;
+  /// a ruling must stay dark over nearly the entire header/player band.
+  static _Table _alignColumns(
+    Uint8List rgba,
+    int width,
+    int height,
+    _Table table,
+  ) {
+    final phases = <double>[];
+    for (var i = 0; i < 9; i++) {
+      final center = table.first + i * table.pitch;
+      final headerY = table.y + i * table.slope;
+      final gap = table.rowY(center) - headerY;
+      final left = ((center + table.pitch * .05) * width).round();
+      final right = ((center + table.pitch * .9) * width).round();
+      final top = ((headerY - table.height * .1) * height).round();
+      final bottom = ((headerY + gap) * height).round();
+      if (left < 0 ||
+          right >= width ||
+          top < 0 ||
+          bottom > height ||
+          bottom <= top) {
+        continue;
+      }
+      final values = <int>[];
+      for (var x = left; x < right; x++) {
+        final histogram = List.filled(256, 0);
+        for (var y = top; y < bottom; y++) {
+          final p = (y * width + x) * 4;
+          histogram[math.max(rgba[p], math.max(rgba[p + 1], rgba[p + 2]))]++;
+        }
+        var count = 0, quantile = 255;
+        for (var v = 0; v < histogram.length; v++) {
+          count += histogram[v];
+          if (count >= (bottom - top) * .85) {
+            quantile = v;
+            break;
+          }
+        }
+        values.add(quantile);
+      }
+      if (values.isEmpty) continue;
+      final sorted = [...values]..sort();
+      final dark = sorted.first, background = sorted[sorted.length ~/ 2];
+      if (background - dark < math.max(8, background * .08)) continue;
+      final x = left + values.indexOf(dark);
+      phases.add((x / width - center) / table.pitch);
+    }
+    if (phases.length < 6) return table;
+    phases.sort();
+    final phase = phases[phases.length ~/ 2];
+    if (phases.where((p) => (p - phase).abs() < .1).length < 6) return table;
+    final shift = (phase - .5) * table.pitch;
+    return _Table(
+      table.name,
+      table.first + shift,
+      table.pitch,
+      table.y + shift * table.slope / table.pitch,
+      table.slope,
+      table.height,
+      table.headers,
+    );
   }
 
   static Future<List<_Template>> _loadTemplates() async {
@@ -360,9 +544,10 @@ abstract final class FrameGlyphReader {
         continue;
       }
       final ratio = gw / gh;
-      if (ratio >= 1.6 &&
+      if (ratio >= 1.2 &&
           ratio <= 8 &&
           gh < h * .3 &&
+          (ratio >= 1.6 || c.pixels.length / (gw * gh) >= .7) &&
           (c.t + c.b) / 2 > h * .2 &&
           (c.t + c.b) / 2 < h * .8) {
         result.write('-');
@@ -458,4 +643,5 @@ class _Table {
   final RecognizedLine name;
   final double first, pitch, y, slope, height;
   final int headers;
+  double rowY(double x) => name.centerY + (x - name.centerX) * slope / pitch;
 }
