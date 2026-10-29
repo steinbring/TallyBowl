@@ -37,6 +37,50 @@ void main() {
       );
     }
   }
+  test('bright crop rulings do not hide an otherwise visible strike', () async {
+    const profile = BowlerProfile(name: 'Bowler');
+    final bytes = await File('test/fixtures/practice_89.png').readAsBytes();
+    final lines = geometry(89, 'apple');
+    final region = (await FrameGlyphReader.regions(bytes, [
+      lines,
+    ], profile)).first;
+    final codec = await ui.instantiateImageCodec(bytes);
+    final image = (await codec.getNextFrame()).image;
+    final recorder = ui.PictureRecorder();
+    final canvas = ui.Canvas(recorder)
+      ..drawImage(image, ui.Offset.zero, ui.Paint());
+    final x = (region.x * image.width).roundToDouble();
+    final y = (region.y * image.height).roundToDouble();
+    final width = (region.width * image.width).roundToDouble();
+    final height = (region.height * image.height).roundToDouble();
+    final paint = ui.Paint()..color = const ui.Color(0xFFFFFFFF);
+    canvas.drawRect(ui.Rect.fromLTWH(x, y, width, 2), paint);
+    canvas.drawRect(ui.Rect.fromLTWH(x, y, 2, height), paint);
+    final picture = recorder.endRecording();
+    final ruled = await picture.toImage(image.width, image.height);
+    final png = (await ruled.toByteData(format: ui.ImageByteFormat.png))!.buffer
+        .asUint8List();
+    RecognizedLine omitStrike(RecognizedLine line) => RecognizedLine(
+      text: region.contains(line) ? line.text.replaceAll('X', '') : line.text,
+      x: line.x,
+      y: line.y,
+      width: line.width,
+      height: line.height,
+      elements: line.elements.map(omitStrike).toList(),
+    );
+    final observations = lines.map(omitStrike).toList();
+    final recovered = await FrameGlyphReader.read(png, observations, profile);
+    final selected = ScoreSheetParser.automaticRow(
+      ScoreSheetParser.rows([...observations, ...recovered], profile),
+    );
+    expect(selected?.frames, game89);
+    expect(selected?.displayedTotal, 89);
+    ruled.dispose();
+    picture.dispose();
+    image.dispose();
+    codec.dispose();
+  });
+
   test('wrong displayed total cannot validate observed glyphs', () async {
     final lines = geometry(89, 'android')
         .map(

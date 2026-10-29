@@ -8,14 +8,15 @@ import 'package:flutter/services.dart';
 import '../domain/models.dart';
 import '../domain/scoring.dart';
 import 'recognized_text.dart';
+import 'scoreboard_name.dart';
+import 'scoreboard_ink.dart';
 import 'scoreboard_grid.dart';
 
 /// Conservative local fallback for separated delivery cells on monitor grids.
 /// Templates classify photographed ink; score totals only validate the result.
 abstract final class FrameGlyphReader {
   static Future<List<_Template>>? _templates;
-  static String _name(String s) =>
-      s.toUpperCase().replaceAll(RegExp('[^A-Z0-9]'), '');
+  static String _name(String s) => normalizedBowlerName(s);
 
   static Future<List<RecognizedLine>> read(
     Uint8List bytes,
@@ -568,6 +569,21 @@ abstract final class FrameGlyphReader {
         final candidate = classify(pixels);
         if (TenPinScorer.parseFrame(candidate, tenth: i == 9).complete) {
           physical = candidate;
+        }
+      }
+      // Bright grid edges can connect into an oversized component. Preserve
+      // every previously complete physical or native reading; only retry an
+      // otherwise incomplete cell after measuring/removing boundary rulings.
+      if (!TenPinScorer.parseFrame(physical, tenth: i == 9).complete &&
+          !TenPinScorer.parseFrame(nativeFrame, tenth: i == 9).complete) {
+        for (final pixels in [mask, neutralMask, strictMask]) {
+          final cleaned = withoutBoundaryRulings(pixels, w, h);
+          if (identical(cleaned, pixels)) continue;
+          final candidate = classify(cleaned);
+          if (TenPinScorer.parseFrame(candidate, tenth: i == 9).complete) {
+            physical = candidate;
+            break;
+          }
         }
       }
       // Prefer a complete physical ordering when available. A complete native

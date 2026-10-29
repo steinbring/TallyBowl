@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import '../domain/models.dart';
 import 'recognized_text.dart';
 import 'scoreboard_grid.dart';
+import 'scoreboard_name.dart';
 
 /// A context crop for small score tables. It keeps the name, headers, delivery
 /// band and totals together; observations retain original-image coordinates.
@@ -11,8 +12,7 @@ abstract final class ScoreboardFocus {
     List<List<RecognizedLine>> readings,
     BowlerProfile profile,
   ) {
-    String normalized(String value) =>
-        value.toUpperCase().replaceAll(RegExp('[^A-Z0-9]'), '');
+    String normalized(String value) => normalizedBowlerName(value);
     final aliases = [
       profile.name,
       ...profile.aliases,
