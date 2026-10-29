@@ -247,8 +247,7 @@ abstract final class ScoreboardGrid {
     return value <= 300 ? value : null;
   }
 
-  static String _name(String value) =>
-      value.toUpperCase().replaceAll(RegExp(r'[^A-Z0-9]'), '');
+  static String _name(String value) => normalizedBowlerName(value);
 
   static Iterable<RecognizedLine> words(RecognizedLine line) => _words(line);
 

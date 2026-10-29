@@ -107,8 +107,7 @@ abstract final class ScoreSheetParser {
     return result;
   }
 
-  static String _normalized(String text) =>
-      text.toUpperCase().replaceAll(RegExp(r'[^A-Z0-9]'), '');
+  static String _normalized(String text) => normalizedBowlerName(text);
   static (List<String>?, int?) _extract(String source) {
     final text = source
         .toUpperCase()

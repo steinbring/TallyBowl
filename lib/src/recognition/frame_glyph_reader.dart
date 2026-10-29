@@ -8,14 +8,14 @@ import 'package:flutter/services.dart';
 import '../domain/models.dart';
 import '../domain/scoring.dart';
 import 'recognized_text.dart';
+import 'scoreboard_name.dart';
 import 'scoreboard_grid.dart';
 
 /// Conservative local fallback for separated delivery cells on monitor grids.
 /// Templates classify photographed ink; score totals only validate the result.
 abstract final class FrameGlyphReader {
   static Future<List<_Template>>? _templates;
-  static String _name(String s) =>
-      s.toUpperCase().replaceAll(RegExp('[^A-Z0-9]'), '');
+  static String _name(String s) => normalizedBowlerName(s);
 
   static Future<List<RecognizedLine>> read(
     Uint8List bytes,
