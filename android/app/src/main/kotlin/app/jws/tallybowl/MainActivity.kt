@@ -37,7 +37,7 @@ class MainActivity : FlutterActivity() {
             val regions = call.argument<List<Map<String, Number>>>("regions")
             imageExecutor.execute {
                 try {
-                    val lines = ScoreTextRecognizer.recognize(bytes, regions, call.argument<Number>("aspect")?.toDouble() ?: 1.0)
+                    val lines = ScoreTextRecognizer.recognize(bytes, regions, call.argument<Number>("aspect")?.toDouble() ?: 1.0, call.argument<Boolean>("context") ?: false)
                     runOnUiThread { result.success(lines) }
                 } catch (_: Exception) {
                     runOnUiThread { result.error("recognition", "This image could not be read. Try a clearer photo or enter frames manually.", null) }

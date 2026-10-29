@@ -253,18 +253,55 @@ abstract final class ScoreboardGrid {
   static Iterable<RecognizedLine> words(RecognizedLine line) => _words(line);
 
   static Iterable<RecognizedLine> _words(RecognizedLine line) {
-    if (line.elements.isNotEmpty) return line.elements;
+    if (line.elements.isNotEmpty) return line.elements.expand(_gridWords);
     final matches = RegExp(r'\S+').allMatches(line.text);
     return [
       for (final m in matches)
-        RecognizedLine(
-          text: m.group(0)!,
-          x: line.x + line.width * m.start / line.text.length,
-          y: line.y,
-          width: line.width * (m.end - m.start) / line.text.length,
-          height: line.height,
+        ..._gridWords(
+          RecognizedLine(
+            text: m.group(0)!,
+            x: line.x + line.width * m.start / line.text.length,
+            y: line.y,
+            width: line.width * (m.end - m.start) / line.text.length,
+            height: line.height,
+          ),
         ),
     ];
+  }
+
+  // A vertical cell border is sometimes attached to a number, or joins two
+  // neighboring cells into one OCR word. Preserve the observed symbols and
+  // their bounds while separating only that explicit delimiter.
+  static Iterable<RecognizedLine> _gridWords(RecognizedLine word) sync* {
+    if (!word.text.contains('|')) {
+      yield word;
+      return;
+    }
+    var group = <RecognizedLine>[];
+    RecognizedLine combined(List<RecognizedLine> symbols) {
+      final left = symbols.map((s) => s.x).reduce(math.min);
+      final top = symbols.map((s) => s.y).reduce(math.min);
+      return RecognizedLine(
+        text: symbols.map((s) => s.text).join(),
+        x: left,
+        y: top,
+        width: symbols.map((s) => s.x + s.width).reduce(math.max) - left,
+        height: symbols.map((s) => s.y + s.height).reduce(math.max) - top,
+        elements: List.unmodifiable(symbols),
+        confidence: word.confidence,
+        isStroke: word.isStroke,
+      );
+    }
+
+    for (final symbol in _symbols(word)) {
+      if (symbol.text == '|') {
+        if (group.isNotEmpty) yield combined(group);
+        group = [];
+      } else {
+        group.add(symbol);
+      }
+    }
+    if (group.isNotEmpty) yield combined(group);
   }
 
   static Iterable<RecognizedLine> symbols(RecognizedLine word) =>

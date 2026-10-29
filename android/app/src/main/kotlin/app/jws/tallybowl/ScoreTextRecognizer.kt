@@ -20,13 +20,14 @@ internal object ScoreTextRecognizer {
     private const val MAX_BYTES = 40 * 1024 * 1024
     private const val MAX_DIMENSION = 4096
 
-    fun recognize(bytes: ByteArray, requested: List<Map<String, Number>>?, aspect: Double = 1.0): List<Map<String, Any>> {
+    fun recognize(bytes: ByteArray, requested: List<Map<String, Number>>?, aspect: Double = 1.0, context: Boolean = false): List<Map<String, Any>> {
         require(bytes.size <= MAX_BYTES && aspect.isFinite() && aspect in 1.0..3.0)
         val bitmap = decodeUpright(bytes)
         val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
         try {
             val regions = requested ?: listOf(mapOf("x" to 0, "y" to 0, "width" to 1, "height" to 1))
             require(regions.size in 1..20)
+            require(!context || (requested != null && regions.size == 1))
             val output = mutableListOf<Map<String, Any>>()
             for (region in regions) {
                 val x = region["x"]!!.toDouble()
@@ -43,7 +44,7 @@ internal object ScoreTextRecognizer {
                 // Scoreboard fonts are often tall and condensed. A bounded
                 // horizontal normalization makes a cell legible without a
                 // language model or inferring deliveries from its total.
-                val input = if (requested == null) {
+                val input = if (requested == null || context) {
                     if (aspect == 1.0) crop else Bitmap.createScaledBitmap(crop, crop.width, max(1, (crop.height / aspect).toInt()), true)
                 } else Bitmap.createScaledBitmap(crop,
                     (crop.width.toDouble() / crop.height * 128 * 2.5).toInt().coerceIn(128, 640), 128, true)
@@ -66,7 +67,7 @@ internal object ScoreTextRecognizer {
                                 }) }
                         }))
                     }
-                    if (requested != null) for (stroke in DashStrokeDetector.find(crop)) {
+                    if (requested != null && !context) for (stroke in DashStrokeDetector.find(crop)) {
                         val mark = mapOf<String, Any>("text" to "-", "stroke" to true,
                             "x" to (left + stroke.left).toDouble() / bitmap.width,
                             "y" to (top + stroke.top).toDouble() / bitmap.height,

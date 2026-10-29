@@ -37,4 +37,4 @@ The build-11 baseline recovered **4/10 complete images on each engine**. The upd
 
 Private per-photo results, native observations, timings and diagnostics are under ignored `build/corpus12/`. TestFlight distribution status is recorded in [TESTFLIGHT.md](TESTFLIGHT.md).
 
-The [October 28 five-photo evaluation](FIVE_PHOTO_EVALUATION.md) tests build 12 on four additional unseen photos and the repeated 115-pin view. Both engines recover only the repeated view automatically; it records further recognition gaps separately from this development corpus.
+The [October 28 five-photo evaluation](FIVE_PHOTO_EVALUATION.md) preserves the build-12 baseline on four additional unseen photos and the repeated 115-pin view, followed by the recognition fix. The follow-up recovers all five exactly on both engines. Its combined 20-original rerun preserves every earlier exact result: Apple remains 9/10 complete in this twelve-photo set, while Android improves to 8/10 by recovering the 76-pin photo. The two incomplete games remain in review. The table and build-12 counts above are historical.

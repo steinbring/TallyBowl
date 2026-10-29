@@ -13,6 +13,7 @@ import '../domain/scoring.dart';
 import 'scoreboard_grid.dart';
 import 'frame_glyph_reader.dart';
 import 'score_parser.dart';
+import 'scoreboard_focus.dart';
 
 abstract final class PhotoService {
   static const maxPhotoBytes = 40 * 1024 * 1024;
@@ -71,7 +72,11 @@ abstract final class PhotoService {
     Future<List<RecognizedLine>> read({
       List<RecognitionRegion>? regions,
       double aspect = 1,
+      bool focus = false,
     }) async {
+      final context = focus && profile != null
+          ? ScoreboardFocus.region(fullReadings, profile)
+          : null;
       final output = await channel.invokeMethod<List<dynamic>>(
         'recognizeText',
         {
@@ -79,6 +84,10 @@ abstract final class PhotoService {
           if (aspect != 1) 'aspect': aspect,
           if (regions != null)
             'regions': regions.map((r) => r.toJson()).toList(),
+          if (context != null) ...{
+            'regions': [context.toJson()],
+            'context': true,
+          },
         },
       );
       final lines = (output ?? [])
@@ -121,6 +130,7 @@ abstract final class PhotoService {
     Future<List<RecognizedLine>> Function({
       List<RecognitionRegion>? regions,
       double aspect,
+      bool focus,
     })
     read,
     Uint8List bytes,
@@ -177,7 +187,7 @@ abstract final class PhotoService {
       // A pass can omit the bowler name or several headers, so a missing grid
       // is also a reason to try the remaining bounded full-image aspect pass.
       try {
-        final context = await read(aspect: 1.5);
+        final context = await read(aspect: 1.5, focus: true);
         if (ScoreSheetParser.automaticRow(
               ScoreSheetParser.rows(context, profile),
             ) !=
@@ -213,7 +223,10 @@ abstract final class PhotoService {
       // Both native engines can miss context that a bounded aspect pass keeps.
       var contextLines = <RecognizedLine>[];
       try {
-        contextLines = await read(aspect: 1.5);
+        contextLines = await read(
+          aspect: 1.5,
+          focus: regions.every((r) => r.width <= .05),
+        );
       } catch (_) {
         /* Optional retry. */
       }

@@ -15,17 +15,36 @@ import 'recognition/league_scoreboard_test.dart' show league80, league104;
 import 'recognition/scoreboard_grid_test.dart' show practiceFrames, checkpoints;
 
 void main() {
-  for (final score in [90, 89, 109, 80, 104]) {
+  for (final id in [
+    '90',
+    '89',
+    '109',
+    '80',
+    '104',
+    for (var i = 1; i <= 5; i++) 'extra5_${i.toString().padLeft(2, '0')}',
+  ]) {
+    final extraPath = id.startsWith('extra5_')
+        ? 'test/fixtures/extra5/case_${id.substring(7)}'
+        : null;
+    final extra = extraPath == null
+        ? null
+        : jsonDecode(File('${extraPath}_android.json').readAsStringSync())
+              as Map;
+    final score = extra == null
+        ? int.parse(id)
+        : (extra['cumulative'] as List).last as int;
     for (final resume in [false, true]) {
       testWidgets(
-        'game $score ${resume ? 'resumes photo draft' : 'imports photo'} with ten filled frame inputs and metadata',
+        'game $id ${resume ? 'resumes photo draft' : 'imports photo'} with ten filled frame inputs and metadata',
         (tester) async {
           await tester.runAsync(() async {
             tester.view.physicalSize = const Size(1440, 1800);
             tester.view.devicePixelRatio = 1;
             addTearDown(tester.view.resetPhysicalSize);
             addTearDown(tester.view.resetDevicePixelRatio);
-            final expectedFrames = score == 90
+            final expectedFrames = extra != null
+                ? (extra['frames'] as List).cast<String>()
+                : score == 90
                 ? practiceFrames
                 : score == 89
                 ? game89
@@ -35,7 +54,9 @@ void main() {
                 ? league80
                 : league104;
             final leagueName = score == 80 ? 'league_80_angled' : 'league_104';
-            final path = score == 90
+            final path = extraPath != null
+                ? '${Directory.current.path}/$extraPath.png'
+                : score == 90
                 ? '${Directory.current.path}/test/goldens/recap.png'
                 : score == 80 || score == 104
                 ? '${Directory.current.path}/test/fixtures/$leagueName.png'
@@ -72,8 +93,21 @@ void main() {
               PhotoService.channel,
               (call) async {
                 final args = call.arguments as Map;
+                if (extra != null) {
+                  final key = args['context'] == true
+                      ? 'focus${args['aspect'] ?? 1}'
+                      : args['regions'] == null
+                      ? 'a${args['aspect'] ?? 1}'
+                      : 'regional';
+                  final responses = extra['responses'] as Map;
+                  return responses[key] ??
+                      (key == 'a1.5' ? responses['focus1.5'] : null) ??
+                      [];
+                }
                 if (score == 80 || score == 104) {
-                  if (args['regions'] != null) return [];
+                  if (args['regions'] != null && args['context'] != true) {
+                    return [];
+                  }
                   final data = jsonDecode(
                     await File('test/fixtures/${leagueName}_android.json')
                         .readAsString(),
@@ -86,7 +120,7 @@ void main() {
                 }
                 final name = score != 90
                     ? 'practice_${score}_android'
-                    : args['regions'] == null
+                    : args['regions'] == null || args['context'] == true
                     ? 'monitor_geometry'
                     : 'monitor_cells';
                 return jsonDecode(

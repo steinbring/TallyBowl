@@ -1,6 +1,6 @@
 # Five-photo evaluation — October 28, 2026
 
-Tested the five supplied original 4000×3000 JPEGs against the unchanged **0.1.11 (12)** recognition source, revision **3a73227**. Expected deliveries were transcribed from the photographs before running recognition, then checked against all ten displayed cumulative scores using `TenPinScorer`.
+Initially tested the five supplied original 4000×3000 JPEGs against the unchanged **0.1.11 (12)** recognition source, revision **3a73227**. Expected deliveries were transcribed from the photographs before running recognition, then checked against all ten displayed cumulative scores using `TenPinScorer`. The baseline below is preserved; the subsequent fix and rerun are recorded at the end.
 
 ## Results
 
@@ -43,3 +43,21 @@ Apple checks used the production Swift Vision helper on this Mac, called from th
 The five Apple harness checks passed their scoring and native-call-bound assertions; recognition outcomes are reported above, including the four review cases. No recognition thresholds, app code or scoring rules were changed for this evaluation. Physical iPad/Samsung capture and installed TestFlight behavior were not tested. Device/OS OCR results can vary.
 
 Original images, native observations, expected scorecards and diagnostic outputs remain private under ignored `build/corpus5/`. The original photos and diagnostic entry points are excluded from Git and distribution artifacts. The normal verified build 12 was restored on the isolated emulator after testing. TestFlight remains build 12; this evaluation does not publish a new app version.
+
+## Recognition fix and original-photo rerun
+
+The `codex/focus-small-scoreboards` follow-up recovers **all ten exact frames and the scratch total in all five originals on both engines**. This includes the previously working 115-pin image. Apple checks call the production Swift Vision helper; Android checks run the complete production Flutter/native ML Kit pipeline on the isolated Android 17 emulator. Results compare `automaticRow`, every frame string and the independently transcribed scratch total, rather than counting partial recognition as success.
+
+| Original image | Apple Vision after fix | Android ML Kit after fix |
+| --- | --- | --- |
+| 20260920_150625.jpg | Exact, 98 | Exact, 98 |
+| 20260926_192151.jpg | Exact, 109 | Exact, 109 |
+| 20260929_193212.jpg | Exact, 107 scratch | Exact, 107 scratch |
+| 20261005_180009.jpg | Exact, 115 | Exact, 115 |
+| 20261003_173317.jpg | Exact, 107 | Exact, 107 |
+
+The failures combined small table/context loss, sparse stylized headers, border-merged numeric tokens, colored background decoration and a green tenth-frame strike. A bounded context crop, physical bright/dark ruling checks, explicit border separation and conservative ink masks address these cases. Native cell retries retain the earlier broadly supported header fit: changing a valid crop by only a few pixels caused Vision to omit a digit in an older 152-pin photo. The original-photo regression caught that problem before release. See [the recognition design and safeguards](FRAME_RECOGNITION.md).
+
+The combined rerun covers **20 unique originals: 18 complete and two incomplete**. Apple recovers **17/18 complete images**, preserving all earlier exact examples; its 114-pin image still requires review. Android recovers **16/18**, preserving earlier exact examples and additionally recovering the 76-pin image; its 112- and 103-pin images remain review cases. Both incomplete games remain unselected. **No incorrect automatic result was observed.** These tuned development photos are not an independent estimate of recognition accuracy.
+
+**207 Dart/widget tests pass and static analysis is clean.** Ten new anonymized engine fixtures and ten import/resume editor cases cover all five games; sparse-header, crop ambiguity and border handling have regression checks. An Android native integration test verifies context-crop coordinate reprojection and rejects a context request without an explicit region. Original names, photos and private diagnostics remain excluded from Git and normal app packages. Physical iPad/Samsung capture, OS-specific OCR variation and TestFlight installation acceptance remain separate checks. Current distribution status is recorded in [TESTFLIGHT.md](TESTFLIGHT.md).

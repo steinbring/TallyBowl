@@ -8,18 +8,18 @@ import Vision
 /// upright image and a top-left origin, matching the Android bridge.
 enum ScoreTextRecognition {
   static func recognize(
-    _ data: Data, regions: [[String: Double]]?, aspect: Double,
+    _ data: Data, regions: [[String: Double]]?, aspect: Double, context: Bool = false,
     completion: @escaping (Result<[[String: Any]], Error>) -> Void
   ) {
     DispatchQueue.global(qos: .userInitiated).async {
       let outcome: Result<[[String: Any]], Error> = Result {
-        try autoreleasepool { try read(data, regions: regions, aspect: aspect) }
+        try autoreleasepool { try read(data, regions: regions, aspect: aspect, context: context) }
       }
       DispatchQueue.main.async { completion(outcome) }
     }
   }
 
-  private static func read(_ data: Data, regions: [[String: Double]]?, aspect: Double) throws
+  private static func read(_ data: Data, regions: [[String: Double]]?, aspect: Double, context: Bool) throws
     -> [[String: Any]]
   {
     guard data.count <= 40 * 1024 * 1024, aspect.isFinite, (1...3).contains(aspect),
@@ -33,7 +33,9 @@ enum ScoreTextRecognition {
         ] as CFDictionary)
     else { throw failure() }
     let areas = regions ?? [["x": 0, "y": 0, "width": 1, "height": 1]]
-    guard !areas.isEmpty, areas.count <= 20 else { throw failure() }
+    guard !areas.isEmpty, areas.count <= 20,
+      !context || (regions != nil && areas.count == 1)
+    else { throw failure() }
     let expression = try NSRegularExpression(pattern: "\\S+")
     var lines: [[String: Any]] = []
     for area in areas {
@@ -51,10 +53,10 @@ enum ScoreTextRecognition {
       var header = 0
       var displayHeight = crop.height
       if regions != nil || aspect != 1 {
-        header = regions == nil ? 0 : 48
-        displayHeight = regions == nil ? max(1, Int(Double(crop.height) / aspect)) : 128
+        header = regions == nil || context ? 0 : 48
+        displayHeight = regions == nil || context ? max(1, Int(Double(crop.height) / aspect)) : 128
         let width =
-          regions == nil
+          regions == nil || context
           ? crop.width
           : min(640, max(128, Int(Double(crop.width) / Double(crop.height) * 128 * 2.5)))
         guard
@@ -119,7 +121,7 @@ enum ScoreTextRecognition {
         line["elements"] = words
         lines.append(line)
       }
-      if regions != nil {
+      if regions != nil && !context {
         for stroke in dashStrokes(crop) {
           let mark: [String: Any] = [
             "text": "-", "stroke": true, "x": (rect.minX + stroke.minX) / Double(image.width),
