@@ -1,5 +1,22 @@
 # TestFlight readiness and release runbook
 
+## 0.1.12 (13): small and stylized scoreboards
+
+Recognition source **c4be3dc** adds bounded local context crops, independently confirmed sparse-header geometry, bright/dark ruling hypotheses, colored ink recovery and explicit OCR border separation. All five latest original photos fill every frame and scratch total exactly on both engines, including the repeated 115-pin regression. The combined original-photo check recovers 17/18 complete Apple images and 16/18 Android images, preserves all previous exact results and leaves two incomplete games unselected. No incorrect automatic result was observed. **207 Dart/widget tests pass; static analysis is clean.** The Android native context-coordinate integration test also passes. See [results and limits](FIVE_PHOTO_EVALUATION.md).
+
+**Both iPad and native Mac 0.1.12 (13) are Testing in Owner testing.** Both uploads processed successfully, export compliance is cleared with the previously approved standard-encryption answer and France exclusion, and testing notes are saved. Both are assigned to External testing and show **Waiting for Review**, with automatic tester notification enabled. External access to build 13 awaits Apple approval; earlier working builds remain available. Verified in App Store Connect on October 28, 2026, at approximately 8:32 PM Central.
+
+| Evidence | Result |
+| --- | --- |
+| iPad ASC build | `052fcd97-c831-4e07-8c44-360451c1fe7c`, owner Testing; external Waiting for Review |
+| Native Mac ASC build | `4f0ba8e8-873c-4094-a640-28a70a875af7`, owner Testing; external Waiting for Review |
+| Source | Recognition `c4be3dc`; version `ba909cb`; later documentation-only revisions do not alter the binaries |
+| Apple artifacts | Normal `lib/main.dart`; iPad release IPA and universal native Mac package; both archive/content and exported certificate/profile checks pass; Mac installer chain verified |
+| Android artifact | `build/releases/TallyBowl-0.1.12-android-debug.apk`, normal entry point and unchanged owner development signer; installed/launched on isolated emulator only |
+| Regression evidence | 207 tests, clean static analysis, native original-photo checks, ten added anonymized engine fixtures and ten added import/resume editor cases |
+
+Private release records, SHA-256 hashes, signing reports and upload logs are under ignored `build/testflight/build-13/`. Original photos and diagnostic entry points stay under ignored `build/corpus5/` and are excluded from distribution packages. No physical camera, recipient-app or new physical owner-installation acceptance is claimed by these checks. The sections below preserve their earlier release status.
+
 ## 0.1.11 (12): expanded photo corpus
 
 Recognition source **d7236e6** adds slanted ruling calibration, a bounded retry for missing text grids, same-position native corroboration and physical delivery ordering. **179 tests pass; static analysis is clean.** The twelve added originals recover every delivery in 9/10 complete Apple examples and 7/10 Android examples. Both incomplete-game photos require review; no incorrect automatic original-image result was observed. See [the exact per-photo results and limitations](PHOTO_CORPUS_RESULTS.md).
