@@ -24,7 +24,7 @@ void main() {
             .setMockMethodCallHandler(PhotoService.channel, (call) async {
               final args = call.arguments as Map;
               calls.add(args);
-              if (args['regions'] != null) {
+              if (args['regions'] != null && args['context'] != true) {
                 return fixture(apple ? 'apple_cells' : 'monitor_cells');
               }
               if (args['aspect'] == 1.5) return fixture('apple_context');
@@ -50,7 +50,9 @@ void main() {
         expect(ScoreSheetParser.automaticRow(rows), same(row));
         expect(calls.length, lessThanOrEqualTo(4));
         expect(
-          calls.where((c) => c['regions'] != null).single['regions'],
+          calls
+              .where((c) => c['regions'] != null && c['context'] != true)
+              .single['regions'],
           hasLength(apple ? 7 : 2),
         );
       },
@@ -60,7 +62,7 @@ void main() {
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(PhotoService.channel, (call) async {
           final args = call.arguments as Map;
-          if (args['regions'] != null) {
+          if (args['regions'] != null && args['context'] != true) {
             return fixture('monitor_cells')
                 .where((v) => v['stroke'] != true)
                 .toList();
@@ -82,7 +84,8 @@ void main() {
   test('failed regional reading preserves original marks for review', () async {
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(PhotoService.channel, (call) async {
-          if ((call.arguments as Map)['regions'] != null) {
+          if ((call.arguments as Map)['regions'] != null &&
+              (call.arguments as Map)['context'] != true) {
             throw PlatformException(code: 'recognition');
           }
           return fixture('monitor_geometry');

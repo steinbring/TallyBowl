@@ -22,7 +22,7 @@ class MainFlutterWindow: NSWindow {
         guard let args = call.arguments as? [String: Any], let bytes = args["bytes"] as? FlutterStandardTypedData else {
           result(FlutterError(code: "invalid_image", message: "Select an image first.", details: nil)); return
         }
-        recognizeScoreText(bytes.data, regions: args["regions"] as? [[String: Double]], aspect: args["aspect"] as? Double ?? 1, result: result)
+        recognizeScoreText(bytes.data, regions: args["regions"] as? [[String: Double]], aspect: args["aspect"] as? Double ?? 1, context: args["context"] as? Bool ?? false, result: result)
       case "capturePhoto":
         guard let self = self else { result(nil); return }
         AVCaptureDevice.requestAccess(for: .video) { granted in
@@ -46,8 +46,8 @@ class MainFlutterWindow: NSWindow {
   }
 }
 
-private func recognizeScoreText(_ data: Data, regions: [[String: Double]]?, aspect: Double, result: @escaping FlutterResult) {
-  ScoreTextRecognition.recognize(data, regions: regions, aspect: aspect) { outcome in
+private func recognizeScoreText(_ data: Data, regions: [[String: Double]]?, aspect: Double, context: Bool, result: @escaping FlutterResult) {
+  ScoreTextRecognition.recognize(data, regions: regions, aspect: aspect, context: context) { outcome in
     switch outcome {
     case .success(let lines): result(lines)
     case .failure: result(FlutterError(code:"recognition",message:"This image could not be read. Try a clearer photo or enter the frames manually.",details:nil))

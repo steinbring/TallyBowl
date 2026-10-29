@@ -150,4 +150,60 @@ void main() {
       codec.dispose();
     },
   );
+  test('duplicated sparse headers require physical ruling evidence', () async {
+    final recorder = ui.PictureRecorder();
+    ui.Canvas(recorder).drawColor(const ui.Color(0xFF163450), ui.BlendMode.src);
+    final picture = recorder.endRecording();
+    final image = await picture.toImage(1000, 500);
+    final png = (await image.toByteData(format: ui.ImageByteFormat.png))!.buffer
+        .asUint8List();
+    final lines = [
+      const RecognizedLine(
+        text: 'Bowler',
+        x: .01,
+        y: .36,
+        width: .11,
+        height: .08,
+      ),
+      for (final i in [0, 5, 9])
+        for (final offset in [0.0, .005])
+          RecognizedLine(
+            text: '${i + 1}',
+            x: .2 + i * .06 + offset,
+            y: .2,
+            width: .002,
+            height: .025,
+          ),
+      for (var i = 0; i < 10; i++) ...[
+        RecognizedLine(
+          text: '9-',
+          x: .18 + i * .06,
+          y: .28,
+          width: .04,
+          height: .04,
+        ),
+        RecognizedLine(
+          text: '${(i + 1) * 9}',
+          x: .19 + i * .06,
+          y: .43,
+          width: .03,
+          height: .04,
+        ),
+      ],
+      const RecognizedLine(text: '90', x: .85, y: .36, width: .06, height: .08),
+    ];
+    try {
+      expect(
+        await FrameGlyphReader.read(
+          png,
+          lines,
+          const BowlerProfile(name: 'Bowler'),
+        ),
+        isEmpty,
+      );
+    } finally {
+      image.dispose();
+      picture.dispose();
+    }
+  });
 }

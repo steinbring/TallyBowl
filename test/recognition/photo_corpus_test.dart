@@ -35,7 +35,7 @@ void main() {
               .setMockMethodCallHandler(PhotoService.channel, (call) async {
                 calls++;
                 final args = call.arguments as Map;
-                final key = args['regions'] == null
+                final key = args['regions'] == null || args['context'] == true
                     ? 'a${args['aspect'] ?? 1}'
                     : 'regional';
                 return (fixture['responses'] as Map)[key] ?? [];
@@ -54,7 +54,7 @@ void main() {
             ScoreSheetParser.rows(lines, profile),
           );
           if (fixture['complete'] == false ||
-              (platform == 'apple' ? [12] : [4, 7]).contains(number)) {
+              (platform == 'apple' ? [12] : [4]).contains(number)) {
             expect(
               row,
               isNull,

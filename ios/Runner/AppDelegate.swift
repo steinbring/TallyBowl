@@ -22,7 +22,8 @@ import UIKit
       }
       let regions = args["regions"] as? [[String: Double]]
       let aspect = args["aspect"] as? Double ?? 1
-      ScoreTextRecognition.recognize(bytes.data, regions: regions, aspect: aspect) { outcome in
+      ScoreTextRecognition.recognize(bytes.data, regions: regions, aspect: aspect,
+        context: args["context"] as? Bool ?? false) { outcome in
         switch outcome {
         case .success(let lines): result(lines)
         case .failure: result(FlutterError(code:"recognition",message:"This image could not be read. Try a clearer photo or enter the frames manually.",details:nil))
