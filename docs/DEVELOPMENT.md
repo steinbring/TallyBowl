@@ -1,8 +1,8 @@
 # TallyBowl! development status
 
-Updated October 27, 2026. Candidate **0.1.11 (12)** fixes angled multi-bowler league boards, right-aligned headers, rounded misses, duplicate OCR blocks and separate scratch/handicap totals. **179 Flutter tests pass**, static analysis is clean, and all four original league photos produce exact observed deliveries and scratch totals 104/80 through local Apple Vision and actual Android ML Kit. Anonymized fixtures retain two rows and both engines' observations; import/resume tests cover ten filled inputs and saved metadata. The additional twelve-photo evaluation and per-engine review cases are recorded in [photo results](PHOTO_CORPUS_RESULTS.md). See [recognition](FRAME_RECOGNITION.md) for validation rules and limits.
+Updated October 28, 2026. Beta **0.1.12 (13)** adds bounded context crops for small tables, physically confirmed sparse-header grids, bright rulings, colored strike ink and explicit OCR border separation. **207 Flutter tests pass**, static analysis is clean, and an Android native context-coordinate integration test passes. All five latest original photos fill every frame and scratch total exactly on both engines. Across 20 unique originals (18 complete, two incomplete), Apple fills 17/18 complete and Android 16/18, preserving previous exact examples. Neither engine automatically completes the unfinished games; no incorrect automatic result was observed. See [the five-photo follow-up](FIVE_PHOTO_EVALUATION.md) and [recognition](FRAME_RECOGNITION.md) for evidence and limits.
 
-Signed build-12 iPad and native Mac uploads processed successfully; both are **Testing** in the owner group and **Waiting for Review** in the external group, with testing notes and automatic notification saved. Normal Android build 12 was built and smoke-launched on the isolated emulator. The last verified Samsung installation is 0.1.9 (10); the last verified local Mac/iPad installations are 0.1.7 (8). Current external/owner assignment and signing evidence are recorded in the [TestFlight release record](TESTFLIGHT.md). Physical Google Chat acceptance, Apple TestFlight installation and public privacy-policy hosting remain open. Results below retain their original build labels.
+Signed build-13 iPad and native Mac uploads processed successfully. Both are **Testing** in Owner testing and **Waiting for Review** in External testing, with saved testing notes and automatic notification. The normal Android build 13 was built and smoke-launched on the isolated emulator. No new physical owner installation is claimed by these checks. Current assignments and signing evidence are recorded in [TESTFLIGHT.md](TESTFLIGHT.md). Physical Google Chat acceptance, camera workflows and public privacy-policy hosting remain open. Results below retain their historical build labels.
 
 ## Feature branches
 
@@ -58,6 +58,9 @@ Features are committed on `codex/` branches and merged locally into `main`. The 
 | `codex/testflight-0-1-10` | Build 11 packages, signing verification and owner/external TestFlight update |
 | `codex/score-photo-corpus` | Twelve-photo native regression corpus, tilted grid calibration, bounded retries and physical delivery ordering |
 | `codex/testflight-0-1-11` | Build 12 packages, distribution signing checks and owner/external TestFlight update |
+| `codex/five-photo-evaluation` | Unchanged build-12 baseline on five more original scoreboards |
+| `codex/focus-small-scoreboards` | Local context crops, sparse/stylized grids, colored ink and five-photo regressions |
+| `codex/testflight-0-1-12` | Build 13 packages, signing checks and owner/external TestFlight update |
 
 The completed stack is integrated into local `main` after verification. Feature branches are retained. All work is local until explicitly pushed to the remote repository.
 

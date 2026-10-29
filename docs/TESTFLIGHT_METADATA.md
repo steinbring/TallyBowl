@@ -1,6 +1,6 @@
 # TestFlight metadata
 
-Current beta: **0.1.11 (12)**. Both iPad and native Mac uploads processed successfully. Both show **Testing** in Owner testing and **Waiting for Review** in External testing; automatic tester notification is enabled. The existing external group contains the two requested email testers. Build-specific testing notes, beta description, feedback email and private reviewer contact/instructions are saved in App Store Connect; sign-in is marked as not required. See the [runbook](TESTFLIGHT.md) for current external-review and installation status.
+Current beta: **0.1.12 (13)**. Both iPad and native Mac uploads processed successfully. Both show **Testing** in Owner testing and **Waiting for Review** in External testing; automatic tester notification is enabled. The existing external group contains the two requested email testers. Build-specific testing notes, beta description, feedback email and private reviewer contact/instructions are saved in App Store Connect; sign-in is marked as not required. See the [runbook](TESTFLIGHT.md) for current external-review and installation status.
 
 ## Public contact and remaining account fields
 
@@ -21,7 +21,7 @@ This beta stores your journal locally, has no login or subscription, and include
 
 ## What to test
 
-Build 0.1.11 (12) additionally improves tilted rulings, missing-grid retries, native corroboration and physical delivery order. The twelve added originals recover 9/10 complete images on Apple and 7/10 on Android; the remainder and two incomplete games require review. Four original league photos produce every exact frame and scratch totals 104 and 80 through both local Apple Vision and Android ML Kit. Earlier practice regressions remain covered. These examples do not establish general recognition accuracy.
+Build 0.1.12 (13) improves small tables, sparse stylized headers, border-merged numbers, bright rulings and colored strikes. All five latest original photos fill exactly on both engines. The combined 20-original rerun preserves previous exact examples: 17/18 complete on Apple and 16/18 on Android, with two incomplete games left for review and no incorrect automatic result observed. These tuned development examples do not establish general recognition accuracy. See [the per-photo follow-up](FIVE_PHOTO_EVALUATION.md).
 
 - Add scoreboard aliases, two balls and an alley; try both suggestions and manual entry.
 - Start practice or league, capture/import a final scoreboard, verify the correct bowler and all ten frames, select balls/primary ball, lane and notes, then save.
