@@ -20,9 +20,14 @@ Research did not identify a documented, maintained public bowling-ball catalog A
 
 Do not turn retail pages, undocumented store endpoints, or a PDF approval list into a scraping dependency. A future public JSON catalog at tallybowl.jws.app could provide key-free updates, once its data source and redistribution rights are settled. Ball suggestions must allow custom, old, and regional models and must not be presented as tournament eligibility or purchasing advice.
 
-The initial implementation bundles a deliberately small, manually selected set of 11 manufacturer/brand names and 22 model names. Suggestions also include the owner's previously entered brands and models, including retired equipment. Choosing a model fills its manufacturer; both fields remain editable. No catalog request leaves the device. The list is incomplete and not a current-stock or eligibility list; surface, weight, color, and custom notes remain the owner's entries.
+The offline catalog contains 11 manufacturer/brand names and 85 model names: the original 22 selected models plus 50 current Brunswick and 13 current Radical names checked on October 30, 2026. Suggestions also include the owner's previously entered brands and models, including retired equipment. Choosing a model fills its manufacturer; both fields remain editable. No catalog request leaves the device. This is a dated name snapshot, not a live stock or eligibility list. Weight, optional basic color, surface and notes remain the owner's entries.
 
-Name-only starter references checked October 23, 2026 (no automated collection or copied descriptions/images/specifications):
+Current-name expansion checked October 30, 2026, from the official product listings at the owner's request (names only; no descriptions, images, prices or specifications are bundled):
+
+- [Brunswick Current](https://brunswickbowling.com/products/balls/current): 50 distinct products across [page 2](https://brunswickbowling.com/products/balls/current/p2), [page 3](https://brunswickbowling.com/products/balls/current/p3) and [page 4](https://brunswickbowling.com/products/balls/current/p4), including the first page. The named color variants, polyester balls and Viz-A-Ball designs are included. The earlier generic Rhino and Mesmerize suggestions remain available.
+- [Radical Current](https://radicalbowling.com/products/balls/current): 13 products. The owner-supplied [All Balls](https://radicalbowling.com/products/balls) listing also includes retired models; those were excluded from the current expansion.
+
+Original name-only starter references checked October 23, 2026:
 
 - [Storm/SPI buyer's guide](https://www.stormbowling.com/bowling-ball-buyers-guide): selected Storm, Roto Grip, and 900 Global names.
 - [Hammer Black Widow 3.0](https://hammerbowling.com/products/black-widow-3-0): Black Widow 3.0 and the referenced 2.0 Hybrid.
@@ -31,7 +36,7 @@ Name-only starter references checked October 23, 2026 (no automated collection o
 - [Brunswick ball lineup](https://brunswickbowling.com/products/balls/p2?sort=newest) and [Brunswick's registered products](https://www.pba.com/registered-products/brunswick): Rhino and Mesmerize.
 - [DV8 Trouble Maker](https://dv8bowling.com/products/balls/retired/trouble-maker).
 - [Track Cypher](https://trackbowling.com/products/cypher) and [Cyborg](https://trackbowling.com/products/cyborg).
-- [Radical](https://radicalbowling.com/) and [Columbia 300](https://columbia300.com/): brand suggestions; no bundled models yet.
+- [Columbia 300](https://columbia300.com/): brand-only suggestion.
 
 Manufacturer suggestions are derived from the starter models plus explicit brand-only entries. Tests check that brands/models are nonempty, unique, and consistent. Keep this reference list and `BallCatalog.starter` in sync when adding manually verified names. Do not imply endorsement or manufacturer affiliation.
 

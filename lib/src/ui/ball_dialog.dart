@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../app_controller.dart';
 import '../data/ball_catalog.dart';
 import '../domain/models.dart';
+import 'ball_color.dart';
 import 'catalog_autocomplete.dart';
 
 class BallDialog extends StatefulWidget {
@@ -19,6 +20,7 @@ class _BallDialogState extends State<BallDialog> {
   late final TextEditingController _brand, _name, _weight, _notes;
   late final String _id;
   bool _retired = false, _saving = false;
+  BallColor? _color;
   String? _error;
   @override
   void initState() {
@@ -30,6 +32,7 @@ class _BallDialogState extends State<BallDialog> {
     _weight = TextEditingController(text: (ball?.weight ?? 15).toString());
     _notes = TextEditingController(text: ball?.notes);
     _retired = ball?.retired ?? false;
+    _color = ball?.color;
   }
 
   @override
@@ -57,6 +60,7 @@ class _BallDialogState extends State<BallDialog> {
           weight: double.parse(_weight.text),
           notes: _notes.text.trim(),
           retired: _retired,
+          color: _color,
         ),
       );
       if (mounted) {
@@ -90,7 +94,7 @@ class _BallDialogState extends State<BallDialog> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text(
-                  'Offline starter suggestions. Enter any manufacturer or model, including older balls.',
+                  'Offline suggestions. Enter any manufacturer or model, including older balls.',
                 ),
                 const SizedBox(height: 16),
                 CatalogAutocomplete<String>(
@@ -141,6 +145,26 @@ class _BallDialogState extends State<BallDialog> {
                         ? 'Use a weight greater than 0 and up to 16 lb.'
                         : null;
                   },
+                ),
+                const SizedBox(height: 16),
+                DropdownButtonFormField<BallColor>(
+                  initialValue: _color,
+                  isExpanded: true,
+                  hint: const Text('Not set'),
+                  decoration: const InputDecoration(
+                    labelText: 'Color (optional)',
+                  ),
+                  items: [
+                    const DropdownMenuItem<BallColor>(child: Text('Not set')),
+                    for (final color in BallColor.values)
+                      DropdownMenuItem(
+                        value: color,
+                        child: BallColorLabel(color),
+                      ),
+                  ],
+                  onChanged: _saving
+                      ? null
+                      : (value) => setState(() => _color = value),
                 ),
                 const SizedBox(height: 16),
                 TextField(

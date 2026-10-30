@@ -84,6 +84,48 @@ void main() {
     );
     expect((await store.load()).games.single.score, 90);
   });
+  test('ball colors survive database, backup and color removal', () async {
+    for (final color in BallColor.values) {
+      final data = sample().copyWith(
+        balls: [BowlingBall(id: 'b1', name: 'My ball', color: color)],
+      );
+      await store.save(data);
+      final loaded = await store.load();
+      expect(loaded.balls.single.color, color);
+      expect(
+        BowlStore.readBackup(store.backup(loaded)).balls.single.color,
+        color,
+      );
+    }
+    final legacy = sample(); // Its JSON has no optional color field.
+    expect(legacy.balls.single.toJson().containsKey('color'), isFalse);
+    final oldBackup = BowlStore.readBackup(BowlStore.encodeBackup(legacy));
+    expect(oldBackup.balls.single.color, isNull);
+    await store.save(oldBackup);
+    expect((await store.load()).balls.single.color, isNull);
+    expect((await store.load()).games.single.score, 90);
+  });
+  test(
+    'backup rejects unsupported ball colors without changing the journal',
+    () async {
+      await store.save(sample());
+      for (final invalid in [
+        'magenta sparkle',
+        42,
+        ['blue'],
+      ]) {
+        final data = sample().toJson();
+        (data['balls'] as List).first['color'] = invalid;
+        expect(
+          () => BowlStore.readBackup(
+            jsonEncode({'format': 'tallybowl', 'version': 1, 'data': data}),
+          ),
+          throwsFormatException,
+        );
+      }
+      expect((await store.load()).toJson(), sample().toJson());
+    },
+  );
   test(
     'backup rejects broken references, incomplete games and future formats',
     () {
