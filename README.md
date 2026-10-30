@@ -17,6 +17,7 @@ The current beta is **0.1.13 (14)**, developed and published by **Joe Steinbring
 - Branded PNG recaps, privacy switches, native image sharing and export.
 - Local SQLite storage, versioned JSON backups with before-restore recovery, and game/delivery CSV exports.
 - System light/dark appearance, scalable layouts, accessible scorecard labels, offline help/privacy pages, and installed version/build in Settings.
+- Settings links to TallyBowl!'s [Bluesky](https://bsky.app/profile/tallybowl.jws.app) and [GoToSocial](https://jws.social/@tallybowl) profiles (added after build 14; included in the next build).
 
 There is no cloud AI fallback, account, automatic sync, or iPhone target. Real-photo regression coverage includes the [twelve-photo evaluation](docs/PHOTO_CORPUS_RESULTS.md) alongside the earlier monitor examples. All four original October 27 league photos remain exact through local Apple Vision and Android ML Kit. Always compare every delivery before saving. Multi-photo combining, crop/rotation tools, handicap scoring, and per-delivery ball assignment are deferred. Android ML Kit may send SDK diagnostics to Google; map/search providers receive requests. See the [privacy policy](docs/PRIVACY_POLICY.md).
 

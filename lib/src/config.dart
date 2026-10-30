@@ -5,6 +5,10 @@ abstract final class AppConfig {
   static const tagline = 'How you bowled, tonight.';
   static const website = 'https://tallybowl.jws.app';
   static const websiteLabel = 'tallybowl.jws.app';
+  static const blueskyUrl = 'https://bsky.app/profile/tallybowl.jws.app';
+  static const blueskyHandle = '@tallybowl.jws.app';
+  static const goToSocialUrl = 'https://jws.social/@tallybowl';
+  static const goToSocialHandle = '@tallybowl@jws.social';
   // Development tile service. Select production hosting before release.
   static const tileUrl = String.fromEnvironment(
     'TALLYBOWL_TILE_URL',

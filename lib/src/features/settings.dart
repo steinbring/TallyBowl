@@ -53,6 +53,15 @@ class _ProfileSettingsState extends State<ProfileSettings> {
     }
   }
 
+  Future<void> _openLink(String url) => _run(() async {
+    if (!await launchUrl(
+      Uri.parse(url),
+      mode: LaunchMode.externalApplication,
+    )) {
+      throw StateError('Could not open the link.');
+    }
+  });
+
   Future<void> _export(BuildContext buttonContext, String type) async {
     final data = widget.controller.data;
     final today = DateTime.now().toIso8601String().substring(0, 10);
@@ -351,15 +360,29 @@ class _ProfileSettingsState extends State<ProfileSettings> {
                           ),
                         ),
                         TextButton.icon(
-                          onPressed: () => _run(() async {
-                            if (!await launchUrl(
-                              Uri.parse(AppConfig.website),
-                            )) {
-                              throw StateError('Could not open the website.');
-                            }
-                          }),
+                          onPressed: _busy
+                              ? null
+                              : () => _openLink(AppConfig.website),
                           icon: const Icon(Icons.open_in_new_rounded, size: 16),
                           label: const Text(AppConfig.websiteLabel),
+                        ),
+                        ListTile(
+                          leading: const Icon(Icons.public),
+                          title: const Text('TallyBowl! on GoToSocial'),
+                          subtitle: const Text(AppConfig.goToSocialHandle),
+                          trailing: const Icon(Icons.open_in_new_rounded),
+                          onTap: _busy
+                              ? null
+                              : () => _openLink(AppConfig.goToSocialUrl),
+                        ),
+                        ListTile(
+                          leading: const Icon(Icons.cloud_outlined),
+                          title: const Text('TallyBowl! on Bluesky'),
+                          subtitle: const Text(AppConfig.blueskyHandle),
+                          trailing: const Icon(Icons.open_in_new_rounded),
+                          onTap: _busy
+                              ? null
+                              : () => _openLink(AppConfig.blueskyUrl),
                         ),
                         TextButton(
                           onPressed: () => showLicensePage(
