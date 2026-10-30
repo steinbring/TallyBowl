@@ -11,6 +11,31 @@ class BowlerProfile {
   );
 }
 
+enum BallColor {
+  black('Black'),
+  white('White'),
+  gray('Gray'),
+  red('Red'),
+  orange('Orange'),
+  yellow('Yellow'),
+  green('Green'),
+  blue('Blue'),
+  purple('Purple'),
+  pink('Pink'),
+  brown('Brown');
+
+  const BallColor(this.label);
+  final String label;
+
+  static BallColor? fromJson(Object? value) {
+    if (value == null) return null;
+    for (final color in values) {
+      if (color.name == value) return color;
+    }
+    throw const FormatException('Unsupported ball color.');
+  }
+}
+
 class BowlingBall {
   const BowlingBall({
     required this.id,
@@ -19,10 +44,12 @@ class BowlingBall {
     this.weight = 15,
     this.notes = '',
     this.retired = false,
+    this.color,
   });
   final String id, name, brand, notes;
   final double weight;
   final bool retired;
+  final BallColor? color;
   Map<String, dynamic> toJson() => {
     'id': id,
     'name': name,
@@ -30,6 +57,7 @@ class BowlingBall {
     'weight': weight,
     'notes': notes,
     'retired': retired,
+    if (color != null) 'color': color!.name,
   };
   factory BowlingBall.fromJson(Map<String, dynamic> j) => BowlingBall(
     id: j['id'] as String,
@@ -38,6 +66,7 @@ class BowlingBall {
     weight: (j['weight'] as num).toDouble(),
     notes: j['notes'] as String,
     retired: j['retired'] as bool,
+    color: BallColor.fromJson(j['color']),
   );
 }
 

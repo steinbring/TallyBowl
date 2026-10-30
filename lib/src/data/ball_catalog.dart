@@ -6,16 +6,89 @@ class BallModelSuggestion {
   String get label => '$brand · $name';
 }
 
-/// Small, manually maintained name-only starter list. See DATA_SOURCES.md for
-/// first-party references. No prices, product claims, images or scraped feed.
+/// Offline name-only suggestions. Current Brunswick/Radical lists were checked
+/// against their official catalogs on 2026-10-30; see DATA_SOURCES.md.
+/// Older starter and owned/custom models remain available. No runtime feed.
 abstract final class BallCatalog {
   // Brands represented by models are derived, so the two lists cannot drift.
-  static const additionalBrands = ['Columbia 300', 'Radical'];
+  static const additionalBrands = ['Columbia 300'];
   static final List<String> brands = List.unmodifiable(
     {...starter.map((model) => model.brand), ...additionalBrands}.toList()
       ..sort(),
   );
+  // https://brunswickbowling.com/products/balls/current (50 models, checked 2026-10-30).
+  static const brunswickCurrent = [
+    BallModelSuggestion('Brunswick', 'Alert'),
+    BallModelSuggestion('Brunswick', 'Butterflies'),
+    BallModelSuggestion('Brunswick', 'Combat Hybrid'),
+    BallModelSuggestion('Brunswick', 'Combat Solid'),
+    BallModelSuggestion('Brunswick', 'Crown 78U'),
+    BallModelSuggestion('Brunswick', 'Crown Victory Pearl'),
+    BallModelSuggestion('Brunswick', 'Danger Zone'),
+    BallModelSuggestion('Brunswick', 'Danger Zone Purple Ice'),
+    BallModelSuggestion('Brunswick', 'Flaming Skull'),
+    BallModelSuggestion('Brunswick', 'Fury - Emerald / Black'),
+    BallModelSuggestion('Brunswick', 'Fury - Orange / Red'),
+    BallModelSuggestion('Brunswick', 'Fury - Pink / Ice / Silver'),
+    BallModelSuggestion('Brunswick', 'Fury - Purple / Blue'),
+    BallModelSuggestion('Brunswick', 'Fury - Red / Blue / Black'),
+    BallModelSuggestion('Brunswick', 'Hearts'),
+    BallModelSuggestion('Brunswick', 'Infinity Quest Pearl'),
+    BallModelSuggestion('Brunswick', 'Lizard Eye'),
+    BallModelSuggestion('Brunswick', 'Paint Splatter'),
+    BallModelSuggestion('Brunswick', 'Purple Rhino Pro'),
+    BallModelSuggestion('Brunswick', 'Retro Flowers'),
+    BallModelSuggestion('Brunswick', 'Rhino - Blue / Cadet Grey / Silver'),
+    BallModelSuggestion('Brunswick', 'Rhino - Carbon / Lime / Silver'),
+    BallModelSuggestion('Brunswick', 'Rhino - Purple / Black'),
+    BallModelSuggestion('Brunswick', 'Rhino - Purple / Pink / Berry'),
+    BallModelSuggestion('Brunswick', 'Rhino - Red / Black / Gold Pearl'),
+    BallModelSuggestion('Brunswick', 'Sea Turtle'),
+    BallModelSuggestion('Brunswick', 'Shark'),
+    BallModelSuggestion('Brunswick', 'Smiley Face'),
+    BallModelSuggestion('Brunswick', 'Stars and Stripes'),
+    BallModelSuggestion('Brunswick', 'Strategy'),
+    BallModelSuggestion('Brunswick', 'Strategy Logic'),
+    BallModelSuggestion('Brunswick', 'Team Brunswick White'),
+    BallModelSuggestion('Brunswick', 'Tie-Dye Burst'),
+    BallModelSuggestion('Brunswick', 'Tiger'),
+    BallModelSuggestion('Brunswick', 'TZone - Berry Blast'),
+    BallModelSuggestion('Brunswick', 'TZone - Black / Purple / Silver'),
+    BallModelSuggestion('Brunswick', 'TZone - Caribbean Blue'),
+    BallModelSuggestion('Brunswick', 'TZone - Deep Space'),
+    BallModelSuggestion('Brunswick', 'TZone - Frozen Bliss'),
+    BallModelSuggestion('Brunswick', 'TZone - Indigo Swirl'),
+    BallModelSuggestion('Brunswick', 'TZone - Night Sky'),
+    BallModelSuggestion('Brunswick', 'TZone - Ocean Reef'),
+    BallModelSuggestion('Brunswick', 'TZone - Peek-A-Boo Berry'),
+    BallModelSuggestion('Brunswick', 'TZone - Scarlet / Gold / Black'),
+    BallModelSuggestion('Brunswick', 'TZone - Scarlet Shadow'),
+    BallModelSuggestion('Brunswick', 'TZone - Wild Orchid'),
+    BallModelSuggestion('Brunswick', 'Unicorn'),
+    BallModelSuggestion('Brunswick', 'Warning Alert'),
+    BallModelSuggestion('Brunswick', 'White Ball'),
+    BallModelSuggestion('Brunswick', 'World'),
+  ];
+  // https://radicalbowling.com/products/balls/current (13 models, checked 2026-10-30).
+  static const radicalCurrent = [
+    BallModelSuggestion('Radical', 'Deep Impact'),
+    BallModelSuggestion('Radical', 'Evil Eye'),
+    BallModelSuggestion('Radical', 'Evil Eye Pearl'),
+    BallModelSuggestion('Radical', 'Guru Oracle Pearl'),
+    BallModelSuggestion('Radical', 'Intel Recon Hybrid'),
+    BallModelSuggestion('Radical', 'Intel Tour'),
+    BallModelSuggestion('Radical', 'No Doubt Hybrid'),
+    BallModelSuggestion('Radical', 'Outer Limits Black Hole'),
+    BallModelSuggestion('Radical', 'Revenge Pearl'),
+    BallModelSuggestion('Radical', 'Revenge Solid'),
+    BallModelSuggestion('Radical', 'The Spy'),
+    BallModelSuggestion('Radical', 'Vexed'),
+    BallModelSuggestion('Radical', 'Vexed Variant'),
+  ];
+
   static const starter = [
+    ...brunswickCurrent,
+    ...radicalCurrent,
     BallModelSuggestion('900 Global', 'Sublime Focus'),
     BallModelSuggestion('Brunswick', 'Mesmerize'),
     BallModelSuggestion('Brunswick', 'Rhino'),

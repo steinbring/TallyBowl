@@ -4,6 +4,7 @@ import '../app_controller.dart';
 import '../theme.dart';
 import '../ui/common.dart';
 import '../ui/branding.dart';
+import '../ui/ball_color.dart';
 import '../ui/layout.dart';
 import '../ui/dialogs.dart';
 import 'alley_map.dart';
@@ -71,11 +72,13 @@ class BagPage extends StatelessWidget {
                                     children: [
                                       BallArt(
                                         size: 68,
-                                        color: [
-                                          BowlColors.orange,
-                                          const Color(0xFF557CB0),
-                                          const Color(0xFF56775D),
-                                        ][i % 3],
+                                        color:
+                                            ball.color?.swatch ??
+                                            [
+                                              BowlColors.orange,
+                                              const Color(0xFF557CB0),
+                                              const Color(0xFF56775D),
+                                            ][i % 3],
                                       ),
                                       const Spacer(),
                                       if (ball.retired)
@@ -107,6 +110,15 @@ class BagPage extends StatelessWidget {
                                           .onSurfaceVariant,
                                     ),
                                   ),
+                                  if (ball.color != null)
+                                    Text(
+                                      'Color: ${ball.color!.label}',
+                                      style: TextStyle(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSurfaceVariant,
+                                      ),
+                                    ),
                                   const Padding(
                                     padding: EdgeInsets.symmetric(vertical: 18),
                                     child: Divider(),

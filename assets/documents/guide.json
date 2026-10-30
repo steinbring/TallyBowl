@@ -1,11 +1,12 @@
 {
   "title": "User guide",
-  "updated": "2026-10-27",
+  "updated": "2026-10-30",
   "sections": [
     {
       "heading": "Set up your journal",
       "paragraphs": [
-        "Open Settings and set your bowler name and the names or nicknames shown on scoreboards. TallyBowl tracks one bowler. In My Bag, add your balls using the offline starter suggestions or any custom manufacturer/model. In Alleys, search by name and city, confirm the result, or enter an alley manually. Map and search services need internet access; saved alleys work offline."
+        "Open Settings and set your bowler name and the names or nicknames shown on scoreboards. TallyBowl tracks one bowler. In My Bag, add your balls using the offline starter suggestions or any custom manufacturer/model. In Alleys, search by name and city, confirm the result, or enter an alley manually. Map and search services need internet access; saved alleys work offline.",
+        "When adding or editing a ball, Color (optional) lets you choose black, white, gray, red, orange, yellow, green, blue, purple, pink or brown. My Bag uses the selected color for the ball artwork and shows its name. Choose Not set to clear it. Colors are included in journal backups; older balls and backups start with no color selected."
       ]
     },
     {

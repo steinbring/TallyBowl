@@ -7,7 +7,7 @@ The current beta is **0.1.13 (14)**, developed and published by **Joe Steinbring
 ## What works
 
 - One bowler with scoreboard name/nickname aliases; standard ten-pin scratch scoring.
-- An offline ball starter catalog, unrestricted custom entries, and retiring inventory while retaining history.
+- An offline ball catalog, unrestricted custom entries, and retiring inventory while retaining history. The next build adds all 50 Brunswick and 13 Radical models in their official Current listings checked October 30, 2026, plus optional basic ball colors shown in My Bag and retained in backups.
 - Saved alleys with explicit key-free Photon/OpenStreetMap suggestions, manual entry, and `flutter_map` pin selection.
 - Practice/league sessions, date and lane/pair, per-game ball tags, optional primary ball, and notes.
 - Camera/photo import with on-device Apple Vision or bundled Android ML Kit; geometry-based frame parsing, editable frames, deterministic scoring, and recoverable drafts.

@@ -21,7 +21,7 @@ Flow: acquire one image → retain privately with draft → local OCR/geometry r
 
 ## Persistence and recovery contract
 
-The application-support directory holds `tallybowl.db`. SQLite schema **2** stores ordered JSON documents in `balls`, `alleys`, `sessions`, `games`, with profile/draft in `settings`. Foreign keys link sessions to alleys and games to sessions; model validation checks other relationships and game legality. Version 1→2 adds stable record ordering. Changed rows are saved transactionally; a failed write does not advance the in-memory snapshot/cache. BowlStore owns writes on its connection; independent/external writers are unsupported.
+The application-support directory holds `tallybowl.db`. SQLite schema **2** stores ordered JSON documents in `balls`, `alleys`, `sessions`, `games`, with profile/draft in `settings`. Foreign keys link sessions to alleys and games to sessions; model validation checks other relationships and game legality. Version 1→2 adds stable record ordering. Changed rows are saved transactionally; a failed write does not advance the in-memory snapshot/cache. BowlStore owns writes on its connection; independent/external writers are unsupported. Ball documents can carry an optional basic-color enum name; missing colors remain unset, and unsupported color values are rejected during import. This additive JSON field requires no SQL schema or backup-envelope version change.
 
 Controller updates run through a single pending queue. Photo acquisition reserves its session before a nonmodal desktop camera or external picker can outlive the initiating screen. Don’t bypass this reservation with new restore/delete flows. Restart recovery and orphan cleanup share the reservation so they cannot erase a concurrently retained import.
 
