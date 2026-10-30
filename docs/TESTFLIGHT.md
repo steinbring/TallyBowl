@@ -1,5 +1,24 @@
 # TestFlight readiness and release runbook
 
+## 0.1.13 (14): conservative recognition follow-up
+
+Recognition sources **031846f** and **00c3fc8** add shared matching for visually identical alphabets in bowler names and a bounded pixel retry that removes measured bright crop-boundary rulings. The normal entry point remains `lib/main.dart`; no private diagnostic target or online test JPEG is distributed. **216 Flutter tests pass and static analysis is clean.** Actual native checks cover 45 row cases per engine. The 20 personal originals preserve 17/18 completed Apple games and 16/18 Android games, with both incomplete games unselected and no incorrect automatic result observed.
+
+The unfamiliar online sets remain a material limitation: first set Apple 1/9, Android 0/9 complete games; second set 0/8 on both, with two additional conflicting/incomplete rows left for review. These fixes do not establish reliable recognition across unfamiliar layouts or a perfect live experience. See [the exact evaluation](ONLINE_PHOTO_EVALUATION.md).
+
+**Both iPad and native Mac 0.1.13 (14) are Testing in Owner testing.** Both uploads processed successfully, the previously approved standard-encryption answer and France exclusion are saved, and build-specific testing notes are saved. Both are assigned to External testing and show **Waiting for Review**, with automatic tester notification enabled. External access to build 14 awaits Apple approval; earlier working builds remain available. Verified in App Store Connect on **October 30, 2026**. No testers or public links were added.
+
+| Evidence | Result |
+| --- | --- |
+| iPad ASC build | `8273800c-361b-4415-b328-8ccf43275d35`, owner Testing; external Waiting for Review |
+| Native Mac ASC build | `515043de-769e-4957-83ff-84ad13fae285`, owner Testing; external Waiting for Review |
+| Source | Recognition `031846f`, `00c3fc8`; version `1d85b5f`; subsequent documentation does not change the binaries |
+| Apple artifacts | iPad release IPA and universal native Mac package; archive/content and exported certificate/profile checks pass; nested signatures and Mac installer chain verified |
+| Android artifact | `build/releases/TallyBowl-0.1.13-android-debug.apk`, normal entry point, unchanged owner development signer; installed on the Samsung and restored on the isolated emulator |
+| Samsung preservation | All 12 app-data files match across replacement installation; post-startup journal integrity passes and its logical dump is unchanged: 3 alleys, 2 balls, 2 sessions, 6 games; installed APK matches release SHA-256 |
+
+Private release records, hashes, signing reports, uploads and owner-device backup evidence are under ignored `build/testflight/build-14/`. The Samsung runs the new activity/process, but its lock screen prevented visual in-app acceptance. This release does not add physical Apple TestFlight installation, live-camera or Google Chat composer acceptance evidence. The following sections retain historical release status.
+
 ## 0.1.12 (13): small and stylized scoreboards
 
 Recognition source **c4be3dc** adds bounded local context crops, independently confirmed sparse-header geometry, bright/dark ruling hypotheses, colored ink recovery and explicit OCR border separation. All five latest original photos fill every frame and scratch total exactly on both engines, including the repeated 115-pin regression. The combined original-photo check recovers 17/18 complete Apple images and 16/18 Android images, preserves all previous exact results and leaves two incomplete games unselected. No incorrect automatic result was observed. **207 Dart/widget tests pass; static analysis is clean.** The Android native context-coordinate integration test also passes. See [results and limits](FIVE_PHOTO_EVALUATION.md).
