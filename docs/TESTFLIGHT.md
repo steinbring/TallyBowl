@@ -1,5 +1,22 @@
 # TestFlight readiness and release runbook
 
+## 0.1.14 (15): social links, expanded catalog and ball colors
+
+Feature sources **e4d0bfc** and **b6f73bc** add TallyBowl!'s Bluesky/GoToSocial links in Settings, all 50 Brunswick and 13 Radical names in their official Current catalogs checked October 30, 2026, and 11 optional basic ball colors. My Bag shows each saved color; colors survive journal persistence and backups, and older records remain unset. Existing/custom models remain available. The bundled guide documents the color controls. **221 Flutter tests pass; static analysis is clean**, including recognition regressions, database/backup compatibility, save retries and light/dark 200% text checks. Recognition code is unchanged from build 14; its documented limitations remain.
+
+**Both iPad and native Mac 0.1.14 (15) are Testing in Owner testing.** Both uploads processed successfully. Standard-encryption answers and the previously approved France exclusion are saved; build-specific testing notes are saved. Both builds are assigned to External testing and show **Waiting for Review**, with automatic tester notification enabled. External access to build 15 awaits Apple approval; prior working builds remain available. Verified in App Store Connect on **October 30, 2026**. Existing group membership and public-link settings were retained.
+
+| Evidence | Result |
+| --- | --- |
+| iPad ASC build | `5dd2df53-5ffa-46c6-93dc-8ebf5689a28f`, owner Testing; external Waiting for Review |
+| Native Mac ASC build | `b19a4da4-a794-4885-b1d2-fafc3d8912dd`, owner Testing; external Waiting for Review |
+| Source | Features `e4d0bfc`, `b6f73bc`; version `0bdcd82`; later documentation does not change the binaries |
+| Apple artifacts | Normal `lib/main.dart`; iPad release IPA and universal arm64/x86_64 native Mac package; archive/content and exported certificate/profile checks pass; nested signatures and Mac installer chain verified |
+| Regression evidence | 221 tests and clean analysis; all 63 expanded model names compared with the complete official catalog snapshot |
+| Device installations | No new physical installation in this release; Samsung remains verified at 0.1.13 (14) |
+
+Private archives, hashes, signing reports, catalog verification, test logs and uploads are retained under ignored `build/testflight/build-15/`. No private photo probes or online JPEGs are distributed. The following sections preserve historical release status.
+
 ## 0.1.13 (14): conservative recognition follow-up
 
 Recognition sources **031846f** and **00c3fc8** add shared matching for visually identical alphabets in bowler names and a bounded pixel retry that removes measured bright crop-boundary rulings. The normal entry point remains `lib/main.dart`; no private diagnostic target or online test JPEG is distributed. **216 Flutter tests pass and static analysis is clean.** Actual native checks cover 45 row cases per engine. The 20 personal originals preserve 17/18 completed Apple games and 16/18 Android games, with both incomplete games unselected and no incorrect automatic result observed.
