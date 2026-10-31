@@ -13,7 +13,7 @@ Feature sources **e4d0bfc** and **b6f73bc** add TallyBowl!'s Bluesky/GoToSocial 
 | Source | Features `e4d0bfc`, `b6f73bc`; version `0bdcd82`; later documentation does not change the binaries |
 | Apple artifacts | Normal `lib/main.dart`; iPad release IPA and universal arm64/x86_64 native Mac package; archive/content and exported certificate/profile checks pass; nested signatures and Mac installer chain verified |
 | Regression evidence | 221 tests and clean analysis; all 63 expanded model names compared with the complete official catalog snapshot |
-| Device installations | No new physical installation in this release; Samsung remains verified at 0.1.13 (14) |
+| Device installations | Samsung updated in place to the normal Android owner build 0.1.14 (15) on October 30; matching signer and installed APK hash, all 12 app-data files unchanged after installation, identical post-startup journal; [device evidence](DEVICE_TESTING.md) |
 
 Private archives, hashes, signing reports, catalog verification, test logs and uploads are retained under ignored `build/testflight/build-15/`. No private photo probes or online JPEGs are distributed. The following sections preserve historical release status.
 
