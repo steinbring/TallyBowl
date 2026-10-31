@@ -2,12 +2,12 @@
 
 **How you bowled, tonight.** A Flutter bowling journal for native macOS, iPadOS, and Android. Planned website: [tallybowl.jws.app](https://tallybowl.jws.app).
 
-The current beta is **0.1.13 (14)**, developed and published by **Joe Steinbring**. [Contact Joe for support](https://jws.dev/contact). It improves mixed-script OCR name matching and delivery ink obscured by bright grid borders. Previous personal-photo results are preserved, but the unfamiliar online scoreboards still expose substantial recognition gaps; see [the measured results](docs/ONLINE_PHOTO_EVALUATION.md). Both Apple builds are available in owner TestFlight and waiting for external beta review. The normal Android update is installed on the Samsung. [TestFlight readiness](docs/TESTFLIGHT.md) records distribution status and remaining device checks.
+The current Apple beta is **0.1.14 (15)**, developed and published by **Joe Steinbring**. [Contact Joe for support](https://jws.dev/contact). It adds official social-profile links in Settings, the current Brunswick/Radical ball-name snapshot, and optional basic colors saved with each ball. Both iPad and native Mac builds are Testing in Owner testing and Waiting for Review in External testing. The Samsung's last verified owner installation remains 0.1.13 (14). Recognition is unchanged; unfamiliar online scoreboards still expose substantial gaps. See [measured results](docs/ONLINE_PHOTO_EVALUATION.md) and [TestFlight readiness](docs/TESTFLIGHT.md).
 
 ## What works
 
 - One bowler with scoreboard name/nickname aliases; standard ten-pin scratch scoring.
-- An offline ball catalog, unrestricted custom entries, and retiring inventory while retaining history. The next build adds all 50 Brunswick and 13 Radical models in their official Current listings checked October 30, 2026, plus optional basic ball colors shown in My Bag and retained in backups.
+- An offline ball catalog, unrestricted custom entries, and retiring inventory while retaining history. Build 15 includes all 50 Brunswick and 13 Radical models in their official Current listings checked October 30, 2026, plus optional basic ball colors shown in My Bag and retained in backups.
 - Saved alleys with explicit key-free Photon/OpenStreetMap suggestions, manual entry, and `flutter_map` pin selection.
 - Practice/league sessions, date and lane/pair, per-game ball tags, optional primary ball, and notes.
 - Camera/photo import with on-device Apple Vision or bundled Android ML Kit; geometry-based frame parsing, editable frames, deterministic scoring, and recoverable drafts.
@@ -17,7 +17,7 @@ The current beta is **0.1.13 (14)**, developed and published by **Joe Steinbring
 - Branded PNG recaps, privacy switches, native image sharing and export.
 - Local SQLite storage, versioned JSON backups with before-restore recovery, and game/delivery CSV exports.
 - System light/dark appearance, scalable layouts, accessible scorecard labels, offline help/privacy pages, and installed version/build in Settings.
-- Settings links to TallyBowl!'s [Bluesky](https://bsky.app/profile/tallybowl.jws.app) and [GoToSocial](https://jws.social/@tallybowl) profiles (added after build 14; included in the next build).
+- Settings links to TallyBowl!'s [Bluesky](https://bsky.app/profile/tallybowl.jws.app) and [GoToSocial](https://jws.social/@tallybowl) profiles.
 
 There is no cloud AI fallback, account, automatic sync, or iPhone target. Real-photo regression coverage includes the [twelve-photo evaluation](docs/PHOTO_CORPUS_RESULTS.md) alongside the earlier monitor examples. All four original October 27 league photos remain exact through local Apple Vision and Android ML Kit. Always compare every delivery before saving. Multi-photo combining, crop/rotation tools, handicap scoring, and per-delivery ball assignment are deferred. Android ML Kit may send SDK diagnostics to Google; map/search providers receive requests. See the [privacy policy](docs/PRIVACY_POLICY.md).
 
