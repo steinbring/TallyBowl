@@ -2,7 +2,7 @@
 
 **How you bowled, tonight.** A Flutter bowling journal for native macOS, iPadOS, and Android. Planned website: [tallybowl.jws.app](https://tallybowl.jws.app).
 
-The current Apple beta is **0.1.14 (15)**, developed and published by **Joe Steinbring**. [Contact Joe for support](https://jws.dev/contact). It adds official social-profile links in Settings, the current Brunswick/Radical ball-name snapshot, and optional basic colors saved with each ball. Both iPad and native Mac builds are Testing in Owner testing and Waiting for Review in External testing. The Samsung's last verified owner installation remains 0.1.13 (14). Recognition is unchanged; unfamiliar online scoreboards still expose substantial gaps. See [measured results](docs/ONLINE_PHOTO_EVALUATION.md) and [TestFlight readiness](docs/TESTFLIGHT.md).
+The current beta is **0.1.14 (15)**, developed and published by **Joe Steinbring**. [Contact Joe for support](https://jws.dev/contact). It adds official social-profile links in Settings, the current Brunswick/Radical ball-name snapshot, and optional basic colors saved with each ball. Both iPad and native Mac builds are Testing in Owner testing and Waiting for Review in External testing. The Samsung has the matching Android owner build, with its saved journal verified unchanged after the update. Recognition is unchanged; unfamiliar online scoreboards still expose substantial gaps. See [measured results](docs/ONLINE_PHOTO_EVALUATION.md) and [TestFlight readiness](docs/TESTFLIGHT.md).
 
 ## What works
 
