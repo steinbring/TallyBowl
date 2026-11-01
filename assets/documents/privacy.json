@@ -1,6 +1,6 @@
 {
   "title": "Privacy policy",
-  "updated": "2026-10-27",
+  "updated": "2026-11-01",
   "sections": [
     {
       "heading": "Your journal on your device",
@@ -40,10 +40,22 @@
       ]
     },
     {
-      "heading": "Beta feedback and contact",
+      "heading": "Purchases, app stores, and beta testing",
       "paragraphs": [
-        "TestFlight is operated by Apple. If you send beta feedback, crash reports, screenshots, or diagnostic attachments through TestFlight, Apple and the developer may receive that information. Include only information you intend to share. For a recognition report, use a photo you have permission to send and remove other bowlers\u2019 names.",
-        "TallyBowl is developed and published by Joe Steinbring. For privacy questions or app support, contact Joe through https://jws.dev/contact. This policy will be updated when relevant app behavior or service providers change."
+        "TallyBowl is bought and downloaded through the App Store or Google Play, with no subscription or in-app purchases. Apple and Google handle downloads and payments under their own policies, and your payment details never reach the app or the developer. The developer may see the aggregate sales, usage, and crash statistics they provide, along with any reviews you publish.",
+        "TestFlight is operated by Apple. If you send beta feedback, crash reports, screenshots, or diagnostic attachments through TestFlight, Apple and the developer may receive that information. Include only information you intend to share. For a recognition report, use a photo you have permission to send and remove other bowlers\u2019 names."
+      ]
+    },
+    {
+      "heading": "Children",
+      "paragraphs": [
+        "TallyBowl is not directed at children. It has no accounts, and journal records stay on the device unless someone exports or shares them, so a parent or guardian can review or remove anything a child has entered there using the steps above."
+      ]
+    },
+    {
+      "heading": "Contact and changes",
+      "paragraphs": [
+        "TallyBowl is developed and published by Joe Steinbring. For privacy questions or app support, contact Joe through https://jws.dev/contact. Messages you send are used to answer you. This policy will be updated when relevant app behavior or service providers change, and the date at the top shows the latest version."
       ]
     }
   ],
@@ -65,8 +77,16 @@
       "url": "https://developers.google.com/ml-kit/android-data-disclosure"
     },
     {
+      "label": "Apple privacy policy",
+      "url": "https://www.apple.com/legal/privacy/"
+    },
+    {
       "label": "Apple TestFlight privacy",
       "url": "https://www.apple.com/legal/privacy/data/en/test-flight/"
+    },
+    {
+      "label": "Google privacy policy",
+      "url": "https://policies.google.com/privacy"
     }
   ]
 }
