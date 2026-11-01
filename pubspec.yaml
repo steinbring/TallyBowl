@@ -78,6 +78,7 @@ flutter:
   assets:
     - assets/recognition/glyphs.json
     - assets/recognition/OFL-Roboto.txt
+    - assets/recognition/LICENSE-RobotoSlab.txt
     - assets/branding/tallybowl-logo.png
     - assets/documents/privacy.json
     - assets/documents/guide.json

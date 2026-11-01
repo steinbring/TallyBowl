@@ -50,30 +50,59 @@ abstract final class FrameGlyphReader {
         // for all text passes. At most sixteen layouts and four readings exist;
         // each layout can have two independently confirmed ruling polarities.
         final readings = await Isolate.run(() {
-          return [
-            for (final aligned in _columnAlignments(
+          final results = <(_Table, List<List<String>>)>[];
+          for (final aligned in _columnAlignments(
+            rgba,
+            imageWidth,
+            imageHeight,
+            table,
+          )) {
+            if (table.headers < 6 && identical(aligned, table)) continue;
+            final white = _inkWhitePoint(
               rgba,
               imageWidth,
               imageHeight,
-              table,
-            ))
-              if (table.headers >= 6 || !identical(aligned, table))
-                (
-                  aligned,
-                  [
-                    for (final words in wordReadings)
-                      _readFrames(
-                        rgba,
-                        imageWidth,
-                        imageHeight,
-                        aligned,
-                        words,
-                        templates,
-                        supportingWords,
-                      ),
-                  ],
-                ),
-          ];
+              aligned,
+            );
+            results.add((
+              aligned,
+              [
+                for (final words in wordReadings)
+                  _readFrames(
+                    rgba,
+                    imageWidth,
+                    imageHeight,
+                    aligned,
+                    words,
+                    templates,
+                    supportingWords,
+                    white,
+                  ),
+              ],
+            ));
+            if (white != null) {
+              // Keep the established neutral-ink row as an independent
+              // candidate. A cast mask must not replace already readable ink;
+              // each complete row is validated separately below.
+              results.add((
+                aligned,
+                [
+                  for (final words in wordReadings)
+                    _readFrames(
+                      rgba,
+                      imageWidth,
+                      imageHeight,
+                      aligned,
+                      words,
+                      templates,
+                      supportingWords,
+                      null,
+                    ),
+                ],
+              ));
+            }
+          }
+          return results;
         });
         for (final reading in readings) {
           final aligned = reading.$1;
@@ -84,6 +113,13 @@ abstract final class FrameGlyphReader {
           ) {
             final source = sources[sourceIndex],
                 words = wordReadings[sourceIndex];
+            bool sameName(RecognizedLine w) =>
+                _name(w.text) == _name(table.name.text) &&
+                (w.centerX - table.name.centerX).abs() <
+                    table.name.width * .5 &&
+                (w.centerY - table.name.centerY).abs() <
+                    table.name.height * .75;
+            final hasName = words.any(sameName);
             final frames = reading.$2[sourceIndex];
             if (frames.length != 10 || !TenPinScorer.score(frames).complete) {
               continue;
@@ -108,6 +144,50 @@ abstract final class FrameGlyphReader {
                       observedCheckpoints[i] != null &&
                       observedCheckpoints[i] != score.cumulative[i],
                 )) {
+              continue;
+            }
+            // A native pass can omit the large player name while retaining
+            // the complete score band. Bind it to another named pass only with
+            // six agreeing checkpoints in each, including the tenth. An
+            // explicit different name at this position remains a conflict.
+            if (!hasName) {
+              final conflictingName = words.any(
+                (w) =>
+                    RegExp(r'\p{L}', unicode: true).hasMatch(w.text) &&
+                    (w.centerX - table.name.centerX).abs() <
+                        table.name.width * .5 &&
+                    (w.centerY - table.name.centerY).abs() <
+                        table.name.height * .75,
+              );
+              if (conflictingName ||
+                  observedCheckpoints.whereType<int>().length < 6 ||
+                  observedCheckpoints.last != score.total) {
+                continue;
+              }
+              final namedSupport = sources.any((other) {
+                final otherWords = _distinctWords(other);
+                if (!otherWords.any(sameName)) return false;
+                final checks = _checkpoints(otherWords, aligned);
+                return checks != null &&
+                    checks.whereType<int>().length >= 6 &&
+                    checks.last == score.total &&
+                    List.generate(10, (i) => i).every(
+                      (i) =>
+                          checks[i] == null || checks[i] == score.cumulative[i],
+                    );
+              });
+              if (!namedSupport) continue;
+            }
+            // A total-only observation cannot become a new primary reading
+            // merely because another pass located a grid. Require its own
+            // name/header fit or three agreeing checkpoints including frame ten.
+            final ownsLayout = _tables(
+              source,
+              profile,
+            ).any((candidate) => sameName(candidate.name));
+            if (!ownsLayout &&
+                (observedCheckpoints.whereType<int>().length < 3 ||
+                    observedCheckpoints.last != score.total)) {
               continue;
             }
             if (checkpoints != null &&
@@ -230,27 +310,39 @@ abstract final class FrameGlyphReader {
   ) async {
     final tables = [for (final source in readings) ..._tables(source, profile)];
     if (tables.isEmpty) return [];
-    final best = tables.reduce((a, b) => b.headers > a.headers ? b : a);
+    final ordered = tables.indexed.toList()
+      ..sort((a, b) {
+        final support = b.$2.headers.compareTo(a.$2.headers);
+        return support != 0 ? support : a.$1.compareTo(b.$1);
+      });
     final image = await _decode(bytes);
     try {
       final rgba = (await image.toByteData(format: ui.ImageByteFormat.rawRgba))!
           .buffer
           .asUint8List();
-      final width = image.width, height = image.height, table = best;
+      final width = image.width, height = image.height;
       return await Isolate.run(() {
-        final aligned = _alignColumns(rgba, width, height, table);
-        if (identical(aligned, table)) return <RecognitionRegion>[];
-        return [for (var i = 0; i < 10; i++) _region(aligned, i)]
-            .where(
-              (r) =>
-                  r.width > 0 &&
-                  r.height > 0 &&
-                  r.x >= 0 &&
-                  r.y >= 0 &&
-                  r.x + r.width <= 1 &&
-                  r.y + r.height <= 1,
-            )
-            .toList();
+        // A repeated name in a footer can have more readable headers than
+        // the player row. Rank only layouts whose rulings actually align;
+        // an unsupported footer must not hide a supported row in another pass.
+        for (final candidate in ordered) {
+          final table = candidate.$2;
+          final aligned = _alignColumns(rgba, width, height, table);
+          if (identical(aligned, table)) continue;
+          final regions = [for (var i = 0; i < 10; i++) _region(aligned, i)];
+          if (regions.every(
+            (r) =>
+                r.width > 0 &&
+                r.height > 0 &&
+                r.x >= 0 &&
+                r.y >= 0 &&
+                r.x + r.width <= 1 &&
+                r.y + r.height <= 1,
+          )) {
+            return regions;
+          }
+        }
+        return <RecognitionRegion>[];
       });
     } finally {
       image.dispose();
@@ -480,6 +572,49 @@ abstract final class FrameGlyphReader {
     return result;
   }
 
+  /// A shared reference keeps a bright background patch in one cell from
+  /// redefining the foreground color for that delivery. Never uses OCR values.
+  static List<int>? _inkWhitePoint(
+    Uint8List rgba,
+    int width,
+    int height,
+    _Table table,
+  ) {
+    final histogram = List.generate(3, (_) => List.filled(256, 0));
+    var count = 0;
+    for (var i = 0; i < 10; i++) {
+      final region = _region(table, i);
+      final x = (region.x * width).round(), y = (region.y * height).round();
+      final w = (region.width * width).round(),
+          h = (region.height * height).round();
+      if (x < 0 || y < 0 || x + w > width || y + h > height) return null;
+      for (var py = 0; py < h; py++) {
+        for (var px = 0; px < w; px++) {
+          final p = ((y + py) * width + x + px) * 4;
+          if (rgba[p + 3] < 165) continue;
+          for (var channel = 0; channel < 3; channel++) {
+            histogram[channel][rgba[p + channel]]++;
+          }
+          count++;
+        }
+      }
+    }
+    if (count == 0) return null;
+    final white = <int>[];
+    for (final channel in histogram) {
+      var seen = 0;
+      for (var value = 0; value < 256; value++) {
+        seen += channel[value];
+        if (seen >= count * .95) {
+          white.add(value);
+          break;
+        }
+      }
+    }
+    final low = white.reduce(math.min), high = white.reduce(math.max);
+    return low >= 140 && high - low >= 45 ? white : null;
+  }
+
   static List<String> _readFrames(
     Uint8List rgba,
     int imageWidth,
@@ -488,6 +623,7 @@ abstract final class FrameGlyphReader {
     List<RecognizedLine> words,
     List<_Template> templates,
     List<RecognizedLine> supportingWords,
+    List<int>? white,
   ) {
     final frames = <String>[];
     for (var i = 0; i < 10; i++) {
@@ -560,7 +696,61 @@ abstract final class FrameGlyphReader {
         supporting: (l, t, r, b) =>
             _inside(supporting, imageWidth, imageHeight, x, y, l, t, r, b),
       );
-      var physical = classify(mask);
+      String? corrected;
+      if (white != null) {
+        // The row's measured light ink can carry a strong monitor/camera cast.
+        // Progressively retain more of that ink, never choosing by a score.
+        for (final levels in [(.85, .12), (.75, .3), (.65, .5)]) {
+          final pixels = Uint8List(w * h);
+          for (var py = 0; py < h; py++) {
+            for (var px = 0; px < w; px++) {
+              final p = ((y + py) * imageWidth + x + px) * 4;
+              final r = rgba[p] / white[0],
+                  g = rgba[p + 1] / white[1],
+                  b = rgba[p + 2] / white[2];
+              final low = math.min(r, math.min(g, b));
+              final high = math.max(r, math.max(g, b));
+              if (rgba[p + 3] >= 165 &&
+                  low >= levels.$1 &&
+                  high - low < levels.$2) {
+                pixels[py * w + px] = 1;
+              }
+            }
+          }
+          // Outlined lettering is separated from the illustration behind it.
+          // Edge-connected decoration cannot be an intact photographed glyph.
+          String readCorrected(Uint8List input) => _classify(
+            input,
+            w,
+            h,
+            templates,
+            outlined: true,
+            supporting: (l, t, r, b) =>
+                _inside(supporting, imageWidth, imageHeight, x, y, l, t, r, b),
+          );
+          final cleaned = withoutEdgeConnectedInk(pixels, w, h);
+          var candidate = readCorrected(cleaned);
+          if (!TenPinScorer.parseFrame(candidate, tenth: i == 9).complete) {
+            continue;
+          }
+          // A legal primary observation, even a partial frame, must remain
+          // present. Pixel ordering can repair merged-word order, but cannot
+          // replace its delivery values. Invalid merged tokens do not validate
+          // a frame; the corrected ink still needs full template confidence.
+          if (TenPinScorer.parseFrame(nativeFrame, tenth: i == 9).error ==
+              null) {
+            final remaining = candidate.split('');
+            var agrees = true;
+            for (final mark in nativeFrame.split('')) {
+              if (!remaining.remove(mark)) agrees = false;
+            }
+            if (!agrees) continue;
+          }
+          corrected = candidate;
+          break;
+        }
+      }
+      var physical = corrected ?? classify(mask);
       // Do not discard readable ink. Only when the broad mask is incomplete,
       // progressively exclude colored decoration; each attempt still reads
       // the photographed components and preserves primary native characters.
@@ -599,6 +789,56 @@ abstract final class FrameGlyphReader {
     return frames;
   }
 
+  static List<MapEntry<String, double>> _rankGlyph(
+    _Component c,
+    int w,
+    int h,
+    List<_Template> templates,
+  ) {
+    final gw = c.r - c.l, gh = c.b - c.t;
+    final componentMask = Uint8List(w * h);
+    for (final p in c.pixels) {
+      componentMask[p] = 1;
+    }
+    final normalized = Uint8List(24 * 32);
+    for (var yy = 0; yy < 32; yy++) {
+      for (var xx = 0; xx < 24; xx++) {
+        final sx = (c.l + (xx + .5) * gw / 24 - .5).clamp(
+          c.l.toDouble(),
+          (c.r - 1).toDouble(),
+        );
+        final sy = (c.t + (yy + .5) * gh / 32 - .5).clamp(
+          c.t.toDouble(),
+          (c.b - 1).toDouble(),
+        );
+        final x0 = sx.floor(),
+            y0 = sy.floor(),
+            x1 = math.min(c.r - 1, x0 + 1),
+            y1 = math.min(c.b - 1, y0 + 1);
+        final dx = sx - x0, dy = sy - y0;
+        final value =
+            componentMask[y0 * w + x0] * (1 - dx) * (1 - dy) +
+            componentMask[y0 * w + x1] * dx * (1 - dy) +
+            componentMask[y1 * w + x0] * (1 - dx) * dy +
+            componentMask[y1 * w + x1] * dx * dy;
+        if (value > .5) normalized[yy * 24 + xx] = 1;
+      }
+    }
+    final scores = <String, double>{};
+    for (final template in templates) {
+      var intersection = 0, union = 0;
+      for (var p = 0; p < normalized.length; p++) {
+        if (normalized[p] != 0 || template.mask[p] != 0) union++;
+        if (normalized[p] != 0 && template.mask[p] != 0) intersection++;
+      }
+      final score = intersection / union;
+      scores[template.text] = math.max(scores[template.text] ?? 0, score);
+    }
+    final ranked = scores.entries.toList()
+      ..sort((a, b) => b.value.compareTo(a.value));
+    return ranked;
+  }
+
   static Set<String> _inside(
     List<RecognizedLine> input,
     int imageWidth,
@@ -634,7 +874,8 @@ abstract final class FrameGlyphReader {
     int height,
     _Table table,
   ) {
-    final darkPhases = <(double, int)>[], lightPhases = <(double, int)>[];
+    final darkPhases = <(double, int, int)>[],
+        lightPhases = <(double, int, int)>[];
     for (var i = 0; i < 9; i++) {
       final center = table.first + i * table.pitch;
       final headerY = table.y + i * table.slope;
@@ -686,7 +927,11 @@ abstract final class FrameGlyphReader {
       final dark = sorted.first, background = sorted[sorted.length ~/ 2];
       if (background - dark >= math.max(8, background * .08)) {
         final x = left + values.indexOf(dark);
-        darkPhases.add(((x / width - center) / table.pitch, background - dark));
+        darkPhases.add((
+          (x / width - center) / table.pitch,
+          background - dark,
+          i,
+        ));
       }
       final lightSorted = [...lightValues]..sort();
       final bright = lightSorted.last,
@@ -697,19 +942,30 @@ abstract final class FrameGlyphReader {
         lightPhases.add((
           (x / width - center) / table.pitch,
           bright - lightBackground,
+          i,
         ));
       }
     }
-    final winners = <(double, int)>[];
+    final winners = <(double, int, double)>[];
     for (final family in [darkPhases, lightPhases]) {
       if (family.length < 6) continue;
       family.sort((a, b) => a.$1.compareTo(b.$1));
-      final phase = family[family.length ~/ 2].$1;
-      final agreeing = family.where((p) => (p.$1 - phase).abs() < .1).toList();
+      // Dense native headers already establish the pitch. Preserve those
+      // readings; only sparse-header layouts need ruling-derived spacing.
+      final spacing = table.headers < 6 ? _rulingSpacing(family) : null;
+      final phase = spacing?.$1 ?? family[family.length ~/ 2].$1;
+      final drift = spacing?.$2 ?? 0.0;
+      final agreeing = family
+          .where(
+            (p) =>
+                (p.$1 - phase - drift * p.$3).abs() <
+                (spacing == null ? .1 : .035),
+          )
+          .toList();
       if (agreeing.length < 6) continue;
       final contrasts = agreeing.map((p) => p.$2).toList()..sort();
       final contrast = contrasts[contrasts.length ~/ 2];
-      winners.add((phase, contrast));
+      winners.add((phase, contrast, 1 + drift));
     }
     if (winners.isEmpty) return [table];
     winners.sort((a, b) => b.$2.compareTo(a.$2));
@@ -717,14 +973,54 @@ abstract final class FrameGlyphReader {
       for (final winner in winners)
         _Table(
           table.name,
-          table.first + (winner.$1 - .5) * table.pitch,
-          table.pitch,
-          table.y + (winner.$1 - .5) * table.slope,
-          table.slope,
+          table.first + (winner.$1 - winner.$3 * .5) * table.pitch,
+          table.pitch * winner.$3,
+          table.y + (winner.$1 - winner.$3 * .5) * table.slope,
+          table.slope * winner.$3,
           table.height,
           table.headers,
         ),
     ];
+  }
+
+  /// Sparse OCR headers can slightly compress the column pitch. Accept a
+  /// spacing correction only when six photographed rulings independently show
+  /// the same small linear drift across at least five column intervals.
+  static (double, double)? _rulingSpacing(List<(double, int, int)> family) {
+    List<(double, int, int)> best = [];
+    var bestError = double.infinity;
+    for (final a in family) {
+      for (final b in family) {
+        if (b.$3 - a.$3 < 5) continue;
+        final drift = (b.$1 - a.$1) / (b.$3 - a.$3);
+        if (drift.abs() < .005 || drift.abs() > .05) continue;
+        final first = a.$1 - a.$3 * drift;
+        final matches = family
+            .where((p) => (p.$1 - first - p.$3 * drift).abs() < .035)
+            .toList();
+        if (matches.length < 6) continue;
+        final error = matches.fold(
+          0.0,
+          (v, p) => v + (p.$1 - first - p.$3 * drift).abs(),
+        );
+        if (matches.length > best.length ||
+            (matches.length == best.length && error < bestError)) {
+          best = matches;
+          bestError = error;
+        }
+      }
+    }
+    if (best.length < 6) return null;
+    final meanX = best.fold(0.0, (v, p) => v + p.$3) / best.length;
+    final meanY = best.fold(0.0, (v, p) => v + p.$1) / best.length;
+    var covariance = 0.0, variance = 0.0;
+    for (final p in best) {
+      covariance += (p.$3 - meanX) * (p.$1 - meanY);
+      variance += (p.$3 - meanX) * (p.$3 - meanX);
+    }
+    final drift = covariance / variance;
+    if (drift.abs() < .005 || drift.abs() > .05) return null;
+    return (meanY - drift * meanX, drift);
   }
 
   static Future<List<_Template>> _loadTemplates() async {
@@ -750,6 +1046,7 @@ abstract final class FrameGlyphReader {
     int w,
     int h,
     List<_Template> templates, {
+    bool outlined = false,
     Set<String> Function(int, int, int, int)? observed,
     Set<String> Function(int, int, int, int)? supporting,
   }) {
@@ -781,21 +1078,56 @@ abstract final class FrameGlyphReader {
         components.add(_Component(l, t, r + 1, b + 1, pixels));
       }
     }
-    // A split ring encloses a separate digit. Remove only the enclosing ink,
-    // retaining the observed digit, including both holes of an eight.
-    final glyphs =
-        components
-            .where(
-              (c) => !components.any(
-                (d) =>
-                    c.l <= d.l - 2 &&
-                    c.t <= d.t - 2 &&
-                    c.r >= d.r + 2 &&
-                    c.b >= d.b + 2,
-              ),
-            )
-            .toList()
-          ..sort((a, b) => a.l.compareTo(b.l));
+    final rankings = <_Component, List<MapEntry<String, double>>>{};
+    List<MapEntry<String, double>> ranking(_Component c) =>
+        rankings.putIfAbsent(c, () => _rankGlyph(c, w, h, templates));
+    bool encloses(_Component outer, _Component inner) =>
+        outer.l <= inner.l - 2 &&
+        outer.t <= inner.t - 2 &&
+        outer.r >= inner.r + 2 &&
+        outer.b >= inner.b + 2;
+    final List<_Component> glyphs;
+    if (!outlined) {
+      // Retain the established behavior for neutral-ink readings.
+      glyphs = components
+          .where((c) => !components.any((d) => encloses(c, d)))
+          .toList();
+    } else {
+      final rings = <_Component>{};
+      for (final outer in components) {
+        for (final inner in components) {
+          if (!encloses(outer, inner) ||
+              inner.b - inner.t < (outer.b - outer.t) * .45 ||
+              inner.r - inner.l < (outer.r - outer.l) * .25) {
+            continue;
+          }
+          final gh = inner.b - inner.t, gw = inner.r - inner.l;
+          if (gh < h * .22 || gh > h * .92 || gw > w * .65) continue;
+          final ranked = ranking(inner);
+          // A real split ring encloses a readable digit. A bright island inside
+          // an outlined 0/8/9 (or decoration inside a 2) is a background counter,
+          // not another digit. Keep the same uncorroborated glyph thresholds.
+          if (RegExp(r'^[0-9]$').hasMatch(ranked.first.key) &&
+              ranked.first.value >= .68 &&
+              ranked.first.value - ranked[1].value >= .06) {
+            rings.add(outer);
+          }
+        }
+      }
+      glyphs =
+          components
+              .where(
+                (c) =>
+                    !rings.contains(c) &&
+                    !components.any(
+                      (parent) =>
+                          !rings.contains(parent) && encloses(parent, c),
+                    ),
+              )
+              .toList()
+            ..sort((a, b) => a.l.compareTo(b.l));
+    }
+    glyphs.sort((a, b) => a.l.compareTo(b.l));
     final result = StringBuffer();
     for (final c in glyphs) {
       final gw = c.r - c.l, gh = c.b - c.t;
@@ -814,46 +1146,7 @@ abstract final class FrameGlyphReader {
       }
       if (gh < h * .22) continue;
       if (gh > h * .92 || gw > w * .65) return '';
-      final componentMask = Uint8List(w * h);
-      for (final p in c.pixels) {
-        componentMask[p] = 1;
-      }
-      final normalized = Uint8List(24 * 32);
-      for (var yy = 0; yy < 32; yy++) {
-        for (var xx = 0; xx < 24; xx++) {
-          final sx = (c.l + (xx + .5) * gw / 24 - .5).clamp(
-            c.l.toDouble(),
-            (c.r - 1).toDouble(),
-          );
-          final sy = (c.t + (yy + .5) * gh / 32 - .5).clamp(
-            c.t.toDouble(),
-            (c.b - 1).toDouble(),
-          );
-          final x0 = sx.floor(),
-              y0 = sy.floor(),
-              x1 = math.min(c.r - 1, x0 + 1),
-              y1 = math.min(c.b - 1, y0 + 1);
-          final dx = sx - x0, dy = sy - y0;
-          final value =
-              componentMask[y0 * w + x0] * (1 - dx) * (1 - dy) +
-              componentMask[y0 * w + x1] * dx * (1 - dy) +
-              componentMask[y1 * w + x0] * (1 - dx) * dy +
-              componentMask[y1 * w + x1] * dx * dy;
-          if (value > .5) normalized[yy * 24 + xx] = 1;
-        }
-      }
-      final scores = <String, double>{};
-      for (final template in templates) {
-        var intersection = 0, union = 0;
-        for (var p = 0; p < normalized.length; p++) {
-          if (normalized[p] != 0 || template.mask[p] != 0) union++;
-          if (normalized[p] != 0 && template.mask[p] != 0) intersection++;
-        }
-        final score = intersection / union;
-        scores[template.text] = math.max(scores[template.text] ?? 0, score);
-      }
-      final ranked = scores.entries.toList()
-        ..sort((a, b) => b.value.compareTo(a.value));
+      final ranked = ranking(c);
       final best = ranked.first;
       final native = observed?.call(c.l, c.t, c.r, c.b) ?? <String>{};
       final known = native

@@ -4,6 +4,10 @@ The Samsung has owner build **0.1.14 (15)**. The last directly verified local Ma
 
 Start with the Samsung Galaxy Z Fold 8, then repeat the camera, import, sharing, and accessibility checks on a physical iPad and a supported Mac. Current automated checks are described in [development status](DEVELOPMENT.md). The Samsung was installed with build 0.1.4 (5) and supplied the first real-photo regression. This checklist separates further hardware checks from automated evidence.
 
+## Local recognition verification — November 1, 2026
+
+The complete production Flutter/native ML Kit pipeline on the isolated Android 17 emulator recovered all ten frames and totals **116, 122 and 74** from the three new October 31 original JPEGs. The original-image Apple/native regression run and earlier-photo preservation checks are detailed in [the evaluation report](OCT31_PHOTO_EVALUATION.md). All 239 unit/widget checks and normal Android debug/Mac release builds pass. The private emulator diagnostic was replaced by the normal `lib/main.dart` app after testing. No Samsung was connected during this verification; its installation remains build 15. No physical-camera or new TestFlight-installation acceptance is claimed.
+
 ## Verified Samsung update — October 30, 2026
 
 Updated the connected Samsung SM_F971U1 in place from **0.1.13 (14)** to **0.1.14 (15)** using the normal `lib/main.dart` owner debug APK and unchanged development signer. Package permissions are unchanged, the bundled guide matches source, and `adb install -r` succeeded. The installed APK SHA-256 exactly matches `build/releases/TallyBowl-0.1.14-android-debug.apk`. Protected copies of the previous APK and app data, build/signature checks and installation evidence are retained under ignored `build/testflight/build-15/samsung-update/`.

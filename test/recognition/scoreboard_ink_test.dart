@@ -4,6 +4,35 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tallybowl/src/recognition/scoreboard_ink.dart';
 
 void main() {
+  test(
+    'cast mask removes connected illustration but retains separate marks',
+    () {
+      const w = 60, h = 80;
+      final mask = Uint8List(w * h);
+      // Illustration reaches the crop edge and curves into the delivery band.
+      for (var y = 0; y < 65; y++) {
+        mask[y * w + y ~/ 3] = 1;
+        mask[y * w + y ~/ 3 + 1] = 1;
+      }
+      // A disconnected digit stem and a miss remain real delivery candidates.
+      for (var y = 15; y < 65; y++) {
+        mask[y * w + 35] = 1;
+      }
+      for (var x = 42; x < 55; x++) {
+        mask[40 * w + x] = 1;
+      }
+      final cleaned = withoutEdgeConnectedInk(mask, w, h);
+      for (var y = 0; y < 65; y++) {
+        expect(cleaned[y * w + y ~/ 3], 0);
+      }
+      for (var y = 15; y < 65; y++) {
+        expect(cleaned[y * w + 35], 1);
+      }
+      expect(cleaned.sublist(40 * w + 42, 40 * w + 55), List.filled(13, 1));
+      expect(mask[0], 1);
+    },
+  );
+
   test('bright connected grid edges leave interior delivery ink intact', () {
     const w = 60, h = 80;
     final mask = Uint8List(w * h);

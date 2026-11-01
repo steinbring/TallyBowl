@@ -1,5 +1,35 @@
 import 'dart:typed_data';
 
+/// Discard cropped, edge-connected foreground from an optional cast-corrected
+/// mask. Complete outlined glyphs remain isolated from the monitor illustration.
+Uint8List withoutEdgeConnectedInk(Uint8List mask, int width, int height) {
+  if (width < 1 || height < 1 || mask.length != width * height) return mask;
+  final cleaned = Uint8List.fromList(mask);
+  final queue = <int>[];
+  void add(int position) {
+    if (cleaned[position] == 0) return;
+    cleaned[position] = 0;
+    queue.add(position);
+  }
+
+  for (var x = 0; x < width; x++) {
+    add(x);
+    add((height - 1) * width + x);
+  }
+  for (var y = 0; y < height; y++) {
+    add(y * width);
+    add(y * width + width - 1);
+  }
+  for (var i = 0; i < queue.length; i++) {
+    final p = queue[i], x = p % width, y = p ~/ width;
+    if (x > 0) add(p - 1);
+    if (x + 1 < width) add(p + 1);
+    if (y > 0) add(p - width);
+    if (y + 1 < height) add(p + width);
+  }
+  return cleaned;
+}
+
 /// Remove long grid rulings connected to a delivery crop's boundary. Short
 /// interior marks and disconnected glyphs remain untouched. Return the original
 /// mask when no ruling is measured, so callers can avoid a duplicate reading.

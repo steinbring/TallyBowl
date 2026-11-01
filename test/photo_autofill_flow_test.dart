@@ -22,9 +22,12 @@ void main() {
     '80',
     '104',
     for (var i = 1; i <= 5; i++) 'extra5_${i.toString().padLeft(2, '0')}',
+    for (final score in [116, 122, 74]) 'oct31_$score',
   ]) {
     final extraPath = id.startsWith('extra5_')
         ? 'test/fixtures/extra5/case_${id.substring(7)}'
+        : id.startsWith('oct31_')
+        ? 'test/fixtures/practice_oct31/score_${id.substring(6)}'
         : null;
     final extra = extraPath == null
         ? null
@@ -157,10 +160,11 @@ void main() {
               ),
             );
             await tester.tap(find.text('Open photo'));
-            // Native recognition and actual retained-file reads finish outside fake time.
+            // Native recognition and worker-isolate raster reads finish outside
+            // fake time. Allow the real photo work to finish under suite load.
             for (
               var i = 0;
-              i < 50 && find.byType(GameEditor).evaluate().isEmpty;
+              i < 500 && find.byType(GameEditor).evaluate().isEmpty;
               i++
             ) {
               await Future<void>.delayed(const Duration(milliseconds: 20));

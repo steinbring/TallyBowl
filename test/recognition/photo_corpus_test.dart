@@ -70,4 +70,45 @@ void main() {
       );
     }
   }
+  test(
+    'a conflicting player name cannot borrow another pass identity',
+    () async {
+      final fixture = jsonDecode(
+        File('test/fixtures/corpus12/case_07_apple.json').readAsStringSync(),
+      ) as Map;
+      final responses = fixture['responses'] as Map;
+      // This pass normally omits the body name and is corroborated by the other
+      // pass's name plus six checkpoints. An explicit different name must block
+      // that recovery even when the numeric observations remain unchanged.
+      final bodyName = (responses['a2.0'] as List)
+          .cast<Map>()
+          .expand((line) => (line['elements'] as List? ?? [line]).cast<Map>())
+          .firstWhere((word) => word['text'] == 'Bowler' && word['y'] < .8);
+      final conflict = {...bodyName, 'text': 'Guest', 'elements': <dynamic>[]};
+      (responses['a1'] as List).add({
+        ...conflict,
+        'elements': [conflict],
+      });
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(PhotoService.channel, (call) async {
+            final args = call.arguments as Map;
+            final key = args['regions'] == null || args['context'] == true
+                ? 'a${args['aspect'] ?? 1}'
+                : 'regional';
+            return responses[key] ?? [];
+          });
+      addTearDown(
+        () => TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+            .setMockMethodCallHandler(PhotoService.channel, null),
+      );
+      final lines = await PhotoService.recognize(
+        'test/fixtures/corpus12/case_07.png',
+        profile: profile,
+      );
+      expect(
+        ScoreSheetParser.automaticRow(ScoreSheetParser.rows(lines, profile)),
+        isNull,
+      );
+    },
+  );
 }
