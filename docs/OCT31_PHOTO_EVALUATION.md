@@ -42,4 +42,4 @@ Android additionally recovers the earlier 103- and 112-pin personal photos. Appl
 
 All **239 unit/widget tests pass**, and static analysis is clean. This includes all new engine fixtures, wrong-total and wrong-name checks, conflicting cross-pass identities, preserved checkpoint/handicap safeguards and the actual import/resume → editor → saved-game flow. Normal Android debug and Mac release builds pass; their packages include the new template license and exclude photo fixtures and private diagnostic targets. The normal app is restored on the isolated emulator after verification.
 
-This fix is local development work. It has not updated the Samsung installation or TestFlight build 15. Physical Samsung/iPad camera capture and installed Apple beta recognition remain separate checks.
+Samsung owner build **0.1.15 (16)** now includes this fix, with verified in-place installation and unchanged journal, profile and draft; see [the installation record](DEVICE_TESTING.md). TestFlight remains build 15. Physical Samsung/iPad camera capture and installed Apple beta recognition remain separate checks.
