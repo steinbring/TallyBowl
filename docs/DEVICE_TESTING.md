@@ -1,12 +1,18 @@
 # Device testing and owner installations
 
-The Samsung has owner build **0.1.14 (15)**. The last directly verified local Mac/iPad installations are **0.1.7 (8)**; TestFlight distribution status is recorded separately in [TESTFLIGHT.md](TESTFLIGHT.md). A physical Apple TestFlight installation has not been verified. Repeat this checklist on each distribution-signed candidate and record its exact version.
+The Samsung has owner build **0.1.15 (16)**. The last directly verified local Mac/iPad installations are **0.1.7 (8)**; TestFlight distribution status is recorded separately in [TESTFLIGHT.md](TESTFLIGHT.md). A physical Apple TestFlight installation has not been verified. Repeat this checklist on each distribution-signed candidate and record its exact version.
 
 Start with the Samsung Galaxy Z Fold 8, then repeat the camera, import, sharing, and accessibility checks on a physical iPad and a supported Mac. Current automated checks are described in [development status](DEVELOPMENT.md). The Samsung was installed with build 0.1.4 (5) and supplied the first real-photo regression. This checklist separates further hardware checks from automated evidence.
 
+## Verified Samsung update — November 1, 2026
+
+Updated the connected Samsung SM_F971U1 in place from **0.1.14 (15)** to **0.1.15 (16)** with the normal `lib/main.dart` owner debug APK. This includes the October 31 recognition fix verified below. The new and installed APK signing certificates match, permissions are unchanged, and the bundled recognition assets match source. Private diagnostics and photo fixtures are excluded. The installed APK SHA-256 matches `build/releases/TallyBowl-0.1.15-android-debug.apk` exactly.
+
+Protected copies of the previous APK and stopped-app data are retained under ignored `build/owner-updates/0.1.15/samsung/`. All **12 app-data files** have identical hashes before and immediately after `adb install -r`. After launch, the journal passes SQLite integrity checks and has an identical logical dump, preserving **3 alleys, 2 balls, 3 sessions and 9 games**, plus all profile/draft settings. Android reports version 0.1.15/build 16, a successful activity launch and a running process. The lock screen prevented a visual foreground check. No uninstall, data clearing, saved-game edit or outgoing share occurred. TestFlight remains build 15; this owner update does not establish new physical-camera or Apple beta acceptance.
+
 ## Local recognition verification — November 1, 2026
 
-The complete production Flutter/native ML Kit pipeline on the isolated Android 17 emulator recovered all ten frames and totals **116, 122 and 74** from the three new October 31 original JPEGs. The original-image Apple/native regression run and earlier-photo preservation checks are detailed in [the evaluation report](OCT31_PHOTO_EVALUATION.md). All 239 unit/widget checks and normal Android debug/Mac release builds pass. The private emulator diagnostic was replaced by the normal `lib/main.dart` app after testing. No Samsung was connected during this verification; its installation remains build 15. No physical-camera or new TestFlight-installation acceptance is claimed.
+The complete production Flutter/native ML Kit pipeline on the isolated Android 17 emulator recovered all ten frames and totals **116, 122 and 74** from the three new October 31 original JPEGs. The original-image Apple/native regression run and earlier-photo preservation checks are detailed in [the evaluation report](OCT31_PHOTO_EVALUATION.md). All 239 unit/widget checks and normal Android debug/Mac release builds pass. The private emulator diagnostic was replaced by the normal `lib/main.dart` app after testing. Samsung was not connected during that emulator verification; its subsequent build-16 owner update is recorded above. No physical-camera or new TestFlight-installation acceptance is claimed.
 
 ## Verified Samsung update — October 30, 2026
 
@@ -54,7 +60,7 @@ The Mac package launched successfully after strict signature and sealed owner-po
 
 - Use the packaged **Android debug APK** for this first local test. Public/store release signing is a separate setup task.
 - If an earlier version contains bowling history, export a JSON backup first. Update in place with the same development signing key. A signature mismatch is a reason to inspect signing, not to uninstall and erase data automatically.
-- Confirm the intended version/build after updating in place (currently 0.1.14/15 on Samsung; the last verified local Mac/iPad installs are 0.1.7/8); retain existing alleys, balls, sessions and drafts.
+- Confirm the intended version/build after updating in place (currently 0.1.15/16 on Samsung; the last verified local Mac/iPad installs are 0.1.7/8); retain existing alleys, balls, sessions and drafts.
 
 ## First complete session
 
