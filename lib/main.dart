@@ -13,6 +13,9 @@ void main() {
     yield LicenseEntryWithLineBreaks([
       'Roboto score glyph templates',
     ], await rootBundle.loadString('assets/recognition/OFL-Roboto.txt'));
+    yield LicenseEntryWithLineBreaks([
+      'Roboto Slab score glyph templates',
+    ], await rootBundle.loadString('assets/recognition/LICENSE-RobotoSlab.txt'));
   });
   runApp(const TallyBowlApp());
   // Metadata improves service identification; it must never delay first paint.
