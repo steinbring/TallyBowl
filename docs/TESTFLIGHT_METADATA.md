@@ -21,7 +21,7 @@ This beta stores your journal locally, has no login or subscription, and include
 
 ## What to test
 
-Build 0.1.12 (13) improves small tables, sparse stylized headers, border-merged numbers, bright rulings and colored strikes. All five latest original photos fill exactly on both engines. The combined 20-original rerun preserves previous exact examples: 17/18 complete on Apple and 16/18 on Android, with two incomplete games left for review and no incorrect automatic result observed. These tuned development examples do not establish general recognition accuracy. See [the per-photo follow-up](FIVE_PHOTO_EVALUATION.md).
+Build 0.1.15 (16) improves blue/purple monitor lettering, outlined digits over cartoon backgrounds, wide-footed numeral 1 and sparse frame headers. All three latest practice photos recover every frame and the scratch totals 116, 122 and 74 on both engines, preserving earlier successful imports. Across 34 retained originals, 102 native regression checks observed no incorrect automatic import; uncertain and unfinished examples still require review. Tiny online images and unfamiliar layouts remain a material limitation. These development examples do not establish general recognition accuracy. Compare every delivery and the scratch total before saving. See [the current photo report](OCT31_PHOTO_EVALUATION.md).
 
 - Add scoreboard aliases, two balls and an alley; try both suggestions and manual entry.
 - Start practice or league, capture/import a final scoreboard, verify the correct bowler and all ten frames, select balls/primary ball, lane and notes, then save.

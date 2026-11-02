@@ -1,5 +1,22 @@
 # TestFlight readiness and release runbook
 
+## 0.1.15 (16): uploaded, export-compliance confirmation pending
+
+Both signed **iPad and native Mac 0.1.15 (16)** uploads succeeded and finished Apple processing. Both currently show **Missing Compliance**. Build-specific What to Test notes are saved on each platform. **Neither build is assigned to a testing group yet**: the Owner testing build picker disables build 16 until compliance is completed. Explicit confirmation of the saved standard-encryption answer and France exclusion is pending. Existing build 15 remains Testing in both Owner testing and External testing on both platforms, as observed November 1, 2026.
+
+Recognition source **1dfb9c4** recovers all ten frames in the three October 31 originals on both engines and preserves earlier successful imports. **239 unit/widget tests pass**, analysis is clean, and **102 native photo checks** across 34 retained originals observe no incorrect automatic import. Small online images and unfamiliar layouts remain limited; see [the evaluation](OCT31_PHOTO_EVALUATION.md). Source version **0.1.15 (16)** is already installed on the Samsung with unchanged journal, profile and draft.
+
+| Evidence | Result |
+| --- | --- |
+| iPad ASC build | `cfc4b014-5082-432a-b0ed-dcbb373b5745`, processed; Missing Compliance |
+| Native Mac ASC build | `b92ecdf9-ea5b-4303-ab0f-a183c9469c3f`, processed; Missing Compliance |
+| Source | Recognition `1dfb9c4`, version `93d53a3`, release source `57bb585`; normal `lib/main.dart` |
+| Packages | iPad App Store IPA; universal arm64/x86_64 native Mac installer; both archive/content and exported nested-certificate/profile checks pass |
+| Mac upload correction | Initial upload rejected because `Contents/_CodeSignature/CodeResources` was mode 0600; archive mode corrected to 0644, re-exported with umask 022, installer/app signatures and every payload mode rechecked, corrected upload succeeded |
+| Packaging regression check | Read-only distribution preflight now rejects the original unreadable package and accepts the corrected package |
+
+Private archives, export/signing reports, hashes, upload logs and testing notes are under ignored `build/testflight/build-16/`. The final Mac artifact is `macos-export-readable/TallyBowl!.pkg`; the earlier rejected export is retained as diagnostic evidence. No private photo targets, original JPEGs or test fixtures are distributed. The following sections retain historical release status.
+
 ## 0.1.14 (15): social links, expanded catalog and ball colors
 
 Feature sources **e4d0bfc** and **b6f73bc** add TallyBowl!'s Bluesky/GoToSocial links in Settings, all 50 Brunswick and 13 Radical names in their official Current catalogs checked October 30, 2026, and 11 optional basic ball colors. My Bag shows each saved color; colors survive journal persistence and backups, and older records remain unset. Existing/custom models remain available. The bundled guide documents the color controls. **221 Flutter tests pass; static analysis is clean**, including recognition regressions, database/backup compatibility, save retries and light/dark 200% text checks. Recognition code is unchanged from build 14; its documented limitations remain.
@@ -188,6 +205,7 @@ Xcode 27 exported an Apple Distribution-signed iPad IPA and an App Store install
 The following commands produce signed archives/exports (normal `lib/main.dart`; they require an authorized Xcode account). The corrected Mac command uses **app-target-scoped** overrides. Do not pass `CODE_SIGN_IDENTITY` or `DEVELOPMENT_TEAM` globally: that signed Swift Package privacy resource bundles with the development certificate, which Xcode did not replace during build 8 export:
 
 ```sh
+umask 022
 flutter build ipa --release --target lib/main.dart \
   --export-options-plist release/apple/ExportOptions.plist
 flutter build macos --release --target lib/main.dart
@@ -204,7 +222,7 @@ xcodebuild -exportArchive \
   -allowProvisioningUpdates
 ```
 
-After export, expand the Mac package with `pkgutil --expand-full` (or unzip the IPA), then run `python3 tool/apple_distribution_preflight.py <exported.app> --output <ignored-report.json>`. This checks App Store profile/team/identifier, root protections and the distribution certificate on every signed nested bundle/framework. Resource-only bundles can be unsigned and remain sealed by the app signature. The check reproduced exactly the five ITMS-90284 mismatches in the rejected Mac export, passed the known-good iPad export, and passed both new build-9 exports. Keep `tool/testflight_preflight.py --archive ...` for source/archive contents as a separate check.
+After export, expand the Mac package with `pkgutil --expand-full` (or unzip the IPA), then run `python3 tool/apple_distribution_preflight.py <exported.app> --output <ignored-report.json>`. This checks App Store profile/team/identifier, root protections and the distribution certificate on every signed nested bundle/framework. Mac payload files must also be readable by other users, with traversable directories and executable binaries. Use umask 022 for packaging; a private parent output directory can remain restricted without embedding owner-only permissions into the installer. Resource-only bundles can be unsigned and remain sealed by the app signature. The check reproduced exactly the five ITMS-90284 mismatches in the rejected Mac export, passed the known-good iPad export, and passed both new build-9 exports. It also reproduces the build-16 unreadable-CodeResources rejection and passes the corrected package. Keep `tool/testflight_preflight.py --archive ...` for source/archive contents as a separate check.
 
 The committed options export locally. For build-9 uploads, an ignored copy at `build/testflight/build-9/UploadOptions.plist` set `destination=upload`, leaving the committed template unchanged. Each platform used `xcodebuild -exportArchive` with its signed archive, separate export directory, upload options and `-allowProvisioningUpdates`. Never repeat a successful upload to check processing; inspect the existing build in App Store Connect instead. The build-8 iPad archive/IPA were preserved under ignored `build/testflight/setup/` before rebuilding build 9. Flutter replaces `build/ios/archive/Runner.xcarchive`; label retained artifacts by version/build.
 
