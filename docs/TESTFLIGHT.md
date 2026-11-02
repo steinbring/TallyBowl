@@ -1,15 +1,15 @@
 # TestFlight readiness and release runbook
 
-## 0.1.15 (16): uploaded, export-compliance confirmation pending
+## 0.1.15 (16): owner Testing, external review submitted
 
-Both signed **iPad and native Mac 0.1.15 (16)** uploads succeeded and finished Apple processing. Both currently show **Missing Compliance**. Build-specific What to Test notes are saved on each platform. **Neither build is assigned to a testing group yet**: the Owner testing build picker disables build 16 until compliance is completed. Explicit confirmation of the saved standard-encryption answer and France exclusion is pending. Existing build 15 remains Testing in both Owner testing and External testing on both platforms, as observed November 1, 2026.
+Both signed **iPad and native Mac 0.1.15 (16)** uploads succeeded and finished Apple processing. **Both are Testing in Owner testing.** Both are assigned to External testing and show **Waiting for Review**, with automatic tester notification enabled. External access awaits Apple's Beta App Review approval. The owner explicitly approved reusing the standard-encryption answer and France exclusion; both questionnaires are cleared and build-specific What to Test notes are saved. Verified in both groups' Builds lists on **November 1, 2026**, at approximately **10:03 PM Central**. Existing build 15 remains Testing in both groups on both platforms. Group membership and public-link settings were retained.
 
 Recognition source **1dfb9c4** recovers all ten frames in the three October 31 originals on both engines and preserves earlier successful imports. **239 unit/widget tests pass**, analysis is clean, and **102 native photo checks** across 34 retained originals observe no incorrect automatic import. Small online images and unfamiliar layouts remain limited; see [the evaluation](OCT31_PHOTO_EVALUATION.md). Source version **0.1.15 (16)** is already installed on the Samsung with unchanged journal, profile and draft.
 
 | Evidence | Result |
 | --- | --- |
-| iPad ASC build | `cfc4b014-5082-432a-b0ed-dcbb373b5745`, processed; Missing Compliance |
-| Native Mac ASC build | `b92ecdf9-ea5b-4303-ab0f-a183c9469c3f`, processed; Missing Compliance |
+| iPad ASC build | `cfc4b014-5082-432a-b0ed-dcbb373b5745`, owner Testing; external Waiting for Review |
+| Native Mac ASC build | `b92ecdf9-ea5b-4303-ab0f-a183c9469c3f`, owner Testing; external Waiting for Review |
 | Source | Recognition `1dfb9c4`, version `93d53a3`, release source `57bb585`; normal `lib/main.dart` |
 | Packages | iPad App Store IPA; universal arm64/x86_64 native Mac installer; both archive/content and exported nested-certificate/profile checks pass |
 | Mac upload correction | Initial upload rejected because `Contents/_CodeSignature/CodeResources` was mode 0600; archive mode corrected to 0644, re-exported with umask 022, installer/app signatures and every payload mode rechecked, corrected upload succeeded |
