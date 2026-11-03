@@ -1,6 +1,6 @@
 # User guide
 
-Updated 2026-10-30.
+Updated 2026-11-03.
 
 ## Set up your journal
 
@@ -30,7 +30,9 @@ To remove an entire session, open it in History and choose Delete session (the t
 
 ## Share a branded recap
 
-Open the session recap and check the preview. Your name, alley/lane, balls, and date each have a privacy switch. Choose Share image to send a PNG attachment using the system share sheet, or use the export/save action to keep a copy. Hiding the date also removes it from the attachment filename.
+Open the session recap and check the preview. Your name, alley/lane, balls, and date each have a privacy switch. Choose Share image to send a PNG attachment using the system share sheet. Hiding the date also removes it from the attachment filename.
+
+Export image saves a PNG directly to Pictures/TallyBowl on Android 10 or later; look for it in your gallery or Files app after the save confirmation. Android 9 and earlier use a system save-location picker. No photo-library or storage permission is requested. On Mac, choose a location in the save dialog. On iPad, choose Save Image or Save to Files from the system sheet. Repeated Android exports keep earlier copies. Images you save outside the app remain until you remove them, including after uninstalling TallyBowl.
 
 Choose Google Chat, AeroSloth, Messages, Mail, or another installed image-compatible app when the system offers it. Recipient availability depends on that app’s platform share support and setup. If it is absent, save the PNG and attach it from the recipient app. Canceling the sheet does not delete the session. TallyBowl never posts to an account automatically.
 

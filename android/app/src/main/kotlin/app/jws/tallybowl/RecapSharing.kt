@@ -8,13 +8,19 @@ import java.io.File
 
 /** Single PNG attachment with explicit, read-only grants through the chooser. */
 internal object RecapSharing {
-    fun intent(context: Context, path: String): Intent {
+    /** Both export and sharing accept only our bounded, private recap PNGs. */
+    fun image(context: Context, path: String): File {
         val root = File(context.cacheDir, "tallybowl-exports").canonicalFile
         val file = File(path).canonicalFile
         require(file.path.startsWith(root.path + File.separator) && file.isFile &&
             file.extension.equals("png", ignoreCase = true) && file.length() in 8..20L * 1024 * 1024)
         val signature = file.inputStream().use { stream -> ByteArray(8).also { require(stream.read(it) == 8) } }
         require(signature.contentEquals(byteArrayOf(137.toByte(), 80, 78, 71, 13, 10, 26, 10)))
+        return file
+    }
+
+    fun intent(context: Context, path: String): Intent {
+        val file = image(context, path)
         val uri = FileProvider.getUriForFile(context, "${context.packageName}.recap_provider", file)
         return Intent(Intent.ACTION_SEND).apply {
             type = "image/png"

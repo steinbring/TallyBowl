@@ -1,6 +1,6 @@
 # Privacy policy
 
-Updated 2026-10-27.
+Updated 2026-11-03.
 
 ## Your journal on your device
 
@@ -24,7 +24,7 @@ Avoid putting private notes or other sensitive information into alley searches. 
 
 ## Sharing, exports, and retention
 
-Recap images and exports are created locally. You choose whether to share or save them and select the destination in the system sheet or file picker. Recaps can include your name, date, alley/lane, balls, and scores; check the preview and privacy switches before sharing. Original scoreboard photos and other bowlers are not included in recap images. Destination apps and services handle received files under their own policies.
+Recap images and exports are created locally. Share image opens the system share sheet. Export image on Android 10 or later saves a PNG directly to Pictures/TallyBowl without photo-library or storage permission; older Android versions use a save-location picker. Mac uses a save dialog and iPad uses the system sheet. Your gallery or backup service may sync saved images according to your device settings. Recaps can include your name, date, alley/lane, balls, and scores; check the preview and privacy switches before sharing or exporting. Original scoreboard photos and other bowlers are not included in recap images. Destination apps and services handle received files under their own policies.
 
 JSON backups contain your journal, including profile, notes, inventory, history, and unfinished frame draft. CSV files contain the selected scoring records. Keep exports somewhere you trust. TallyBowl cannot recall or delete files after you save or share them outside the app.
 

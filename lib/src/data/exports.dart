@@ -27,14 +27,25 @@ abstract final class BowlExports {
         ),
       );
   static Future<File> temporaryFile(String name, Uint8List bytes) async {
+    if (name.isEmpty ||
+        name == '.' ||
+        name == '..' ||
+        RegExp(r'[/\\\x00-\x1f\x7f]').hasMatch(name)) {
+      throw ArgumentError.value(name, 'name', 'Use a plain filename.');
+    }
     final directory = await Directory(
       p.join((await getTemporaryDirectory()).path, 'tallybowl-exports'),
     ).create(recursive: true);
     final before = DateTime.now().subtract(const Duration(days: 1));
     await for (final entry in directory.list(followLinks: false)) {
-      if ((entry is File || entry is Directory) &&
-          (await entry.stat()).modified.isBefore(before)) {
-        await entry.delete(recursive: true);
+      try {
+        if ((entry is File || entry is Directory) &&
+            (await entry.stat()).modified.isBefore(before)) {
+          await entry.delete(recursive: true);
+        }
+      } on FileSystemException {
+        // An old export can disappear during cleanup or be temporarily locked.
+        // It must not prevent the user from creating a new one.
       }
     }
     // Isolate identical export names without exposing a timestamp in the name
@@ -43,7 +54,16 @@ abstract final class BowlExports {
       p.join(directory.path, const Uuid().v4()),
     ).create();
     final file = File(p.join(exportDirectory.path, name));
-    return file.writeAsBytes(bytes, flush: true);
+    try {
+      return await file.writeAsBytes(bytes, flush: true);
+    } on FileSystemException {
+      try {
+        await exportDirectory.delete(recursive: true);
+      } on FileSystemException {
+        // A later opportunistic cleanup can retry.
+      }
+      rethrow;
+    }
   }
 
   static Rect origin(BuildContext context) {
@@ -70,13 +90,20 @@ abstract final class BowlExports {
     }
   }
 
-  static Future<void> exportFile(
+  /// Returns a confirmed save destination, or null after cancellation/sharing.
+  static Future<String?> exportFile(
     BuildContext context, {
     required String name,
     required String mime,
     required Uint8List bytes,
   }) async {
-    if (Platform.isMacOS) {
+    if (defaultTargetPlatform == TargetPlatform.android &&
+        mime == 'image/png') {
+      final file = await temporaryFile(name, bytes);
+      return imageShareChannel.invokeMethod<String>('saveImage', {
+        'path': file.path,
+      });
+    } else if (defaultTargetPlatform == TargetPlatform.macOS) {
       final destination = await getSaveLocation(suggestedName: name);
       if (destination != null) {
         await XFile.fromData(
@@ -84,13 +111,14 @@ abstract final class BowlExports {
           mimeType: mime,
           name: name,
         ).saveTo(destination.path);
+        return destination.path;
       }
     } else {
       final anchor = origin(context);
       final file = await temporaryFile(name, bytes);
       if (mime == 'image/png') {
         await shareImage(file, name, anchor);
-        return;
+        return null;
       }
       await SharePlus.instance.share(
         ShareParams(
@@ -100,6 +128,7 @@ abstract final class BowlExports {
         ),
       );
     }
+    return null;
   }
 
   static Future<void> safetyCopy(BowlData data) async {

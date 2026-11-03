@@ -7,10 +7,19 @@ import java.util.concurrent.Executors
 
 class MainActivity : FlutterActivity() {
     private val imageExecutor = Executors.newSingleThreadExecutor()
+    private var recapExporter: RecapImageExport? = null
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
+        recapExporter = RecapImageExport(this)
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "app.jws.tallybowl/share").setMethodCallHandler { call, result ->
-            if (call.method != "shareImage") {
+            if (call.method == "saveImage") {
+                val path = call.argument<String>("path")
+                if (path == null) {
+                    result.error("invalid_image", "Create a recap first.", null)
+                } else {
+                    recapExporter!!.save(path, result)
+                }
+            } else if (call.method != "shareImage") {
                 result.notImplemented()
             } else {
                 try {
@@ -45,7 +54,13 @@ class MainActivity : FlutterActivity() {
             }
         }
     }
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: android.content.Intent?) {
+        if (recapExporter?.onActivityResult(requestCode, resultCode, data) != true) {
+            super.onActivityResult(requestCode, resultCode, data)
+        }
+    }
     override fun onDestroy() {
+        recapExporter?.close()
         imageExecutor.shutdown()
         super.onDestroy()
     }
