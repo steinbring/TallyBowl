@@ -9,6 +9,7 @@
 .pub/
 /build/
 /coverage/
+__pycache__/
 *.iml
 .idea/
 
