@@ -1,6 +1,6 @@
 # TestFlight metadata
 
-Current beta: **0.1.12 (13)**. Both iPad and native Mac uploads processed successfully. Both show **Testing** in Owner testing and **Waiting for Review** in External testing; automatic tester notification is enabled. The existing external group contains the two requested email testers. Build-specific testing notes, beta description, feedback email and private reviewer contact/instructions are saved in App Store Connect; sign-in is marked as not required. See the [runbook](TESTFLIGHT.md) for current external-review and installation status.
+Current build: **0.1.16 (17)** for iPad and native Mac. See the [runbook](TESTFLIGHT.md) for verified upload, group and external-review status. Existing Owner testing and External testing membership is retained. Build-specific notes appear below; beta description, feedback email and private reviewer contact/instructions remain in App Store Connect, with sign-in not required.
 
 ## Public contact and remaining account fields
 
@@ -21,17 +21,11 @@ This beta stores your journal locally, has no login or subscription, and include
 
 ## What to test
 
-Build 0.1.15 (16) improves blue/purple monitor lettering, outlined digits over cartoon backgrounds, wide-footed numeral 1 and sparse frame headers. All three latest practice photos recover every frame and the scratch totals 116, 122 and 74 on both engines, preserving earlier successful imports. Across 34 retained originals, 102 native regression checks observed no incorrect automatic import; uncertain and unfinished examples still require review. Tiny online images and unfamiliar layouts remain a material limitation. These development examples do not establish general recognition accuracy. Compare every delivery and the scratch total before saving. See [the current photo report](OCT31_PHOTO_EVALUATION.md).
+Build 0.1.16 (17) improves recap export feedback and temporary-file handling. Mac Export image confirms completed saves; sharing and export failures allow retry with clearer messages. Date-hidden recaps keep a neutral filename. The guide and privacy policy describe each platform's save behavior. Recognition and journal formats are unchanged.
 
-- Add scoreboard aliases, two balls and an alley; try both suggestions and manual entry.
-- Start practice or league, capture/import a final scoreboard, verify the correct bowler and all ten frames, select balls/primary ball, lane and notes, then save.
-- Resume after closing during an unfinished game. Test photo-picker cancel, permission denial and offline recording/recognition.
-- In Tonight or History session details, test Delete session, cancellation, and removal of the session's games and unfinished draft. Keep a backup before deletion.
-- Finish a session and share the PNG to an installed recipient such as Messages, Mail or AeroSloth; test cancellation and hiding each identifying detail.
-- Export a backup and verify restore/recovery on an isolated journal. Restore replaces the whole journal, so keep your original backup outside the app.
-- Try VoiceOver, large text, dark appearance, iPad rotation/multitasking and Mac keyboard navigation. Report clipped controls or lost focus/data.
+Please test Share your night: preview the recap, hide each identifying detail, share a PNG to an installed receiving app, cancel the sheet, and try Export image. On Mac, confirm the saved PNG opens correctly and cancelling the save dialog leaves the journal unchanged. On iPad, save through the system sheet. Also check photo import and draft resume, all ten frames and tenth-frame fills, manual scoring, session history, ball colors, large text, dark mode and VoiceOver. Compare every delivery and scratch total before saving; small or unfamiliar scoreboards may still need correction.
 
-Include version/build, device/OS, steps, expected/actual outcome and whether it repeats. Use permissioned, redacted scoreboard photos in feedback.
+Keep a journal backup before testing restore or deletion. Report version/build, device/OS, steps, expected and actual results. Use permissioned, redacted photos in feedback.
 
 ## Beta review notes
 

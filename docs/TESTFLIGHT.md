@@ -1,5 +1,23 @@
 # TestFlight readiness and release runbook
 
+## 0.1.16 (17): recap export and quick audit
+
+**Both iPad and native Mac 0.1.16 (17) are Testing in Owner testing.** Both uploads processed successfully and are assigned to External testing with status **Waiting for Review**. Automatic tester notification is enabled; external access awaits Apple's Beta App Review approval. The existing owner-approved standard-encryption answer and France exclusion are saved on both builds. Build-specific testing notes are saved. Both groups' Builds lists were verified on **November 3, 2026**. Existing group membership and public-link settings were retained.
+
+Source **2a9a1df** separates Android Export image from Share image. Android 10+ saves a new PNG directly to Pictures/TallyBowl; older Android uses a save-location picker. Sharing retains its chooser and read-only grants. The update adds confirmed-save feedback, action-specific busy labels, retry messages, filename boundary checks, failed-write cleanup and reliable rendered-image disposal. The bundled guide/policy describe each platform's behavior. Recognition and journal formats are unchanged. See [the quick audit](NOV03_QUICK_AUDIT.md).
+
+| Evidence | Result |
+| --- | --- |
+| iPad ASC build | `ba9e7878-2f29-4c87-bf3a-d6a247243aa0`, owner Testing; external Waiting for Review |
+| Native Mac ASC build | `17eb6197-cadf-4a56-9773-5e4ac193d091`, owner Testing; external Waiting for Review |
+| Regression checks | 242 Flutter tests pass, including all retained recognition fixtures and import/resume flows; static analysis clean |
+| Android checks | 7 native tests pass on the isolated API-37 emulator, including real saved PNGs, repeated saves, failure rollback and separate-UID read-only sharing; Lint has 0 errors and 10 advisory warnings |
+| Apple packages | Normal `lib/main.dart`; iPad App Store IPA and universal arm64/x86_64 native Mac installer; archive/content, distribution profile/nested certificate, Mac payload readability and installer-chain checks pass |
+| Bundled assets | Recognition assets/licenses and updated guide/policy match source in both exports; private photos and fixtures excluded |
+| Android artifact | `build/releases/TallyBowl-0.1.16-android-debug.apk`, version/code 0.1.16/17; normal entry point, verified signer, no storage/photo-library permission; no new physical Samsung installation |
+
+Private archives, packages, hashes, testing notes, test/signing reports and upload logs are retained under ignored `build/testflight/build-17/`. Physical Apple TestFlight installation and physical Samsung gallery/Chat acceptance remain separate checks. The following sections preserve historical release status.
+
 ## 0.1.15 (16): owner Testing, external review submitted
 
 Both signed **iPad and native Mac 0.1.15 (16)** uploads succeeded and finished Apple processing. **Both are Testing in Owner testing.** Both are assigned to External testing and show **Waiting for Review**, with automatic tester notification enabled. External access awaits Apple's Beta App Review approval. The owner explicitly approved reusing the standard-encryption answer and France exclusion; both questionnaires are cleared and build-specific What to Test notes are saved. Verified in both groups' Builds lists on **November 1, 2026**, at approximately **10:03 PM Central**. Existing build 15 remains Testing in both groups on both platforms. Group membership and public-link settings were retained.
