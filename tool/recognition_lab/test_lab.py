@@ -31,6 +31,15 @@ class LabSafetyTest(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'hash changed'):
             validate({'schema': 1, 'cases': [self.case]})
 
+    def test_redacted_identity_is_a_negative_even_with_complete_frames(self):
+        unidentified = dict(self.case, status='unidentified')
+        validate({'schema': 1, 'cases': [unidentified]})
+        baseline = copy.deepcopy(self.report)
+        baseline['cases'][0].update(status='unidentified', exact=False)
+        candidate = copy.deepcopy(baseline)
+        candidate['cases'][0]['wrongAutomatic'] = True
+        self.assertFalse(gate(baseline, candidate)['safe'])
+
     def test_same_photo_cannot_leak_to_test_even_under_different_path(self):
         other = dict(self.case, id='r002', split='test', group='another-capture')
         with self.assertRaisesRegex(ValueError, 'leaks'):

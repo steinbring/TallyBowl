@@ -1,0 +1,367 @@
+{
+  "schema": 1,
+  "date": "2026-11-04",
+  "search": "Google Images: bowling scoreboard screen",
+  "photos": 8,
+  "rowCases": 26,
+  "completeEligibleGames": 12,
+  "incompleteGames": 13,
+  "unidentifiedGames": 1,
+  "productionChanged": false,
+  "previousCorpusRerun": false,
+  "previousCorpusFingerprintMatches": {
+    "apple-baseline": {
+      "pipelineSha256": true,
+      "nativeFingerprint": true,
+      "templatesSha256": true
+    },
+    "apple-candidate": {
+      "pipelineSha256": true,
+      "nativeFingerprint": true,
+      "templatesSha256": true
+    },
+    "android-baseline": {
+      "pipelineSha256": true,
+      "nativeFingerprint": true,
+      "templatesSha256": true
+    },
+    "android-candidate": {
+      "pipelineSha256": true,
+      "nativeFingerprint": true,
+      "templatesSha256": true
+    }
+  },
+  "manifestSha256": "4cc3e31aba86b7647e2b11c55e6786a01f513cdce9be1368cf073f4bacbe54db",
+  "sources": [
+    {
+      "id": "g01",
+      "imageUrl": "https://racheleditullio.com/wp-content/uploads/2016/03/bowling-screen-old.jpg",
+      "sourcePage": "https://racheleditullio.com/blog/2016/02/bowling-2/",
+      "kind": "CRT photographed screen",
+      "sha256": "8a8848069ffa4fbca2eec6bfbeb9dc75ebe4bec617fbe16773c9e63baf617c5e",
+      "previousExactDuplicate": false,
+      "googleQuery": "bowling scoreboard screen",
+      "width": 700,
+      "height": 525,
+      "completeRows": 1,
+      "negativeRows": 4
+    },
+    {
+      "id": "g02",
+      "imageUrl": "https://computerscore.com.au/wp-content/uploads/Replay-Part-3.jpg",
+      "sourcePage": "https://computerscore.com.au/bowlers/",
+      "kind": "Computer Score display example",
+      "sha256": "46143ff86b5824408b90e08d9923b2d39266e8791696e6d440f0ee47b6759781",
+      "previousExactDuplicate": false,
+      "googleQuery": "bowling scoreboard screen",
+      "width": 1366,
+      "height": 768,
+      "completeRows": 0,
+      "negativeRows": 3
+    },
+    {
+      "id": "g03",
+      "imageUrl": "https://coachlippy.com/wp-content/uploads/2015/01/IMG_0706.jpg",
+      "sourcePage": "https://coachlippy.com/what-bowling-taught-me-about-execution/",
+      "kind": "Photographed game",
+      "sha256": "c2a820cf80906bf2f958babfc1ffb602a6d37c3c74bf359f2a7fe6e05df2ce55",
+      "previousExactDuplicate": false,
+      "googleQuery": "bowling scoreboard screen",
+      "width": 3264,
+      "height": 2448,
+      "completeRows": 2,
+      "negativeRows": 0
+    },
+    {
+      "id": "g04",
+      "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/b/b3/Hollywood_Bowl_Score_Screen.jpg",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Hollywood_Bowl_Score_Screen.jpg",
+      "kind": "Hollywood Bowl photographed screen",
+      "sha256": "d87a15bc13881d2d92bd0522eab5dde250e01f40375352ab904c3b899116f0de",
+      "previousExactDuplicate": false,
+      "googleQuery": "bowling scoreboard screen",
+      "width": 5120,
+      "height": 3840,
+      "completeRows": 3,
+      "negativeRows": 0
+    },
+    {
+      "id": "g05",
+      "imageUrl": "https://steltronicscoring.com/wp-content/uploads/2025/06/StelPad-ScoresFullNoBorder2000X1000.png",
+      "sourcePage": "https://steltronicscoring.com/steltronic-products/",
+      "kind": "Steltronic display example",
+      "sha256": "60e58b1442bab50753950ee3e58d053934f52d21940b62070a88909ee5cbd244",
+      "previousExactDuplicate": false,
+      "googleQuery": "bowling scoreboard screen",
+      "width": 2000,
+      "height": 1125,
+      "completeRows": 3,
+      "negativeRows": 0
+    },
+    {
+      "id": "g06",
+      "imageUrl": "https://www.scoremaster.eu/assets/images/sslane1007-1.jpg",
+      "sourcePage": "https://www.scoremaster.eu/",
+      "kind": "ScoreMaster display example",
+      "sha256": "bbe2bf25c0bed0b0c8177b801253a6eaa2b91c21527878a6f261ba7a2095fd23",
+      "previousExactDuplicate": false,
+      "googleQuery": "bowling scoreboard screen",
+      "width": 1280,
+      "height": 768,
+      "completeRows": 0,
+      "negativeRows": 6
+    },
+    {
+      "id": "g07",
+      "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/5/55/300_Perfect_game_-_tenpin_bowling.jpg",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:300_Perfect_game_-_tenpin_bowling.jpg",
+      "kind": "Perfect game photographed screen",
+      "sha256": "1a8a5300a8e33f1d975cd4f703a1e387cd721af582274a95da27f7abc7cc772b",
+      "previousExactDuplicate": false,
+      "googleQuery": "bowling scoreboard screen",
+      "width": 2207,
+      "height": 1123,
+      "completeRows": 0,
+      "negativeRows": 1
+    },
+    {
+      "id": "g08",
+      "imageUrl": "https://i0.wp.com/snieronbowling.com/wp-content/uploads/2025/06/SCORING-RECORD.jpg?resize=750%2C574&ssl=1",
+      "sourcePage": "https://snieronbowling.com/2025/06/09/monday-feature-trio-team-posts-second-best-national-score-at-eastbury/",
+      "kind": "League scoring record photographed screen",
+      "sha256": "c85fb0dcf1ecdaa536fcba835dbf69cd72c4226d08d2fab3274cee00233cd173",
+      "previousExactDuplicate": false,
+      "googleQuery": "bowling scoreboard screen",
+      "width": 750,
+      "height": 574,
+      "completeRows": 3,
+      "negativeRows": 0
+    }
+  ],
+  "reports": {
+    "apple": {
+      "baseline": {
+        "schema": 1,
+        "manifestSha256": "4cc3e31aba86b7647e2b11c55e6786a01f513cdce9be1368cf073f4bacbe54db",
+        "engine": "apple",
+        "nativeFingerprint": "d99dfc7ee2aaf2203a5d43eca347df0e59603850f70fe9264008d995a36f83a3",
+        "pipelineSha256": "520047f098b55d4cd399545bed650ff9ab73724e0947b19411b2dd4a53d9bcb8",
+        "templatesSha256": "776d2e351fd8b00c24a7b538a1d2b2ad134ed510c99c1e9d590e85ed2400c82e",
+        "expectedCases": 26,
+        "complete": true,
+        "reportSha256": "ecab65c61787aabe3b9197797730ba6f10fdf0cd5c175fc568091a248c443f22",
+        "exactComplete": 0,
+        "wrongAutomatic": 0,
+        "negativesRejected": 14,
+        "maxNativeCalls": 4,
+        "perImage": {
+          "g01": {
+            "exact": 0,
+            "wrongAutomatic": 0
+          },
+          "g02": {
+            "exact": 0,
+            "wrongAutomatic": 0
+          },
+          "g03": {
+            "exact": 0,
+            "wrongAutomatic": 0
+          },
+          "g04": {
+            "exact": 0,
+            "wrongAutomatic": 0
+          },
+          "g05": {
+            "exact": 0,
+            "wrongAutomatic": 0
+          },
+          "g06": {
+            "exact": 0,
+            "wrongAutomatic": 0
+          },
+          "g07": {
+            "exact": 0,
+            "wrongAutomatic": 0
+          },
+          "g08": {
+            "exact": 0,
+            "wrongAutomatic": 0
+          }
+        }
+      },
+      "candidate": {
+        "schema": 1,
+        "manifestSha256": "4cc3e31aba86b7647e2b11c55e6786a01f513cdce9be1368cf073f4bacbe54db",
+        "engine": "apple",
+        "nativeFingerprint": "d99dfc7ee2aaf2203a5d43eca347df0e59603850f70fe9264008d995a36f83a3",
+        "pipelineSha256": "520047f098b55d4cd399545bed650ff9ab73724e0947b19411b2dd4a53d9bcb8",
+        "templatesSha256": "8a418dd76b0b3fc160c6466382396168e3bcb990399e003eb105286e5b37dc76",
+        "expectedCases": 26,
+        "complete": true,
+        "reportSha256": "c6d2c216f8f7791583ce1da0e1fc364329287b8b89932fbfc797e7bbc3bf7f03",
+        "exactComplete": 0,
+        "wrongAutomatic": 0,
+        "negativesRejected": 14,
+        "maxNativeCalls": 4,
+        "perImage": {
+          "g01": {
+            "exact": 0,
+            "wrongAutomatic": 0
+          },
+          "g02": {
+            "exact": 0,
+            "wrongAutomatic": 0
+          },
+          "g03": {
+            "exact": 0,
+            "wrongAutomatic": 0
+          },
+          "g04": {
+            "exact": 0,
+            "wrongAutomatic": 0
+          },
+          "g05": {
+            "exact": 0,
+            "wrongAutomatic": 0
+          },
+          "g06": {
+            "exact": 0,
+            "wrongAutomatic": 0
+          },
+          "g07": {
+            "exact": 0,
+            "wrongAutomatic": 0
+          },
+          "g08": {
+            "exact": 0,
+            "wrongAutomatic": 0
+          }
+        }
+      }
+    },
+    "android": {
+      "baseline": {
+        "schema": 1,
+        "manifestSha256": "4cc3e31aba86b7647e2b11c55e6786a01f513cdce9be1368cf073f4bacbe54db",
+        "engine": "android",
+        "nativeFingerprint": "3bb7902df0d0283ae2f10f47eeda0b44387f0bdde07e7ba871769b3d9ce6240b",
+        "pipelineSha256": "520047f098b55d4cd399545bed650ff9ab73724e0947b19411b2dd4a53d9bcb8",
+        "templatesSha256": "776d2e351fd8b00c24a7b538a1d2b2ad134ed510c99c1e9d590e85ed2400c82e",
+        "expectedCases": 26,
+        "complete": true,
+        "reportSha256": "3afdb202c2897b380b6638f6a40e8b578287e8ad9df7a292c3d3aa6ea6bf54f7",
+        "exactComplete": 0,
+        "wrongAutomatic": 0,
+        "negativesRejected": 14,
+        "maxNativeCalls": 4,
+        "perImage": {
+          "g01": {
+            "exact": 0,
+            "wrongAutomatic": 0
+          },
+          "g02": {
+            "exact": 0,
+            "wrongAutomatic": 0
+          },
+          "g03": {
+            "exact": 0,
+            "wrongAutomatic": 0
+          },
+          "g04": {
+            "exact": 0,
+            "wrongAutomatic": 0
+          },
+          "g05": {
+            "exact": 0,
+            "wrongAutomatic": 0
+          },
+          "g06": {
+            "exact": 0,
+            "wrongAutomatic": 0
+          },
+          "g07": {
+            "exact": 0,
+            "wrongAutomatic": 0
+          },
+          "g08": {
+            "exact": 0,
+            "wrongAutomatic": 0
+          }
+        }
+      },
+      "candidate": {
+        "schema": 1,
+        "manifestSha256": "4cc3e31aba86b7647e2b11c55e6786a01f513cdce9be1368cf073f4bacbe54db",
+        "engine": "android",
+        "nativeFingerprint": "3bb7902df0d0283ae2f10f47eeda0b44387f0bdde07e7ba871769b3d9ce6240b",
+        "pipelineSha256": "520047f098b55d4cd399545bed650ff9ab73724e0947b19411b2dd4a53d9bcb8",
+        "templatesSha256": "8a418dd76b0b3fc160c6466382396168e3bcb990399e003eb105286e5b37dc76",
+        "expectedCases": 26,
+        "complete": true,
+        "reportSha256": "519a704af82bd8dd41be6dd7d9f5a1d8a595848b431653a4aef3b3b21f423524",
+        "exactComplete": 0,
+        "wrongAutomatic": 0,
+        "negativesRejected": 14,
+        "maxNativeCalls": 4,
+        "perImage": {
+          "g01": {
+            "exact": 0,
+            "wrongAutomatic": 0
+          },
+          "g02": {
+            "exact": 0,
+            "wrongAutomatic": 0
+          },
+          "g03": {
+            "exact": 0,
+            "wrongAutomatic": 0
+          },
+          "g04": {
+            "exact": 0,
+            "wrongAutomatic": 0
+          },
+          "g05": {
+            "exact": 0,
+            "wrongAutomatic": 0
+          },
+          "g06": {
+            "exact": 0,
+            "wrongAutomatic": 0
+          },
+          "g07": {
+            "exact": 0,
+            "wrongAutomatic": 0
+          },
+          "g08": {
+            "exact": 0,
+            "wrongAutomatic": 0
+          }
+        }
+      }
+    }
+  },
+  "gate": {
+    "photoGatePassed": false,
+    "engines": [
+      {
+        "engine": "apple",
+        "safe": true,
+        "promotable": false,
+        "gains": [],
+        "regressions": [],
+        "wrongAutomatic": [],
+        "failures": []
+      },
+      {
+        "engine": "android",
+        "safe": true,
+        "promotable": false,
+        "gains": [],
+        "regressions": [],
+        "wrongAutomatic": [],
+        "failures": []
+      }
+    ],
+    "note": "Also require held-out glyph safety and fresh layout-family tests before release."
+  }
+}

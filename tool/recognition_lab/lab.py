@@ -6,7 +6,7 @@ import json
 from pathlib import Path
 
 SPLITS = {'train', 'validation', 'test', 'regression'}
-STATUSES = {'complete', 'incomplete', 'conflict', 'unsupported'}
+STATUSES = {'complete', 'incomplete', 'conflict', 'unsupported', 'unidentified'}
 
 
 def digest(path):

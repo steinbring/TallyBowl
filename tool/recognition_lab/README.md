@@ -9,9 +9,11 @@ future layout/segmentation changes without changing the installed app.
 All photos, human labels, native OCR text, experimental templates and detailed
 logs belong under ignored `build/recognition-lab/`. No cloud service is used.
 Do not add downloaded scoreboards, private names or EXIF to app assets or Git.
-The November 4 local corpus is `build/recognition-lab/corpus.json` (51 cases,
-34 original photos); it intentionally keeps **all previously inspected photos
-as regression data**, rather than calling them unseen test data.
+The latest combined corpus is `build/recognition-lab/corpus-expanded.json`
+(77 cases, 42 originals), including the eight fresh Google Images sources in
+[the benchmark record](../../docs/GOOGLE_IMAGES_EVALUATION.md). All inspected
+photos are now protected regression data. The earlier 51-case/34-photo manifest
+remains at `build/recognition-lab/corpus.json` to reproduce its historical reports.
 
 ## Dataset rules
 
@@ -43,13 +45,14 @@ layout performance.
 Transcribe visible deliveries and every available checkpoint independently of
 the engine. For `complete` rows the production ten-pin scorer must agree with
 all ten checkpoints. Use `incomplete`, `conflict` or `unsupported` for negative
-cases; these must never become automatic imports. Include multiple players,
+cases, and `unidentified` when a source redacts the bowler's identity even though
+all frames are visible. These must never become automatic imports. Include multiple players,
 split rings, misses, strikes/spares, tenth-frame fills, handicaps, angled views,
 colored backgrounds, tiny fonts and unrelated adjacent screens. Do not infer
 missing deliveries from a matching total.
 
 ```sh
-python3 tool/recognition_lab/lab.py validate build/recognition-lab/corpus.json
+python3 tool/recognition_lab/lab.py validate build/recognition-lab/corpus-expanded.json
 python3 -m unittest discover -s tool/recognition_lab -p test_lab.py
 ```
 
@@ -118,14 +121,14 @@ Run these **sequentially**, once for `apple` and once for `android`:
 
 ```sh
 flutter test --no-pub tool/recognition_lab/evaluate_test.dart \
-  --dart-define=LAB_MANIFEST=build/recognition-lab/corpus.json \
+  --dart-define=LAB_MANIFEST=build/recognition-lab/corpus-expanded.json \
   --dart-define=LAB_ENGINE=apple \
-  --dart-define=LAB_OUTPUT=build/recognition-lab/apple-baseline.json
+  --dart-define=LAB_OUTPUT=build/recognition-lab/next-trial/apple-baseline.json
 
 flutter test --no-pub tool/recognition_lab/evaluate_test.dart \
-  --dart-define=LAB_MANIFEST=build/recognition-lab/corpus.json \
+  --dart-define=LAB_MANIFEST=build/recognition-lab/corpus-expanded.json \
   --dart-define=LAB_ENGINE=apple \
-  --dart-define=LAB_OUTPUT=build/recognition-lab/apple-candidate.json \
+  --dart-define=LAB_OUTPUT=build/recognition-lab/next-trial/apple-candidate.json \
   --dart-define=LAB_TEMPLATES=build/recognition-lab/candidate-new.json
 ```
 
@@ -145,8 +148,8 @@ iPad helper but do not substitute for installed iPadOS/device capture checks.
 
 ```sh
 python3 tool/recognition_lab/lab.py gate \
-  build/recognition-lab/apple-baseline.json build/recognition-lab/apple-candidate.json \
-  build/recognition-lab/android-baseline.json build/recognition-lab/android-candidate.json
+  build/recognition-lab/next-trial/apple-baseline.json build/recognition-lab/next-trial/apple-candidate.json \
+  build/recognition-lab/next-trial/android-baseline.json build/recognition-lab/next-trial/android-candidate.json
 ```
 
 Both reports must be complete, cover the same labeled originals and production
