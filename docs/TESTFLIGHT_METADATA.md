@@ -1,6 +1,6 @@
 # TestFlight metadata
 
-Current build: **0.1.16 (17)** for iPad and native Mac. See the [runbook](TESTFLIGHT.md) for verified upload, group and external-review status. Existing Owner testing and External testing membership is retained. Build-specific notes appear below; beta description, feedback email and private reviewer contact/instructions remain in App Store Connect, with sign-in not required.
+Current candidate: **0.1.17 (18)** for iPad and native Mac, prepared for **Owner testing**. See the [runbook](TESTFLIGHT.md) for verified processing and assignment status. Existing group membership is retained. Beta description, feedback email and private reviewer contact/instructions remain in App Store Connect; sign-in is not required.
 
 ## Public contact and remaining account fields
 
@@ -21,11 +21,11 @@ This beta stores your journal locally, has no login or subscription, and include
 
 ## What to test
 
-Build 0.1.16 (17) improves recap export feedback and temporary-file handling. Mac Export image confirms completed saves; sharing and export failures allow retry with clearer messages. Date-hidden recaps keep a neutral filename. The guide and privacy policy describe each platform's save behavior. Recognition and journal formats are unchanged.
+Build 0.1.17 (18) improves scoreboard row alignment, light/dark and mixed delivery ink, and current-game scratch-total selection. Existing successful photo imports remain covered by regression tests; unfamiliar or small scoreboards may still require manual correction.
 
-Please test Share your night: preview the recap, hide each identifying detail, share a PNG to an installed receiving app, cancel the sheet, and try Export image. On Mac, confirm the saved PNG opens correctly and cancelling the save dialog leaves the journal unchanged. On iPad, save through the system sheet. Also check photo import and draft resume, all ten frames and tenth-frame fills, manual scoring, session history, ball colors, large text, dark mode and VoiceOver. Compare every delivery and scratch total before saving; small or unfamiliar scoreboards may still need correction.
+Please test importing a final scoreboard with your saved name/alias, compare all ten frames and the scratch total, and resume an interrupted photo draft. Test offline recognition, multiple bowlers, splits, spares, strikes and tenth-frame fills. Confirm uncertain/incomplete images require review rather than inventing rolls. Also check session history, manual scoring, Share image, Export image, dark mode, large text and VoiceOver. Journal and backup formats are unchanged.
 
-Keep a journal backup before testing restore or deletion. Report version/build, device/OS, steps, expected and actual results. Use permissioned, redacted photos in feedback.
+Keep a backup before testing restore or deletion. Report version/build, device/OS, expected and actual results. Use permissioned, redacted photos in feedback.
 
 ## Beta review notes
 
