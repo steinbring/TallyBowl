@@ -69,6 +69,7 @@ abstract final class PhotoService {
     final bytes = await readPhoto(XFile(path));
     final fullReadings = <List<RecognizedLine>>[];
     var regionalReading = <RecognizedLine>[];
+    var nativeCalls = 0;
     Future<List<RecognizedLine>> read({
       List<RecognitionRegion>? regions,
       double aspect = 1,
@@ -77,6 +78,7 @@ abstract final class PhotoService {
       final context = focus && profile != null
           ? ScoreboardFocus.region(fullReadings, profile)
           : null;
+      nativeCalls++;
       final output = await channel.invokeMethod<List<dynamic>>(
         'recognizeText',
         {
@@ -111,6 +113,7 @@ abstract final class PhotoService {
             null) {
       return originalLines;
     }
+    var recognized = originalLines;
     try {
       final glyphRows = await FrameGlyphReader.read(
         bytes,
@@ -119,9 +122,51 @@ abstract final class PhotoService {
         alternatives: fullReadings,
         supplemental: regionalReading,
       );
-      return [...originalLines, ...glyphRows];
+      final observed = [...originalLines, ...glyphRows];
+      recognized = observed;
+      if (ScoreSheetParser.automaticRow(
+            ScoreSheetParser.rows(observed, profile),
+          ) !=
+          null) {
+        return observed;
+      }
+      final recovered = await FrameGlyphReader.read(
+        bytes,
+        originalLines,
+        profile,
+        alternatives: fullReadings,
+        supplemental: regionalReading,
+        recovery: true,
+      );
+      recognized = [...observed, ...recovered];
+      if (nativeCalls < 4 &&
+          ScoreSheetParser.automaticRow(
+                ScoreSheetParser.rows(recognized, profile),
+              ) ==
+              null) {
+        final cells = await FrameGlyphReader.regions(
+          bytes,
+          fullReadings,
+          profile,
+          recovery: true,
+        );
+        if (cells.isNotEmpty) {
+          final previousRegional = regionalReading;
+          final refined = await read(regions: cells);
+          final additional = await FrameGlyphReader.read(
+            bytes,
+            originalLines,
+            profile,
+            alternatives: fullReadings,
+            supplemental: [...previousRegional, ...refined],
+            recovery: true,
+          );
+          recognized = [...recognized, ...additional];
+        }
+      }
+      return recognized;
     } catch (_) {
-      return originalLines;
+      return recognized;
     }
   }
 

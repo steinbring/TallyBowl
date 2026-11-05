@@ -126,3 +126,10 @@ or synthesize missing rolls to increase the success count. Very small online
 images have a real information limit: ML Kit recommends roughly 16×16 pixels per
 character and sufficient focus; upscaling cannot recreate lost strokes.
 [Official input guidance](https://developers.google.com/ml-kit/vision/text-recognition/v2/android#input-image-guidelines).
+
+## Measured layout recovery
+
+The [November 5 recovery change](SCOREBOARD_RECOVERY.md) preserves all earlier
+exact imports and adds two Apple / one Android complete-game imports in the
+77-case corpus, with zero wrong automatic candidates. It keeps the 78-template
+bank and records an untouched follow-up holdout, including its remaining failures.

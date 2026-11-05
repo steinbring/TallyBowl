@@ -11,6 +11,7 @@ import 'recognized_text.dart';
 import 'scoreboard_name.dart';
 import 'scoreboard_ink.dart';
 import 'scoreboard_grid.dart';
+import 'recovery_layout.dart';
 
 /// Conservative local fallback for separated delivery cells on monitor grids.
 /// Templates classify photographed ink; score totals only validate the result.
@@ -24,12 +25,20 @@ abstract final class FrameGlyphReader {
     BowlerProfile profile, {
     List<List<RecognizedLine>> alternatives = const [],
     List<RecognizedLine> supplemental = const [],
+    bool recovery = false,
   }) async {
     final sources = [
       lines,
       ...alternatives.where((s) => !identical(s, lines)).take(3),
     ];
-    final layouts = [for (final source in sources) ..._tables(source, profile)];
+    final sourceLayouts = [
+      for (final source in sources)
+        _tables(source, profile, recovery: recovery),
+    ];
+    final layouts = sourceLayouts
+        .expand((s) => s)
+        .take(recovery ? 8 : 16)
+        .toList();
     if (layouts.isEmpty) return [];
     final supportingWords = _distinctWords([
       ...sources.expand((s) => s),
@@ -43,7 +52,10 @@ abstract final class FrameGlyphReader {
           .buffer
           .asUint8List();
       final output = <RecognizedLine>[];
-      final wordReadings = sources.map(_distinctWords).toList();
+      List<RecognizedLine> wordsFor(List<RecognizedLine> source) => recovery
+          ? recoveryNameWords(_distinctWords(source), profile)
+          : _distinctWords(source);
+      final wordReadings = sources.map(wordsFor).toList();
       final imageWidth = image.width, imageHeight = image.height;
       for (final table in layouts) {
         // Align once per observed layout and transfer the raster only once
@@ -146,6 +158,11 @@ abstract final class FrameGlyphReader {
                 )) {
               continue;
             }
+            if (recovery &&
+                (observedCheckpoints.whereType<int>().length < 6 ||
+                    observedCheckpoints.last != score.total)) {
+              continue;
+            }
             // A native pass can omit the large player name while retaining
             // the complete score band. Bind it to another named pass only with
             // six agreeing checkpoints in each, including the tenth. An
@@ -165,7 +182,7 @@ abstract final class FrameGlyphReader {
                 continue;
               }
               final namedSupport = sources.any((other) {
-                final otherWords = _distinctWords(other);
+                final otherWords = wordsFor(other);
                 if (!otherWords.any(sameName)) return false;
                 final checks = _checkpoints(otherWords, aligned);
                 return checks != null &&
@@ -181,10 +198,9 @@ abstract final class FrameGlyphReader {
             // A total-only observation cannot become a new primary reading
             // merely because another pass located a grid. Require its own
             // name/header fit or three agreeing checkpoints including frame ten.
-            final ownsLayout = _tables(
-              source,
-              profile,
-            ).any((candidate) => sameName(candidate.name));
+            final ownsLayout = sourceLayouts[sourceIndex].any(
+              (candidate) => sameName(candidate.name),
+            );
             if (!ownsLayout &&
                 (observedCheckpoints.whereType<int>().length < 3 ||
                     observedCheckpoints.last != score.total)) {
@@ -208,7 +224,7 @@ abstract final class FrameGlyphReader {
                 observedCheckpoints.whereType<int>().length >= 3 &&
                 observedCheckpoints.last == score.total) {
               for (final other in sources) {
-                final otherWords = _distinctWords(other);
+                final otherWords = wordsFor(other);
                 final sameName = otherWords.any(
                   (w) =>
                       _name(w.text) == _name(table.name.text) &&
@@ -306,9 +322,13 @@ abstract final class FrameGlyphReader {
   static Future<List<RecognitionRegion>> regions(
     Uint8List bytes,
     List<List<RecognizedLine>> readings,
-    BowlerProfile profile,
-  ) async {
-    final tables = [for (final source in readings) ..._tables(source, profile)];
+    BowlerProfile profile, {
+    bool recovery = false,
+  }) async {
+    final tables = [
+      for (final source in readings)
+        ..._tables(source, profile, recovery: recovery),
+    ];
     if (tables.isEmpty) return [];
     final ordered = tables.indexed.toList()
       ..sort((a, b) {
@@ -328,7 +348,9 @@ abstract final class FrameGlyphReader {
         for (final candidate in ordered) {
           final table = candidate.$2;
           final aligned = _alignColumns(rgba, width, height, table);
-          if (identical(aligned, table)) continue;
+          if (identical(aligned, table) && (!recovery || table.headers < 6)) {
+            continue;
+          }
           final regions = [for (var i = 0; i < 10; i++) _region(aligned, i)];
           if (regions.every(
             (r) =>
@@ -375,6 +397,21 @@ abstract final class FrameGlyphReader {
     final center = table.first + i * table.pitch;
     final headerY = table.y + i * table.slope;
     final gap = table.rowY(center) - headerY;
+    if (table.band != null) {
+      final left = center - table.pitch * .56;
+      final right = i == 9
+          ? math.max(center + table.pitch * .47, table.tenthRight!)
+          : center + table.pitch * .47;
+      final top = headerY + table.height * .55;
+      final bottom = table.rowY(center) - table.band!.height * .6;
+      return RecognitionRegion(
+        left,
+        top,
+        right - left,
+        bottom - top,
+        tenth: i == 9,
+      );
+    }
     // Native header boxes can include extra vertical whitespace. Keep them
     // from cutting the top off a delivery immediately beneath the header.
     final inset = math.min(table.height * .55, gap * .2);
@@ -389,9 +426,12 @@ abstract final class FrameGlyphReader {
 
   static List<_Table> _tables(
     List<RecognizedLine> lines,
-    BowlerProfile profile,
-  ) {
-    final words = _distinctWords(lines);
+    BowlerProfile profile, {
+    bool recovery = false,
+  }) {
+    final words = recovery
+        ? recoveryNameWords(_distinctWords(lines), profile)
+        : _distinctWords(lines);
     final aliases = [
       profile.name,
       ...profile.aliases,
@@ -402,6 +442,9 @@ abstract final class FrameGlyphReader {
     for (final name in names) {
       final headerWords = [
         ...words,
+        if (recovery)
+          for (final word in words)
+            if (word.elements.isNotEmpty) ...observedHeaderSymbols(word),
         // ML Kit can merge several numbered cells and their vertical borders.
         // Real symbol boxes retain the header positions even in that word.
         for (final line in lines)
@@ -417,7 +460,8 @@ abstract final class FrameGlyphReader {
             n <= 10 &&
             w.centerX > name.x + name.width &&
             name.centerY - w.centerY > name.height * .35 &&
-            name.centerY - w.centerY < name.height * 6;
+            name.centerY - w.centerY <
+                (recovery ? math.max(name.height * 6, .7) : name.height * 6);
       }).toList();
       _Table? table;
       _Table? firstFit;
@@ -441,7 +485,12 @@ abstract final class FrameGlyphReader {
                 (w.centerY - y).abs() < math.max(a.height, b.height) * .7;
           }).toList();
           final distinctHeaders = matches.map((w) => w.text).toSet().length;
-          if (distinctHeaders < 3) continue;
+          if (distinctHeaders < 3 ||
+              (recovery &&
+                  name.centerY - a.centerY > name.height * 6 &&
+                  distinctHeaders < 6)) {
+            continue;
+          }
           if (table == null ||
               distinctHeaders > table.headers ||
               (distinctHeaders == table.headers && bi - ai > longestSpan)) {
@@ -485,7 +534,48 @@ abstract final class FrameGlyphReader {
         tables.add(table);
       }
     }
-    return tables;
+    if (!recovery) return tables;
+    return [for (final table in tables) ..._recoverTable(table, words)];
+  }
+
+  static List<_Table> _recoverTable(_Table table, List<RecognizedLine> words) {
+    var band = RecoveryScoreBand.fit(
+      words,
+      name: table.name,
+      first: table.first,
+      pitch: table.pitch,
+      headerY: table.y,
+      headerSlope: table.slope,
+      headerHeight: table.height,
+    );
+    if (band == null) return [];
+    final columns = band.columns(words, table.first, table.pitch);
+    final first = columns?.$1 ?? table.first;
+    final pitch = columns?.$2 ?? table.pitch;
+    final shift = (first - table.first) / table.pitch * band.slope;
+    band = RecoveryScoreBand(
+      band.firstY + shift,
+      band.slope * pitch / table.pitch,
+      band.height,
+      band.markTop + shift,
+    );
+    final totals = band.totals(words, first, pitch);
+    final tenthRight = totals.length == 1
+        ? math.min(totals.single.x - pitch * .1, first + pitch * 10.4)
+        : first + pitch * 10;
+    return [
+      _Table(
+        table.name,
+        first,
+        pitch,
+        band.markTop - table.height * .55,
+        band.slope,
+        table.height,
+        table.headers,
+        band: band,
+        tenthRight: tenthRight,
+      ),
+    ];
   }
 
   static List<int?>? _checkpoints(List<RecognizedLine> words, _Table table) {
@@ -497,9 +587,18 @@ abstract final class FrameGlyphReader {
       final values = words
           .where(
             (w) =>
-                (w.centerX - center).abs() < table.pitch * .45 &&
-                w.centerY > rowY - gap * .2 &&
-                w.centerY < rowY + gap * .65 &&
+                (w.centerX - center).abs() <
+                    table.pitch * (table.band != null ? .5 : .45) &&
+                w.centerY >
+                    rowY -
+                        (table.band?.height == null
+                            ? gap * .2
+                            : table.band!.height * .35) &&
+                w.centerY <
+                    rowY +
+                        (table.band?.height == null
+                            ? gap * .65
+                            : table.band!.height * .35) &&
                 RegExp(r'^\d{1,3}$').hasMatch(w.text),
           )
           .toList();
@@ -510,6 +609,12 @@ abstract final class FrameGlyphReader {
   }
 
   static List<int> _scratchTotals(List<RecognizedLine> words, _Table table) {
+    if (table.band != null) {
+      return table.band!
+          .totals(words, table.first, table.pitch)
+          .map((w) => int.parse(w.text))
+          .toList();
+    }
     final last = table.first + 9 * table.pitch;
     final totals = words
         .where(
@@ -628,7 +733,9 @@ abstract final class FrameGlyphReader {
     final frames = <String>[];
     for (var i = 0; i < 10; i++) {
       final region = _region(table, i);
-      if (region.x < 0 ||
+      if (region.width <= 0 ||
+          region.height <= 0 ||
+          region.x < 0 ||
           region.y < 0 ||
           region.x + region.width > 1 ||
           region.y + region.height > 1) {
@@ -683,6 +790,70 @@ abstract final class FrameGlyphReader {
           .replaceAll('×', 'X')
           .replaceAll('–', '-')
           .replaceAll('—', '-');
+      if (table.band != null) {
+        final primary = [
+          for (final word in words)
+            if (word.x >= region.x &&
+                word.x + word.width <= region.x + region.width &&
+                region.contains(word))
+              ...ScoreboardGrid.symbols(word).where(
+                (s) => RegExp(
+                  r'^[0-9XF/×–—\-]$',
+                  caseSensitive: false,
+                ).hasMatch(s.text),
+              ),
+        ]..sort((a, b) => a.x.compareTo(b.x));
+        final confirmed = primary
+            .map((s) => s.text)
+            .join()
+            .toUpperCase()
+            .replaceAll('×', 'X')
+            .replaceAll('–', '-')
+            .replaceAll('—', '-');
+        String readInk(Uint8List pixels) => _classify(
+          pixels,
+          w,
+          h,
+          templates,
+          outlined: true,
+          maxGlyphWidth: .85,
+          observed: (l, t, r, b) => _inside(
+            supportingWords
+                .where(
+                  (w) => RegExp(
+                    r'^[0-9XF/×]$',
+                    caseSensitive: false,
+                  ).hasMatch(w.text),
+                )
+                .toList(),
+            imageWidth,
+            imageHeight,
+            x,
+            y,
+            l,
+            t,
+            r,
+            b,
+          ),
+          supporting: (l, t, r, b) =>
+              _inside(supporting, imageWidth, imageHeight, x, y, l, t, r, b),
+        );
+        frames.add(
+          _recoverInk(
+            rgba,
+            imageWidth,
+            x,
+            y,
+            w,
+            h,
+            i == 9,
+            confirmed,
+            mask,
+            readInk,
+          ),
+        );
+        continue;
+      }
       // Determine delivery order from photographed components. Word-level
       // OCR can spread a merged token across frame boundaries and reverse a
       // miss and digit while preserving the same cumulative and final score.
@@ -787,6 +958,94 @@ abstract final class FrameGlyphReader {
       );
     }
     return frames;
+  }
+
+  static String _recoverInk(
+    Uint8List rgba,
+    int imageWidth,
+    int x,
+    int y,
+    int w,
+    int h,
+    bool tenth,
+    String native,
+    Uint8List neutral,
+    String Function(Uint8List) classify,
+  ) {
+    final luminance = Uint8List(w * h);
+    final histogram = List.filled(256, 0);
+    for (var py = 0; py < h; py++) {
+      for (var px = 0; px < w; px++) {
+        final p = ((y + py) * imageWidth + x + px) * 4;
+        final value = (rgba[p] * .299 + rgba[p + 1] * .587 + rgba[p + 2] * .114)
+            .round();
+        luminance[py * w + px] = value;
+        histogram[value]++;
+      }
+    }
+    int percentile(double q) {
+      var seen = 0;
+      for (var value = 0; value < 256; value++) {
+        seen += histogram[value];
+        if (seen >= w * h * q) return value;
+      }
+      return 255;
+    }
+
+    final low = percentile(.05), high = percentile(.95);
+    final readings = <String>{};
+    bool agrees(String candidate) {
+      // Only native words wholly within this frame constrain delivery order;
+      // synthesized character boxes from a cross-frame word are not primary.
+      var index = 0;
+      for (final c in candidate.split('')) {
+        if (index < native.length && native[index] == c) index++;
+      }
+      return index == native.length;
+    }
+
+    final neutralInk = withoutEdgeConnectedInk(neutral, w, h);
+    void consider(Uint8List mask) {
+      final value = classify(mask);
+      final parsed = TenPinScorer.parseFrame(value, tenth: tenth);
+      if (parsed.complete && parsed.error == null && agrees(value)) {
+        readings.add(value);
+      }
+    }
+
+    consider(neutralInk);
+    if (high - low >= 50) {
+      for (final fraction in [.35, .5]) {
+        final dark = Uint8List(w * h), light = Uint8List(w * h);
+        for (var p = 0; p < luminance.length; p++) {
+          if (luminance[p] < low + (high - low) * fraction) dark[p] = 1;
+          if (luminance[p] > high - (high - low) * fraction) light[p] = 1;
+        }
+        final darkInk = withoutSolidPanels(
+          withoutEdgeConnectedInk(dark, w, h),
+          w,
+          h,
+        );
+        final lightInk = withoutSolidPanels(
+          withoutEdgeConnectedInk(light, w, h),
+          w,
+          h,
+        );
+        final combined = Uint8List.fromList([
+          for (var p = 0; p < darkInk.length; p++) darkInk[p] | lightInk[p],
+        ]);
+        final mixed = Uint8List.fromList([
+          for (var p = 0; p < darkInk.length; p++) darkInk[p] | neutralInk[p],
+        ]);
+        for (final mask in [darkInk, lightInk, combined, mixed]) {
+          consider(mask);
+        }
+      }
+    }
+    if (readings.length == 1) return readings.single;
+    if (readings.length > 1) return '';
+    final parsed = TenPinScorer.parseFrame(native, tenth: tenth);
+    return parsed.complete && parsed.error == null ? native : '';
   }
 
   static List<MapEntry<String, double>> _rankGlyph(
@@ -979,6 +1238,20 @@ abstract final class FrameGlyphReader {
           table.slope * winner.$3,
           table.height,
           table.headers,
+          band: table.band == null
+              ? null
+              : RecoveryScoreBand(
+                  table.band!.y(
+                    table.first + (winner.$1 - winner.$3 * .5) * table.pitch,
+                    table.first,
+                    table.pitch,
+                  ),
+                  table.band!.slope * winner.$3,
+                  table.band!.height,
+                  table.band!.markTop +
+                      (winner.$1 - winner.$3 * .5) * table.band!.slope,
+                ),
+          tenthRight: table.tenthRight,
         ),
     ];
   }
@@ -1047,6 +1320,7 @@ abstract final class FrameGlyphReader {
     int h,
     List<_Template> templates, {
     bool outlined = false,
+    double maxGlyphWidth = .65,
     Set<String> Function(int, int, int, int)? observed,
     Set<String> Function(int, int, int, int)? supporting,
   }) {
@@ -1145,7 +1419,9 @@ abstract final class FrameGlyphReader {
         continue;
       }
       if (gh < h * .22) continue;
-      if (gh > h * .92 || gw > w * .65) return '';
+      if (gh > h * .92 || gw > w * maxGlyphWidth) {
+        return '';
+      }
       final ranked = ranking(c);
       final best = ranked.first;
       final native = observed?.call(c.l, c.t, c.r, c.b) ?? <String>{};
@@ -1217,10 +1493,16 @@ class _Table {
     this.y,
     this.slope,
     this.height,
-    this.headers,
-  );
+    this.headers, {
+    this.band,
+    this.tenthRight,
+  });
   final RecognizedLine name;
   final double first, pitch, y, slope, height;
   final int headers;
-  double rowY(double x) => name.centerY + (x - name.centerX) * slope / pitch;
+  final RecoveryScoreBand? band;
+  final double? tenthRight;
+  double rowY(double x) =>
+      band?.y(x, first, pitch) ??
+      name.centerY + (x - name.centerX) * slope / pitch;
 }
