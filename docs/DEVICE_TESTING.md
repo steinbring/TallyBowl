@@ -1,8 +1,14 @@
 # Device testing and owner installations
 
-The Samsung has owner build **0.1.15 (16)**. The last directly verified local Mac/iPad installations are **0.1.7 (8)**; TestFlight distribution status is recorded separately in [TESTFLIGHT.md](TESTFLIGHT.md). A physical Apple TestFlight installation has not been verified. Repeat this checklist on each distribution-signed candidate and record its exact version.
+The Samsung has owner build **0.1.17 (18)**. The last directly verified local Mac/iPad installations are **0.1.7 (8)**; TestFlight distribution status is recorded separately in [TESTFLIGHT.md](TESTFLIGHT.md). A physical Apple TestFlight installation has not been verified. Repeat this checklist on each distribution-signed candidate and record its exact version.
 
 Start with the Samsung Galaxy Z Fold 8, then repeat the camera, import, sharing, and accessibility checks on a physical iPad and a supported Mac. Current automated checks are described in [development status](DEVELOPMENT.md). The Samsung was installed with build 0.1.4 (5) and supplied the first real-photo regression. This checklist separates further hardware checks from automated evidence.
+
+## Verified Samsung update — November 6, 2026
+
+Updated the connected Galaxy Z Fold 8 (SM_F971U1, Android 17) in place from **0.1.15 (16)** to **0.1.17 (18)** using the normal `lib/main.dart` owner debug APK built from source **5e0a125**. This includes the latest shared recognition recovery and the Android image-export fix. The installed and new signing certificates match, permissions are unchanged, and bundled recognition/guide/privacy assets match source. Private photos, fixtures and diagnostic entry points are excluded. The installed APK SHA-256 matches `build/releases/TallyBowl-0.1.17-android-debug.apk` exactly.
+
+Protected copies of the previous APK and stopped-app data, installation logs and comparisons are retained under ignored `build/owner-updates/0.1.17/samsung/`. All **12 persistent app-data files** have identical hashes before and immediately after `adb install -r`. After startup, the journal passes SQLite integrity checks and has an identical logical dump, preserving **3 alleys, 2 balls, 4 sessions and 12 games**, with profile and draft settings unchanged. Android reports version 0.1.17/build 18, a successful activity launch and a running process. The phone is locked, so visual in-app acceptance was not performed. No uninstall, data clearing, saved-game edit or outgoing share occurred. This verifies installation and data preservation; it does not add live camera, gallery/export or recipient-app acceptance evidence.
 
 ## Verified Samsung update — November 1, 2026
 
@@ -60,7 +66,7 @@ The Mac package launched successfully after strict signature and sealed owner-po
 
 - Use the packaged **Android debug APK** for this first local test. Public/store release signing is a separate setup task.
 - If an earlier version contains bowling history, export a JSON backup first. Update in place with the same development signing key. A signature mismatch is a reason to inspect signing, not to uninstall and erase data automatically.
-- Confirm the intended version/build after updating in place (currently 0.1.15/16 on Samsung; the last verified local Mac/iPad installs are 0.1.7/8); retain existing alleys, balls, sessions and drafts.
+- Confirm the intended version/build after updating in place (currently 0.1.17/18 on Samsung; the last verified local Mac/iPad installs are 0.1.7/8); retain existing alleys, balls, sessions and drafts.
 
 ## First complete session
 
