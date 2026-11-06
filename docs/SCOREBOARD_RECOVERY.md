@@ -102,5 +102,9 @@ Apple cell request failed during exploration and succeeded on retry; final paire
 and holdout reports contain no native errors.
 
 Installed iPadOS and physical Samsung capture, latency and import checks remain
-necessary before a release. The Samsung was not visible to ADB during these checks. This
-change does not alter the app's version or publish a TestFlight build.
+necessary for device acceptance. The Samsung was not visible to ADB during these
+checks. The recognition implementation itself did not change the version or
+publish a build. In the subsequent owner release, **0.1.17 (18)** was built and
+uploaded for iPad and native Mac; both were verified as **Testing in Owner
+testing** on November 5, 2026. See [the release record](TESTFLIGHT.md). This
+distribution does not add physical-device acceptance evidence.

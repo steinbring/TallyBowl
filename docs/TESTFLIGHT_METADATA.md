@@ -1,6 +1,6 @@
 # TestFlight metadata
 
-Current candidate: **0.1.17 (18)** for iPad and native Mac, prepared for **Owner testing**. See the [runbook](TESTFLIGHT.md) for verified processing and assignment status. Existing group membership is retained. Beta description, feedback email and private reviewer contact/instructions remain in App Store Connect; sign-in is not required.
+Current build: **0.1.17 (18)** for iPad and native Mac, both **Testing in Owner testing**, verified November 5, 2026. Build-specific notes and the owner-approved encryption/France answers are saved on both builds. This release was assigned only to Owner testing. See the [runbook](TESTFLIGHT.md) for evidence and limits. Existing group membership is retained. Beta description, feedback email and private reviewer contact/instructions remain in App Store Connect; sign-in is not required.
 
 ## Public contact and remaining account fields
 
