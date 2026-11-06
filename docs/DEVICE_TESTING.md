@@ -1,8 +1,12 @@
 # Device testing and owner installations
 
-The Samsung has owner build **0.1.17 (18)**. The last directly verified local Mac/iPad installations are **0.1.7 (8)**; TestFlight distribution status is recorded separately in [TESTFLIGHT.md](TESTFLIGHT.md). A physical Apple TestFlight installation has not been verified. Repeat this checklist on each distribution-signed candidate and record its exact version.
+The Samsung Galaxy Z Fold 8 (SM-F971U1) and the additional Samsung SM-F766U both have owner build **0.1.17 (18)**. The last directly verified local Mac/iPad installations are **0.1.7 (8)**; TestFlight distribution status is recorded separately in [TESTFLIGHT.md](TESTFLIGHT.md). A physical Apple TestFlight installation has not been verified. Repeat this checklist on each distribution-signed candidate and record its exact version.
 
 Start with the Samsung Galaxy Z Fold 8, then repeat the camera, import, sharing, and accessibility checks on a physical iPad and a supported Mac. Current automated checks are described in [development status](DEVELOPMENT.md). The Samsung was installed with build 0.1.4 (5) and supplied the first real-photo regression. This checklist separates further hardware checks from automated evidence.
+
+## Additional Samsung installation — November 6, 2026
+
+Installed **0.1.17 (18)** on the separately attached Samsung **SM-F766U**, Android 17, using the same verified normal `lib/main.dart` owner debug APK as the Fold 8 update. No previous TallyBowl installation was present. The APK still matches the recorded build hash and current application source/assets; the installed APK matches it exactly. Android reports the correct version/build, a successful activity launch and a running process. The phone was locked, so visual in-app acceptance was not performed. No journal from another device was copied and no message was shared. Private installation and startup evidence is retained under ignored `build/owner-updates/0.1.17/samsung-sm-f766u/`.
 
 ## Verified Samsung update — November 6, 2026
 

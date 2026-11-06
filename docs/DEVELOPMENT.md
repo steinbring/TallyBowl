@@ -8,6 +8,8 @@ Both signed iPad and native Mac build-18 packages are **Testing in Owner testing
 
 Build 18 also retains the build-17 Android export fix: Export image saves directly to Pictures/TallyBowl on Android 10+, with a save-location picker on older Android; Share image opens the chooser. That release passed seven Android native checks and Lint with no errors. See [the quick audit](NOV03_QUICK_AUDIT.md). Journal and backup formats are unchanged. Recognition continues to require review for many unfamiliar or small scoreboards; see [recognition safeguards](FRAME_RECOGNITION.md). Physical Apple TestFlight installation, Google Chat composer acceptance, camera workflows and public privacy-policy hosting remain separate work. Results below retain historical build labels.
 
+The same verified Android build 18 was also installed fresh on a separately attached Samsung SM-F766U running Android 17 on November 6. Its installed APK matches the release artifact and activity startup succeeds. No other device's journal was copied; the locked phone prevented visual acceptance. See [the installation record](DEVICE_TESTING.md).
+
 ## Feature branches
 
 Features are committed on `codex/` branches and merged locally into `main`. The initial implementation used a feature stack; subsequent suggestion and review branches are separate increments.
