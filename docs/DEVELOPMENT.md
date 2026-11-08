@@ -17,8 +17,10 @@ The Fold 8 was subsequently updated in place to the normal Android owner build
 **0.1.18 (19)** on November 8. Signing, permissions and all 12 persistent app-data
 files are preserved; startup succeeds and the journal remains identical, with
 15 games across 5 sessions plus profile and draft settings. The locked phone
-prevented visual acceptance. The additional Samsung remains on build 18; see
-[device evidence](DEVICE_TESTING.md). No new physical Apple acceptance was
+prevented visual acceptance. The Flip 7 (SM-F766U) was also updated in place to
+the same build 19 APK on November 8, preserving all 8 persistent files and its
+empty journal. Startup succeeds; the lock screen prevented visual acceptance.
+See [device evidence](DEVICE_TESTING.md). No new physical Apple acceptance was
 performed. The following build-18 paragraphs retain their historical scope.
 
 Updated November 6, 2026. Build **0.1.17 (18)** improves scoreboard row alignment, light/dark and mixed delivery ink, and current-game scratch-total selection. **259 Flutter tests and 16 lab safety/training tests pass**, and static analysis is clean. Across 77 regression row cases from 42 original photos per native engine, all 24 prior exact complete games are preserved on each engine. Apple now recovers 26/53 complete games and Android 25/53; no incorrect automatic candidate is observed and all 24 negative cases remain unselected. The two complete games in a separate frozen holdout still need review, and its four clipped rows remain unselected. See [scoreboard recovery and limits](SCOREBOARD_RECOVERY.md).

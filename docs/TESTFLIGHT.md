@@ -16,7 +16,7 @@ Recognition source **394b3c9** improves condensed italic glyphs, header sizing a
 | Bundled assets | Recognition assets and guide/privacy documents match source in both exports; private photos, fixtures and diagnostic entry points excluded |
 | Distribution proof | Private `build/testflight/build-19/owner-testing.png` and `external-testing.png` show both platform builds and their group-specific status |
 
-Private archives, exports, signing/asset reports, test and upload logs, testing notes, hashes and the release record are retained under ignored `build/testflight/build-19/`. Journal and backup formats are unchanged. The subsequent Android build-19 Fold 8 installation and data-preservation check is recorded in [device testing](DEVICE_TESTING.md); physical Apple and visual Samsung acceptance remain separate checks. The following sections preserve historical release status.
+Private archives, exports, signing/asset reports, test and upload logs, testing notes, hashes and the release record are retained under ignored `build/testflight/build-19/`. Journal and backup formats are unchanged. The subsequent Android build-19 Fold 8 and Flip 7 installations and data-preservation checks are recorded in [device testing](DEVICE_TESTING.md); physical Apple and visual Samsung acceptance remain separate checks. The following sections preserve historical release status.
 
 ## 0.1.17 (18): scoreboard recovery, owner testing
 
