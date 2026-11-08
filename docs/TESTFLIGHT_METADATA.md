@@ -1,6 +1,6 @@
 # TestFlight metadata
 
-Current build: **0.1.17 (18)** for iPad and native Mac, both **Testing in Owner testing**, verified November 5, 2026. Build-specific notes and the owner-approved encryption/France answers are saved on both builds. This release was assigned only to Owner testing. See the [runbook](TESTFLIGHT.md) for evidence and limits. Existing group membership is retained. Beta description, feedback email and private reviewer contact/instructions remain in App Store Connect; sign-in is not required.
+Current candidate: **0.1.18 (19)** for iPad and native Mac, prepared for **Owner testing and External testing**. See the [runbook](TESTFLIGHT.md) for verified upload, processing and assignment status. Existing group membership is retained. Beta description, feedback email and private reviewer contact/instructions remain in App Store Connect; sign-in is not required.
 
 ## Public contact and remaining account fields
 
@@ -21,7 +21,7 @@ This beta stores your journal locally, has no login or subscription, and include
 
 ## What to test
 
-Build 0.1.17 (18) improves scoreboard row alignment, light/dark and mixed delivery ink, and current-game scratch-total selection. Existing successful photo imports remain covered by regression tests; unfamiliar or small scoreboards may still require manual correction.
+Build 0.1.18 (19) improves condensed italic scoreboard lettering and alignment when OCR includes background decoration in header boxes. It keeps primary and crop readings separate and preserves conflicting-player identity checks. Earlier successful photo imports remain covered by regression tests; unfamiliar or small scoreboards may still require manual correction.
 
 Please test importing a final scoreboard with your saved name/alias, compare all ten frames and the scratch total, and resume an interrupted photo draft. Test offline recognition, multiple bowlers, splits, spares, strikes and tenth-frame fills. Confirm uncertain/incomplete images require review rather than inventing rolls. Also check session history, manual scoring, Share image, Export image, dark mode, large text and VoiceOver. Journal and backup formats are unchanged.
 
