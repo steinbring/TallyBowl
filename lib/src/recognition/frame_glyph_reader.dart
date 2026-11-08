@@ -26,6 +26,7 @@ abstract final class FrameGlyphReader {
     List<List<RecognizedLine>> alternatives = const [],
     List<RecognizedLine> supplemental = const [],
     bool recovery = false,
+    bool deskew = false,
   }) async {
     final sources = [
       lines,
@@ -33,7 +34,7 @@ abstract final class FrameGlyphReader {
     ];
     final sourceLayouts = [
       for (final source in sources)
-        _tables(source, profile, recovery: recovery),
+        _tables(source, profile, recovery: recovery, deskew: deskew),
     ];
     final layouts = sourceLayouts
         .expand((s) => s)
@@ -56,8 +57,25 @@ abstract final class FrameGlyphReader {
           ? recoveryNameWords(_distinctWords(source), profile)
           : _distinctWords(source);
       final wordReadings = sources.map(wordsFor).toList();
+      final aliases = [profile.name, ...profile.aliases].map(_name).toSet();
       final imageWidth = image.width, imageHeight = image.height;
       for (final table in layouts) {
+        if (deskew &&
+            wordReadings
+                .expand((reading) => reading)
+                .any(
+                  (word) =>
+                      isBowlerNameCandidate(word.text) &&
+                      !aliases.contains(_name(word.text)) &&
+                      (word.centerX - table.name.centerX).abs() <
+                          table.name.width * .5 &&
+                      (word.centerY - table.name.centerY).abs() <
+                          table.name.height * .75,
+                )) {
+          // A clearer pixel shape cannot resolve an explicit disagreement
+          // about who owns this row, even if another pass sees a saved alias.
+          continue;
+        }
         // Align once per observed layout and transfer the raster only once
         // for all text passes. At most sixteen layouts and four readings exist;
         // each layout can have two independently confirmed ruling polarities.
@@ -89,6 +107,7 @@ abstract final class FrameGlyphReader {
                     templates,
                     supportingWords,
                     white,
+                    deskew,
                   ),
               ],
             ));
@@ -109,6 +128,7 @@ abstract final class FrameGlyphReader {
                       templates,
                       supportingWords,
                       null,
+                      deskew,
                     ),
                 ],
               ));
@@ -428,6 +448,7 @@ abstract final class FrameGlyphReader {
     List<RecognizedLine> lines,
     BowlerProfile profile, {
     bool recovery = false,
+    bool deskew = false,
   }) {
     final words = recovery
         ? recoveryNameWords(_distinctWords(lines), profile)
@@ -495,14 +516,13 @@ abstract final class FrameGlyphReader {
               distinctHeaders > table.headers ||
               (distinctHeaders == table.headers && bi - ai > longestSpan)) {
             longestSpan = bi - ai;
-            final heights = matches.map((w) => w.height).toList()..sort();
             table = _Table(
               name,
               first,
               pitch,
               a.centerY - ai * (b.centerY - a.centerY) / (bi - ai),
               (b.centerY - a.centerY) / (bi - ai),
-              heights[heights.length ~/ 2],
+              _headerHeight(matches, deskew),
               distinctHeaders,
             );
           }
@@ -511,14 +531,13 @@ abstract final class FrameGlyphReader {
           // rulings. The longest-span alternative remains available to pixels.
           if (bi - ai >= 5 &&
               (firstFit == null || distinctHeaders > firstFit.headers)) {
-            final heights = matches.map((w) => w.height).toList()..sort();
             firstFit = _Table(
               name,
               first,
               pitch,
               a.centerY - ai * (b.centerY - a.centerY) / (bi - ai),
               (b.centerY - a.centerY) / (bi - ai),
-              heights[heights.length ~/ 2],
+              _headerHeight(matches, deskew),
               distinctHeaders,
             );
           }
@@ -536,6 +555,24 @@ abstract final class FrameGlyphReader {
     }
     if (!recovery) return tables;
     return [for (final table in tables) ..._recoverTable(table, words)];
+  }
+
+  static double _headerHeight(List<RecognizedLine> matches, bool deskew) {
+    final heights = matches.map((w) => w.height).toList()..sort();
+    if (deskew) {
+      // OCR can include a ruling or illustration in a few header boxes. Two
+      // independently sized numerals must support the smaller height; a lone
+      // tiny observation cannot shrink the delivery band. The recovery fit
+      // still requires six actual cumulative observations, including frame ten.
+      final compact = matches
+          .where((word) => word.height <= heights.first * 1.5)
+          .toList();
+      if (compact.map((word) => word.text).toSet().length >= 2) {
+        final supported = compact.map((word) => word.height).toList()..sort();
+        return supported[supported.length ~/ 2];
+      }
+    }
+    return heights[heights.length ~/ 2];
   }
 
   static List<_Table> _recoverTable(_Table table, List<RecognizedLine> words) {
@@ -729,6 +766,7 @@ abstract final class FrameGlyphReader {
     List<_Template> templates,
     List<RecognizedLine> supportingWords,
     List<int>? white,
+    bool deskew,
   ) {
     final frames = <String>[];
     for (var i = 0; i < 10; i++) {
@@ -816,9 +854,10 @@ abstract final class FrameGlyphReader {
           h,
           templates,
           outlined: true,
+          deskew: deskew,
           maxGlyphWidth: .85,
           observed: (l, t, r, b) => _inside(
-            supportingWords
+            (deskew ? words : supportingWords)
                 .where(
                   (w) => RegExp(
                     r'^[0-9XF/×]$',
@@ -850,6 +889,7 @@ abstract final class FrameGlyphReader {
             confirmed,
             mask,
             readInk,
+            ignoreInvalidNative: deskew,
           ),
         );
         continue;
@@ -862,6 +902,7 @@ abstract final class FrameGlyphReader {
         w,
         h,
         templates,
+        deskew: deskew,
         observed: (l, t, r, b) =>
             _inside(observations, imageWidth, imageHeight, x, y, l, t, r, b),
         supporting: (l, t, r, b) =>
@@ -896,6 +937,7 @@ abstract final class FrameGlyphReader {
             h,
             templates,
             outlined: true,
+            deskew: deskew,
             supporting: (l, t, r, b) =>
                 _inside(supporting, imageWidth, imageHeight, x, y, l, t, r, b),
           );
@@ -970,8 +1012,9 @@ abstract final class FrameGlyphReader {
     bool tenth,
     String native,
     Uint8List neutral,
-    String Function(Uint8List) classify,
-  ) {
+    String Function(Uint8List) classify, {
+    bool ignoreInvalidNative = false,
+  }) {
     final luminance = Uint8List(w * h);
     final histogram = List.filled(256, 0);
     for (var py = 0; py < h; py++) {
@@ -995,6 +1038,13 @@ abstract final class FrameGlyphReader {
     final low = percentile(.05), high = percentile(.95);
     final readings = <String>{};
     bool agrees(String candidate) {
+      // A malformed OCR token can include a piece of background illustration.
+      // It cannot constrain the ordering of a fully classified pixel reading.
+      // Legal complete or partial observations still have to remain present.
+      if (ignoreInvalidNative &&
+          TenPinScorer.parseFrame(native, tenth: tenth).error != null) {
+        return true;
+      }
       // Only native words wholly within this frame constrain delivery order;
       // synthesized character boxes from a cross-frame word are not primary.
       var index = 0;
@@ -1052,8 +1102,52 @@ abstract final class FrameGlyphReader {
     _Component c,
     int w,
     int h,
-    List<_Template> templates,
-  ) {
+    List<_Template> templates, {
+    bool deskew = false,
+  }) {
+    if (deskew) {
+      final upright = _rankGlyph(c, w, h, templates);
+      // Extra normalizations must not turn a confident existing shape into
+      // an ambiguity. Only unresolved glyphs need an italic correction.
+      if (upright.first.value >= .68 &&
+          upright.first.value - upright[1].value >= .06) {
+        return upright;
+      }
+      final scores = <String, double>{};
+      void collect(List<MapEntry<String, double>> ranked) {
+        for (final entry in ranked) {
+          scores[entry.key] = math.max(scores[entry.key] ?? 0, entry.value);
+        }
+      }
+
+      collect(upright);
+      final gh = c.b - c.t, gw = c.r - c.l;
+      final padding = (gh * .2).ceil() + 1;
+      final width = gw + padding * 2;
+      // Correct a bounded italic lean before normalizing the component. No
+      // templates, scores, or native characters determine the transformation.
+      for (final shear in [-.2, .2]) {
+        final pixels = <int>[];
+        var left = width, right = 0;
+        for (final p in c.pixels) {
+          final y = p ~/ w - c.t;
+          final x = p % w - c.l + padding + (y * shear).round();
+          left = math.min(left, x);
+          right = math.max(right, x + 1);
+          pixels.add(y * width + x);
+        }
+        collect(
+          _rankGlyph(
+            _Component(left, 0, right, gh, pixels),
+            width,
+            gh,
+            templates,
+          ),
+        );
+      }
+      return scores.entries.toList()
+        ..sort((a, b) => b.value.compareTo(a.value));
+    }
     final gw = c.r - c.l, gh = c.b - c.t;
     final componentMask = Uint8List(w * h);
     for (final p in c.pixels) {
@@ -1320,6 +1414,7 @@ abstract final class FrameGlyphReader {
     int h,
     List<_Template> templates, {
     bool outlined = false,
+    bool deskew = false,
     double maxGlyphWidth = .65,
     Set<String> Function(int, int, int, int)? observed,
     Set<String> Function(int, int, int, int)? supporting,
@@ -1353,8 +1448,8 @@ abstract final class FrameGlyphReader {
       }
     }
     final rankings = <_Component, List<MapEntry<String, double>>>{};
-    List<MapEntry<String, double>> ranking(_Component c) =>
-        rankings.putIfAbsent(c, () => _rankGlyph(c, w, h, templates));
+    List<MapEntry<String, double>> ranking(_Component c) => rankings
+        .putIfAbsent(c, () => _rankGlyph(c, w, h, templates, deskew: deskew));
     bool encloses(_Component outer, _Component inner) =>
         outer.l <= inner.l - 2 &&
         outer.t <= inner.t - 2 &&

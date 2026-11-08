@@ -1,0 +1,88 @@
+{
+  "date": "2026-11-08",
+  "status": "source fix; not distributed",
+  "baselineSource": "15c83b1",
+  "corpus": {
+    "photos": 45,
+    "rowCases": 80,
+    "completeGames": 56,
+    "negativeCases": 24
+  },
+  "baselineComposition": "Frozen prior 77-case reports plus 3 fresh native evaluations, verified identical production pipeline, native/runtime and template fingerprints",
+  "engines": [
+    {
+      "engine": "apple",
+      "baselineExactCompleteGames": 27,
+      "candidateExactCompleteGames": 29,
+      "previous77CaseExactBefore": 26,
+      "previous77CaseExactAfter": 26,
+      "newPhotosExactBefore": 1,
+      "newPhotosExactAfter": 3,
+      "lostExactImports": 0,
+      "wrongAutomaticCandidates": 0,
+      "nativeFailures": 0,
+      "maxNativeCalls": 4,
+      "pipelineSha256": "da083f8b71c259994fd7f2ad87b72a75018b76140f1b2fca1baa9c41a8796d7d",
+      "baselinePipelineSha256": "4df443ccc2f9c351e6bab0b44e05fec3136c80d545d936d9b8befedd4bf23483",
+      "nativeFingerprint": "d99dfc7ee2aaf2203a5d43eca347df0e59603850f70fe9264008d995a36f83a3",
+      "templatesSha256": "776d2e351fd8b00c24a7b538a1d2b2ad134ed510c99c1e9d590e85ed2400c82e",
+      "manifestSha256": "5404367177c82f75072b047e459677d10b64f6abb5dedd829a8942670cf3a2ce",
+      "baselineReportSha256": "c7c723a1fa10ac6a6449df76be9be232732813a5fa70742aed55ab24e53dc816",
+      "candidateReportSha256": "99f32f69fbba3e288d267dc19e42b7fbc58dbc2042e5983dbe5a01ba46d9de7b",
+      "previousHoldout": {
+        "exactCompleteGames": 0,
+        "wrongAutomaticCandidates": 0,
+        "manifestSha256": "3ea4f8f2137676fddd10a70c972c0bf5a20d36013c0381dcd97e43424c28987a",
+        "reportSha256": "69beca339a1178673d52004feaa128911bc365732cd000cacba7e0c73993fd88"
+      }
+    },
+    {
+      "engine": "android",
+      "baselineExactCompleteGames": 26,
+      "candidateExactCompleteGames": 28,
+      "previous77CaseExactBefore": 25,
+      "previous77CaseExactAfter": 25,
+      "newPhotosExactBefore": 1,
+      "newPhotosExactAfter": 3,
+      "lostExactImports": 0,
+      "wrongAutomaticCandidates": 0,
+      "nativeFailures": 0,
+      "maxNativeCalls": 4,
+      "pipelineSha256": "da083f8b71c259994fd7f2ad87b72a75018b76140f1b2fca1baa9c41a8796d7d",
+      "baselinePipelineSha256": "4df443ccc2f9c351e6bab0b44e05fec3136c80d545d936d9b8befedd4bf23483",
+      "nativeFingerprint": "3bb7902df0d0283ae2f10f47eeda0b44387f0bdde07e7ba871769b3d9ce6240b",
+      "templatesSha256": "776d2e351fd8b00c24a7b538a1d2b2ad134ed510c99c1e9d590e85ed2400c82e",
+      "manifestSha256": "5404367177c82f75072b047e459677d10b64f6abb5dedd829a8942670cf3a2ce",
+      "baselineReportSha256": "54dd0f226421e92c37d563957938de59d110b649ab5a8626650f3c34e946c9b6",
+      "candidateReportSha256": "2e3f1def54058454d8d7a57b5688adfe448d742806ee94902ccaf630f8583994",
+      "previousHoldout": {
+        "exactCompleteGames": 0,
+        "wrongAutomaticCandidates": 0,
+        "manifestSha256": "3ea4f8f2137676fddd10a70c972c0bf5a20d36013c0381dcd97e43424c28987a",
+        "reportSha256": "4db412aabaed34538139aa0a35835d209eeb129943107aba497a9525be0b9cd2"
+      }
+    }
+  ],
+  "previousHoldout": {
+    "photos": 2,
+    "rowCases": 6,
+    "completeGames": 2,
+    "clippedRows": 4,
+    "previouslyInspected": true,
+    "newUnseenEvaluation": false
+  },
+  "nativeHelpersChanged": false,
+  "templatesChanged": false,
+  "newRasterTests": "synthetic, anonymous",
+  "captureDate": "2026-11-07",
+  "validation": {
+    "flutterTests": 272,
+    "newSyntheticTests": 13,
+    "labTests": 16,
+    "analysis": "clean",
+    "photoGatePassed": true,
+    "photoGateSha256": "e6f2e8e32e616ddcb6e79d3da395783d52e65eacad5aff7e963bb0185175a946",
+    "flutterTestsLogSha256": "cf4d3f5b24228d7369ab0bc25b04fe109d071c5666e0433d06225ccaffb9ea9c",
+    "analyzerLogSha256": "f5470c2055ab64f8ce6a84177f38c367352c29847c06510260ed7c47d5aee84c"
+  }
+}

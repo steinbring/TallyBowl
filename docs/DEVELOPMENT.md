@@ -1,5 +1,16 @@
 # TallyBowl! development status
 
+November 8 unreleased follow-up for the November 7 practice photos: all three originals
+now yield exact frames and totals **93, 148 and 105** through both native engines
+and the shared production pipeline. The additional fallback corrects condensed
+italic glyphs, independently supported header heights and primary/crop evidence
+handling. Existing validated paths run first; native helpers, the 78-template
+glyph bank, confidence thresholds, journal and backup formats are unchanged.
+All **272 Flutter tests and 16 lab safety/training tests pass**; static analysis
+is clean, including the retained conflicting-player identity check.
+See [the evaluation and regression evidence](NOV07_PHOTO_EVALUATION.md).
+The installed and TestFlight builds below remain the released build 18.
+
 Updated November 6, 2026. Build **0.1.17 (18)** improves scoreboard row alignment, light/dark and mixed delivery ink, and current-game scratch-total selection. **259 Flutter tests and 16 lab safety/training tests pass**, and static analysis is clean. Across 77 regression row cases from 42 original photos per native engine, all 24 prior exact complete games are preserved on each engine. Apple now recovers 26/53 complete games and Android 25/53; no incorrect automatic candidate is observed and all 24 negative cases remain unselected. The two complete games in a separate frozen holdout still need review, and its four clipped rows remain unselected. See [scoreboard recovery and limits](SCOREBOARD_RECOVERY.md).
 
 Build 18 retains the official social links in Settings, the 50 Brunswick and 13 Radical suggestions checked for build 15, and 11 optional basic ball colors. The catalog remains offline and accepts custom/older equipment. Colors update My Bag artwork and labels, persist in the journal and backups, and can be cleared; older records remain unset. Persistence, backup compatibility, save retries and light/dark forms at 200% text remain covered. See [catalog provenance](DATA_SOURCES.md) and [the guide](USER_GUIDE.md).

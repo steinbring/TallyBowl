@@ -164,6 +164,37 @@ abstract final class PhotoService {
           recognized = [...recognized, ...additional];
         }
       }
+      if (ScoreSheetParser.automaticRow(
+            ScoreSheetParser.rows(recognized, profile),
+          ) ==
+          null) {
+        // Keep every existing validated result before trying an image-only
+        // italic-font correction. This consumes no additional native OCR call.
+        final slanted = await FrameGlyphReader.read(
+          bytes,
+          originalLines,
+          profile,
+          alternatives: fullReadings,
+          supplemental: regionalReading,
+          deskew: true,
+        );
+        recognized = [...recognized, ...slanted];
+        if (ScoreSheetParser.automaticRow(
+              ScoreSheetParser.rows(recognized, profile),
+            ) ==
+            null) {
+          final recoveredSlant = await FrameGlyphReader.read(
+            bytes,
+            originalLines,
+            profile,
+            alternatives: fullReadings,
+            supplemental: regionalReading,
+            recovery: true,
+            deskew: true,
+          );
+          recognized = [...recognized, ...recoveredSlant];
+        }
+      }
       return recognized;
     } catch (_) {
       return recognized;

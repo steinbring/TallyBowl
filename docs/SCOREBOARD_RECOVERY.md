@@ -1,5 +1,9 @@
 # Scoreboard recovery — November 5, 2026
 
+The later [November 7 practice-photo evaluation](NOV07_PHOTO_EVALUATION.md)
+records the subsequent italic/header correction and preservation checks. The
+measurements below retain their November 5 scope.
+
 The shared reader now has an additional recovery path for unfamiliar scoreboards.
 The existing native-text and glyph paths run first and return their already
 validated imports before recovery runs. Apple Vision and Android ML Kit remain
