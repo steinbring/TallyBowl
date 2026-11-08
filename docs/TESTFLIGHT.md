@@ -1,5 +1,23 @@
 # TestFlight readiness and release runbook
 
+## 0.1.18 (19): November 7 practice-photo recovery
+
+**Both iPad and native Mac 0.1.18 (19) are Testing in Owner testing.** Both uploads processed successfully and are assigned to External testing with status **Waiting for Review**. Automatic tester notification is enabled; external access awaits Apple's Beta App Review approval. The previously approved standard-encryption answer and France exclusion are saved on both builds, along with build-specific What to Test notes. The Owner testing Builds list was verified on **November 8, 2026, at approximately 11:53 AM Central**, and the External testing Builds list at **1:43 PM Central**. Existing builds, group membership and public-link settings were retained.
+
+Recognition source **394b3c9** improves condensed italic glyphs, header sizing and separation of primary/crop observations while preserving conflicting-player identity checks. All three November 7 games now produce exact frames and scratch totals of **93, 148 and 105** on both native engines. The combined regression and previously inspected holdout cover **86 row cases from 47 original photos per engine**: no earlier exact import is lost and no incorrect automatic candidate is observed across 172 checks. Many unfamiliar or small scoreboards still require review. See [the evaluation and limits](NOV07_PHOTO_EVALUATION.md).
+
+| Evidence | Result |
+| --- | --- |
+| iPad ASC build | `4714b385-e4aa-485b-b0f5-c21941a1973b`, owner Testing; external Waiting for Review |
+| Native Mac ASC build | `797bc1d2-b8a1-42ab-b07c-128babdc95f8`, owner Testing; external Waiting for Review |
+| Source | Recognition `394b3c9`; release version and notes `a7cb05a`; normal `lib/main.dart` |
+| Regression checks | 272 Flutter tests and 16 lab safety/training tests pass; static analysis clean |
+| Apple packages | iPad App Store IPA and universal arm64/x86_64 native Mac installer; archive/content, exported distribution profile/nested certificate, Mac installer-chain and payload-readability checks pass |
+| Bundled assets | Recognition assets and guide/privacy documents match source in both exports; private photos, fixtures and diagnostic entry points excluded |
+| Distribution proof | Private `build/testflight/build-19/owner-testing.png` and `external-testing.png` show both platform builds and their group-specific status |
+
+Private archives, exports, signing/asset reports, test and upload logs, testing notes, hashes and the release record are retained under ignored `build/testflight/build-19/`. Journal and backup formats are unchanged. This release task did not perform new physical Apple or Samsung acceptance checks or a Samsung installation. The following sections preserve historical release status.
+
 ## 0.1.17 (18): scoreboard recovery, owner testing
 
 **Both iPad and native Mac 0.1.17 (18) are Testing in Owner testing.** Both uploads processed successfully, the previously approved standard-encryption answer and France exclusion are saved, and build-specific What to Test notes are saved. Both platforms were verified in the Owner testing group's Builds list on **November 5, 2026, at approximately 9:30 PM Central**. This release was assigned only to Owner testing as requested; existing external assignments, tester membership and public-link settings were retained.

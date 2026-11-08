@@ -1,6 +1,6 @@
 {
   "date": "2026-11-08",
-  "status": "source fix; not distributed",
+  "status": "included in Apple TestFlight 0.1.18 (19); owner Testing; external Waiting for Review",
   "baselineSource": "15c83b1",
   "corpus": {
     "photos": 45,

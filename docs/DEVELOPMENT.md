@@ -1,6 +1,6 @@
 # TallyBowl! development status
 
-November 8 unreleased follow-up for the November 7 practice photos: all three originals
+November 8 release **0.1.18 (19)** for the November 7 practice photos: all three originals
 now yield exact frames and totals **93, 148 and 105** through both native engines
 and the shared production pipeline. The additional fallback corrects condensed
 italic glyphs, independently supported header heights and primary/crop evidence
@@ -9,7 +9,13 @@ glyph bank, confidence thresholds, journal and backup formats are unchanged.
 All **272 Flutter tests and 16 lab safety/training tests pass**; static analysis
 is clean, including the retained conflicting-player identity check.
 See [the evaluation and regression evidence](NOV07_PHOTO_EVALUATION.md).
-The installed and TestFlight builds below remain the released build 18.
+Both iPad and native Mac build 19 are **Testing in Owner testing** and assigned
+to **External testing** with status **Waiting for Review**. Automatic tester
+notification is enabled; external access awaits Apple approval. Signing,
+archive/content and bundled-asset checks pass. See [the release record](TESTFLIGHT.md).
+No new physical Apple acceptance or Samsung installation was performed for this
+release; the Samsung installations below remain build 18. The following build-18
+paragraphs retain their historical verification scope.
 
 Updated November 6, 2026. Build **0.1.17 (18)** improves scoreboard row alignment, light/dark and mixed delivery ink, and current-game scratch-total selection. **259 Flutter tests and 16 lab safety/training tests pass**, and static analysis is clean. Across 77 regression row cases from 42 original photos per native engine, all 24 prior exact complete games are preserved on each engine. Apple now recovers 26/53 complete games and Android 25/53; no incorrect automatic candidate is observed and all 24 negative cases remain unselected. The two complete games in a separate frozen holdout still need review, and its four clipped rows remain unselected. See [scoreboard recovery and limits](SCOREBOARD_RECOVERY.md).
 
@@ -27,7 +33,7 @@ Features are committed on `codex/` branches and merged locally into `main`. The 
 
 | Branch | Feature |
 | --- | --- |
-| `codex/scoreboard-recovery` | Conservative layout/ink/total recovery, frozen regression and holdout evidence, and build 18 owner TestFlight release |
+| `codex/scoreboard-recovery` | Conservative layout/ink/total and italic-glyph recovery, frozen regression/holdout evidence, and build 19 owner/external TestFlight release |
 | `codex/project-roadmap` | Product scope and milestone plan |
 | `codex/flutter-foundation` | Flutter targets, branding, visual theme |
 | `codex/scoring-local-storage` | Ten-pin rules, domain records, SQLite persistence |

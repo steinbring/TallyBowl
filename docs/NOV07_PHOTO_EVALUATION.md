@@ -1,7 +1,8 @@
 # November 7 practice-photo recovery
 
-Final verification: November 8, 2026. This is an unreleased source change after
-build 18.
+Final verification: November 8, 2026. This source change is included in
+**0.1.18 (19)** for iPad and native Mac: Testing in Owner testing and assigned to
+External testing, Waiting for Review. See [the release record](TESTFLIGHT.md).
 
 The three supplied original JPEGs show complete games of **93, 148 and 105**.
 Before the fix, Apple Vision plus the shared reader recovered only 148; Android
@@ -88,8 +89,9 @@ measurements use the production ML Kit helper on an isolated Android 17 emulator
 Original photos, private identities, OCR logs and experimental diagnostics are
 excluded from Git and app assets. New committed raster tests are synthetic and
 anonymous. Physical camera latency and installation acceptance remain separate
-from this local evaluation. This source change has not yet been packaged as a
-new distributed build.
+from this local evaluation. The subsequent Apple build-19 release passed signing,
+archive/content and bundled-asset checks; those checks do not replace physical
+device acceptance.
 
 The complete **272-test Flutter suite passes**, including the unchanged
 identity-conflict regression that caught a problem during development and 13 new
