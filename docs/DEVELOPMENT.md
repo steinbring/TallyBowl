@@ -13,9 +13,13 @@ Both iPad and native Mac build 19 are **Testing in Owner testing** and assigned
 to **External testing** with status **Waiting for Review**. Automatic tester
 notification is enabled; external access awaits Apple approval. Signing,
 archive/content and bundled-asset checks pass. See [the release record](TESTFLIGHT.md).
-No new physical Apple acceptance or Samsung installation was performed for this
-release; the Samsung installations below remain build 18. The following build-18
-paragraphs retain their historical verification scope.
+The Fold 8 was subsequently updated in place to the normal Android owner build
+**0.1.18 (19)** on November 8. Signing, permissions and all 12 persistent app-data
+files are preserved; startup succeeds and the journal remains identical, with
+15 games across 5 sessions plus profile and draft settings. The locked phone
+prevented visual acceptance. The additional Samsung remains on build 18; see
+[device evidence](DEVICE_TESTING.md). No new physical Apple acceptance was
+performed. The following build-18 paragraphs retain their historical scope.
 
 Updated November 6, 2026. Build **0.1.17 (18)** improves scoreboard row alignment, light/dark and mixed delivery ink, and current-game scratch-total selection. **259 Flutter tests and 16 lab safety/training tests pass**, and static analysis is clean. Across 77 regression row cases from 42 original photos per native engine, all 24 prior exact complete games are preserved on each engine. Apple now recovers 26/53 complete games and Android 25/53; no incorrect automatic candidate is observed and all 24 negative cases remain unselected. The two complete games in a separate frozen holdout still need review, and its four clipped rows remain unselected. See [scoreboard recovery and limits](SCOREBOARD_RECOVERY.md).
 
