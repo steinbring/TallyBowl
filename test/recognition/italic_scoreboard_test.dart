@@ -95,7 +95,7 @@ Future<ScoreRow?> recognize(
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
-  for (final lean in [-.2, .2]) {
+  for (final lean in [-.2, -.1, .1, .2]) {
     test('italic $lean preserves exact observed deliveries', () async {
       final row = await recognize(await italicBoard(lean), observations());
       expect(row?.frames, List.filled(10, '81'));

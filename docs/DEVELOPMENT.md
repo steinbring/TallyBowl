@@ -1,5 +1,15 @@
 # TallyBowl! development status
 
+November 9 unreleased follow-up: gutter marks, intermediate italic lettering
+and overlapping scratch-total OCR fragments now recover all three November 8
+games (**88, 115 and 117**) from the clearer photos on both native engines. The
+distant duplicate remains in review. All prior exact original-photo imports are
+retained across 188 paired row checks, with no incorrect automatic candidate
+observed. **286 Flutter tests and 16 lab tests pass**; analysis is clean. See
+[the evaluation and limits](NOV08_PHOTO_EVALUATION.md). This source change has
+not been packaged or installed; the released and installed builds below remain
+**0.1.18 (19)**.
+
 November 8 release **0.1.18 (19)** for the November 7 practice photos: all three originals
 now yield exact frames and totals **93, 148 and 105** through both native engines
 and the shared production pipeline. The additional fallback corrects condensed

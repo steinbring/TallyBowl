@@ -157,7 +157,25 @@ abstract final class FrameGlyphReader {
               continue;
             }
             final last = aligned.first + 9 * aligned.pitch;
-            final directTotals = _scratchTotals(words, aligned);
+            Future<List<int>> totalsFor(List<RecognizedLine> input) async {
+              final totals = _scratchTotals(input, aligned);
+              if (!deskew || aligned.band == null || totals.isNotEmpty) {
+                return totals;
+              }
+              final resolved = await Isolate.run(
+                () => _resolveScratchFragments(
+                  input,
+                  aligned,
+                  rgba,
+                  imageWidth,
+                  imageHeight,
+                  templates,
+                ),
+              );
+              return _scratchTotals(resolved, aligned);
+            }
+
+            final directTotals = await totalsFor(words);
             final checkpoints = ScoreboardGrid.rows(source, profile)
                 .where(
                   (r) =>
@@ -277,10 +295,9 @@ abstract final class FrameGlyphReader {
                     continue;
                   }
                 }
-                total = _scratchTotals(
-                  otherWords,
-                  aligned,
-                ).where((v) => v == score.total).firstOrNull;
+                total = (await totalsFor(otherWords))
+                    .where((v) => v == score.total)
+                    .firstOrNull;
                 if (total != null) break;
               }
             }
@@ -683,6 +700,115 @@ abstract final class FrameGlyphReader {
     return value <= 300 ? [value] : [];
   }
 
+  /// A native block may repeat the last digit over the same large total, e.g.
+  /// "5" over "115". Resolve only proper text fragments beneath an observed
+  /// total label, and only when independent pixels read the entire longer word.
+  /// No calculated score participates; competing full numbers stay ambiguous.
+  static List<RecognizedLine> _resolveScratchFragments(
+    List<RecognizedLine> words,
+    _Table table,
+    Uint8List rgba,
+    int imageWidth,
+    int imageHeight,
+    List<_Template> templates,
+  ) {
+    final last = table.first + 9 * table.pitch;
+    final labels = words.where(
+      (w) =>
+          RegExp(
+            r'^(TOT(?:AL)?|TTL)$',
+            caseSensitive: false,
+          ).hasMatch(w.text.replaceAll(RegExp(r'[^a-zA-Z]'), '')) &&
+          w.centerX > last + table.pitch * .55 &&
+          w.centerX < last + table.pitch * 3 &&
+          w.y < table.rowY(w.centerX),
+    );
+    for (final label in labels) {
+      final candidates =
+          words
+              .where(
+                (w) =>
+                    RegExp(r'^\d{1,3}$').hasMatch(w.text) &&
+                    int.parse(w.text) <= 300 &&
+                    (w.centerX - label.centerX).abs() < table.pitch * .5 &&
+                    w.y > label.y + label.height * .8 &&
+                    (w.centerY - table.rowY(w.centerX)).abs() <
+                        math.max(w.height, table.band!.height) * .55,
+              )
+              .toList()
+            ..sort((a, b) => b.text.length.compareTo(a.text.length));
+      if (candidates.length < 2) continue;
+      final whole = candidates.first;
+      if (whole.text.length < 2 ||
+          candidates.skip(1).any((part) {
+            final overlapX = math.max(
+              0.0,
+              math.min(part.x + part.width, whole.x + whole.width) -
+                  math.max(part.x, whole.x),
+            );
+            final overlapY = math.max(
+              0.0,
+              math.min(part.y + part.height, whole.y + whole.height) -
+                  math.max(part.y, whole.y),
+            );
+            return part.text.length >= whole.text.length ||
+                !whole.text.contains(part.text) ||
+                overlapX * overlapY <
+                    math.min(
+                          part.width * part.height,
+                          whole.width * whole.height,
+                        ) *
+                        .8;
+          })) {
+        continue;
+      }
+      final left = candidates.map((w) => w.x).reduce(math.min);
+      final right = candidates.map((w) => w.x + w.width).reduce(math.max);
+      final top = candidates.map((w) => w.y).reduce(math.min);
+      final bottom = candidates.map((w) => w.y + w.height).reduce(math.max);
+      final x = (left * imageWidth).floor() - 2;
+      final y = (top * imageHeight).floor() - 2;
+      final w = ((right - left) * imageWidth).ceil() + 4;
+      final h = ((bottom - top) * imageHeight).ceil() + 4;
+      if (x < 0 || y < 0 || x + w > imageWidth || y + h > imageHeight) continue;
+      final neutral = Uint8List(w * h);
+      for (var py = 0; py < h; py++) {
+        for (var px = 0; px < w; px++) {
+          final p = ((y + py) * imageWidth + x + px) * 4;
+          final low = math.min(rgba[p], math.min(rgba[p + 1], rgba[p + 2]));
+          final high = math.max(rgba[p], math.max(rgba[p + 1], rgba[p + 2]));
+          if (rgba[p + 3] >= 165 && low >= 140 && high - low <= 110) {
+            neutral[py * w + px] = 1;
+          }
+        }
+      }
+      final white = _inkWhitePoint(rgba, imageWidth, imageHeight, table);
+      final physical = _recoverInk(
+        rgba,
+        imageWidth,
+        x,
+        y,
+        w,
+        h,
+        true,
+        '',
+        neutral,
+        (mask) =>
+            _classify(mask, w, h, templates, outlined: true, deskew: true),
+        numeric: true,
+        calibratedMasks: white == null
+            ? const []
+            : _castMasks(rgba, imageWidth, x, y, w, h, white),
+      );
+      if (physical == whole.text) {
+        return words
+            .where((word) => !candidates.skip(1).contains(word))
+            .toList();
+      }
+    }
+    return words;
+  }
+
   // ML Kit can report the same ink twice in overlapping text blocks. Collapse
   // only matching words whose boxes substantially overlap; distinct values
   // in a score cell must still trigger a conflict.
@@ -890,6 +1016,9 @@ abstract final class FrameGlyphReader {
             mask,
             readInk,
             ignoreInvalidNative: deskew,
+            calibratedMasks: deskew && white != null
+                ? _castMasks(rgba, imageWidth, x, y, w, h, white)
+                : const [],
           ),
         );
         continue;
@@ -912,23 +1041,7 @@ abstract final class FrameGlyphReader {
       if (white != null) {
         // The row's measured light ink can carry a strong monitor/camera cast.
         // Progressively retain more of that ink, never choosing by a score.
-        for (final levels in [(.85, .12), (.75, .3), (.65, .5)]) {
-          final pixels = Uint8List(w * h);
-          for (var py = 0; py < h; py++) {
-            for (var px = 0; px < w; px++) {
-              final p = ((y + py) * imageWidth + x + px) * 4;
-              final r = rgba[p] / white[0],
-                  g = rgba[p + 1] / white[1],
-                  b = rgba[p + 2] / white[2];
-              final low = math.min(r, math.min(g, b));
-              final high = math.max(r, math.max(g, b));
-              if (rgba[p + 3] >= 165 &&
-                  low >= levels.$1 &&
-                  high - low < levels.$2) {
-                pixels[py * w + px] = 1;
-              }
-            }
-          }
+        for (final pixels in _castMasks(rgba, imageWidth, x, y, w, h, white)) {
           // Outlined lettering is separated from the illustration behind it.
           // Edge-connected decoration cannot be an intact photographed glyph.
           String readCorrected(Uint8List input) => _classify(
@@ -1002,6 +1115,36 @@ abstract final class FrameGlyphReader {
     return frames;
   }
 
+  static Iterable<Uint8List> _castMasks(
+    Uint8List rgba,
+    int imageWidth,
+    int x,
+    int y,
+    int w,
+    int h,
+    List<int> white,
+  ) sync* {
+    for (final levels in [(.85, .12), (.75, .3), (.65, .5)]) {
+      final pixels = Uint8List(w * h);
+      for (var py = 0; py < h; py++) {
+        for (var px = 0; px < w; px++) {
+          final p = ((y + py) * imageWidth + x + px) * 4;
+          final r = rgba[p] / white[0],
+              g = rgba[p + 1] / white[1],
+              b = rgba[p + 2] / white[2];
+          final low = math.min(r, math.min(g, b));
+          final high = math.max(r, math.max(g, b));
+          if (rgba[p + 3] >= 165 &&
+              low >= levels.$1 &&
+              high - low < levels.$2) {
+            pixels[py * w + px] = 1;
+          }
+        }
+      }
+      yield pixels;
+    }
+  }
+
   static String _recoverInk(
     Uint8List rgba,
     int imageWidth,
@@ -1014,6 +1157,8 @@ abstract final class FrameGlyphReader {
     Uint8List neutral,
     String Function(Uint8List) classify, {
     bool ignoreInvalidNative = false,
+    Iterable<Uint8List> calibratedMasks = const [],
+    bool numeric = false,
   }) {
     final luminance = Uint8List(w * h);
     final histogram = List.filled(256, 0);
@@ -1055,15 +1200,28 @@ abstract final class FrameGlyphReader {
     }
 
     final neutralInk = withoutEdgeConnectedInk(neutral, w, h);
+    bool valid(String value) {
+      if (numeric) {
+        return RegExp(r'^\d{1,3}$').hasMatch(value) && int.parse(value) <= 300;
+      }
+      final parsed = TenPinScorer.parseFrame(value, tenth: tenth);
+      return parsed.complete && parsed.error == null;
+    }
+
     void consider(Uint8List mask) {
       final value = classify(mask);
-      final parsed = TenPinScorer.parseFrame(value, tenth: tenth);
-      if (parsed.complete && parsed.error == null && agrees(value)) {
+      if (valid(value) && agrees(value)) {
         readings.add(value);
       }
     }
 
     consider(neutralInk);
+    // A cast-calibrated row can separate pale delivery ink from colored
+    // illustration fragments with similar luminance. Keep the same complete
+    // glyph, primary-observation and ambiguity checks as every other mask.
+    for (final mask in calibratedMasks) {
+      consider(withoutEdgeConnectedInk(mask, w, h));
+    }
     if (high - low >= 50) {
       for (final fraction in [.35, .5]) {
         final dark = Uint8List(w * h), light = Uint8List(w * h);
@@ -1094,8 +1252,7 @@ abstract final class FrameGlyphReader {
     }
     if (readings.length == 1) return readings.single;
     if (readings.length > 1) return '';
-    final parsed = TenPinScorer.parseFrame(native, tenth: tenth);
-    return parsed.complete && parsed.error == null ? native : '';
+    return valid(native) ? native : '';
   }
 
   static List<MapEntry<String, double>> _rankGlyph(
@@ -1126,7 +1283,7 @@ abstract final class FrameGlyphReader {
       final width = gw + padding * 2;
       // Correct a bounded italic lean before normalizing the component. No
       // templates, scores, or native characters determine the transformation.
-      for (final shear in [-.2, .2]) {
+      for (final shear in [-.2, -.1, .1, .2]) {
         final pixels = <int>[];
         var left = width, right = 0;
         for (final p in c.pixels) {
