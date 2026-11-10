@@ -1,5 +1,40 @@
 # TestFlight readiness and release runbook
 
+## 0.1.20 (21): ball identities and coverstock specifications
+
+**Both iPad and native Mac 0.1.20 (21) are Testing in Owner testing.** Both
+uploads processed successfully and are assigned to **External testing**, with
+status **Waiting for Review** and automatic tester notification enabled. External
+access awaits Apple's Beta App Review approval. Both groups' Builds lists were
+verified on **November 10, 2026, at approximately 12:08 PM Central**. Existing
+builds, group membership and public-link settings were retained. Build-specific
+testing notes and the previously approved standard-encryption answer and France
+exclusion are saved on both builds.
+
+This release adds optional ball nicknames and shared model/weight labels, with
+color and numbered fallbacks for identical balls. Used-ball and primary-ball
+choices, My Bag, history, insights, recaps and CSV consistently distinguish
+owned balls while preserving their IDs. Optional Cover material and Cover type
+fields use 71 verified offline make/model defaults; manual edits take precedence,
+unknown models remain unset, and existing balls change only when explicitly
+applying model specifications. Older backups remain supported.
+
+| Evidence | Result |
+| --- | --- |
+| iPad ASC build | `25def465-726e-46e7-9736-5a2b244b0286`, owner Testing; external Waiting for Review |
+| Native Mac ASC build | `66e9fb1d-0e84-45bf-ae15-4fe595d6dfd2`, owner Testing; external Waiting for Review |
+| Source | Nicknames `649c769`, coverstocks `8fb4060`, release `47fe699`; normal `lib/main.dart` |
+| Regression checks | 303 Flutter tests pass; static analysis clean; production/test/native/assets sources identical to the tested feature commit |
+| Recognition | Pipeline, native helpers, scoring and glyph assets unchanged from build 20; prior photo evaluation and limitations still apply |
+| Apple packages | iPad App Store IPA and universal x86_64/arm64 Mac installer; archive/content, distribution profile, nested signing, installer-chain and payload-readability checks pass |
+| Bundled assets | Recognition assets and guide/privacy match source; private photos, fixtures and diagnostic entry points excluded |
+| Distribution proof | Private `build/testflight/build-21/owner-testing.png` and `external-testing.png` show both platform builds and group-specific status |
+
+Private archives, exports, tests, signing/asset reports, upload logs, hashes,
+notes and the release record are retained under ignored `build/testflight/build-21/`.
+Physical Apple installation and device acceptance remain separate checks; this
+release did not install a new Android build. Historical release records follow.
+
 ## 0.1.19 (20): gutter-mark recovery and recognition verification
 
 **Both iPad and native Mac 0.1.19 (20) are Testing in Owner testing.** Both

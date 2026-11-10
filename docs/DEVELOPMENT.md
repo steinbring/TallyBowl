@@ -1,6 +1,6 @@
 # TallyBowl! development status
 
-November 10 unreleased coverstock follow-up: optional **Cover material** and
+November 10 release **0.1.20 (21)**: optional **Cover material** and
 **Cover type** fields are editable in the ball form and shown in My Bag. The
 71-entry offline specification table covers all 63 retained Brunswick/Radical
 variants, seven additional starter models and generic TZone, using verified
@@ -12,17 +12,18 @@ Optional JSON fields preserve old backups and stable game/draft references.
 recognition suite, save retries, backup/restore and light/dark 200% text checks.
 Recognition helpers, scoring and glyph assets are unchanged. See
 [the specification provenance and rules](DATA_SOURCES.md#offline-coverstock-defaults).
-This feature and the nickname change below are **not in released Apple build 20**.
+Both iPad and native Mac are **Testing in Owner testing** and assigned to
+**External testing**, **Waiting for Review**, with automatic notification enabled.
+Signing, package and asset checks pass. See [the release record](TESTFLIGHT.md).
 
-November 10 unreleased follow-up: ball labels now include model and weight,
+Included in build 21: ball labels now include model and weight,
 with an optional nickname kept separate from the catalog model. Matching labels
 use color, then a number in saved bag order, including retired records, so used
 and primary selectors stay distinct. My Bag, history, insights, recaps and CSV
 use the same labels. Nicknames survive storage/backup; existing ball IDs and
-saved game/draft references are preserved. **295 Flutter tests pass**, including
-recognition and 200% text checks; static analysis is clean. Recognition source,
-native helpers and glyph assets are unchanged. This feature was implemented
-after the Apple build-20 release below and is **not in those binaries**.
+saved game/draft references are preserved. The full **303-test** release suite
+passes, including recognition and 200% text checks; static analysis is clean.
+Recognition source, native helpers and glyph assets are unchanged.
 
 November 9 release **0.1.19 (20)** improves gutter marks, intermediate italic
 lettering and overlapping scratch-total fragments. Both native engines recover
