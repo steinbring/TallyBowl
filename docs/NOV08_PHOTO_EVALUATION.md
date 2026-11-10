@@ -1,7 +1,9 @@
 # November 8 gutter-mark recovery
 
-Verified November 9, 2026. This is a source follow-up after **0.1.18 (19)**;
-it has not been packaged, installed on either phone or uploaded to TestFlight.
+Verified November 9, 2026. Included in **0.1.19 (20)** for iPad and native Mac,
+Testing in Owner testing and assigned to External testing with status Waiting
+for Review. See [the release record](TESTFLIGHT.md). Neither Android phone was
+updated by this release.
 
 The four supplied originals contain three games and a second, more distant view
 of the final game. Both bowler rows were independently transcribed, including

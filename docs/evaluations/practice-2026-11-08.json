@@ -1,7 +1,7 @@
 {
   "date": "2026-11-09",
   "captureDate": "2026-11-08",
-  "status": "source fix after 0.1.18 (19); not packaged or distributed",
+  "status": "included in Apple 0.1.19 (20); owner Testing; external Waiting for Review; no new Android installation",
   "baselineSource": "02b0ae5",
   "corpus": {
     "photos": 49,

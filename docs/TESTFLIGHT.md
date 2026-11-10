@@ -1,5 +1,42 @@
 # TestFlight readiness and release runbook
 
+## 0.1.19 (20): gutter-mark recovery and recognition verification
+
+**Both iPad and native Mac 0.1.19 (20) are Testing in Owner testing.** Both
+uploads processed successfully and are assigned to **External testing**, with
+status **Waiting for Review** and automatic tester notification enabled. External
+access awaits Apple's Beta App Review approval. The previously approved
+standard-encryption answer and France exclusion, and build-specific testing
+notes, are saved on both builds. Both groups' Builds lists were verified on
+**November 9, 2026, at approximately 9:35 PM Central**. Existing builds, group
+membership and public-link settings were retained.
+
+Recognition source **bc110a5** recovers every frame and scratch total in the three
+clearer November 8 game photos (**88, 115 and 117**) on both native engines; the
+distant duplicate remains in review. All 35 prior exact complete-game imports
+per engine are preserved. The fresh online sample recovers **0/4 complete games**
+on each engine and leaves six unsupported team-game rows unselected. Across
+**208 native row checks** from 55 originals, no incorrect automatic candidate or
+native failure is observed. Unfamiliar layouts still require manual correction;
+see [the verification and limits](NOV09_RECOGNITION_CHECK.md).
+
+| Evidence | Result |
+| --- | --- |
+| iPad ASC build | `be0dff5a-0a57-492a-89ad-52407f8b1ba0`, owner Testing; external Waiting for Review |
+| Native Mac ASC build | `48a75820-e0d2-46ac-a4cc-6f78fc824bb7`, owner Testing; external Waiting for Review |
+| Source | Recognition `bc110a5`; version and evaluation record `65f401e`; normal `lib/main.dart` |
+| Regression checks | 286 Flutter tests, 16 lab safety/training tests, clean static analysis; all prior exact photo imports retained |
+| Apple packages | iPad App Store IPA and universal x86_64/arm64 native Mac installer; archive/content, distribution profile, nested certificate, installer-chain and payload-readability checks pass |
+| Bundled assets | Recognition assets and guide/privacy documents match source in both exports; private photos, fixtures and diagnostic entry points excluded |
+| Distribution proof | Private `build/testflight/build-20/owner-testing.png` and `external-testing.png` show both platform builds and group-specific status |
+
+Private archives, exports, test/signing/asset reports, upload logs, testing notes,
+hashes and release record are retained under ignored `build/testflight/build-20/`.
+Journal and backup formats are unchanged. This request did not install a new
+Android build or perform physical iPadOS camera/gallery acceptance. Later
+source-only changes are separate from these distributed binaries. The following
+sections retain their historical release status.
+
 ## 0.1.18 (19): November 7 practice-photo recovery
 
 **Both iPad and native Mac 0.1.18 (19) are Testing in Owner testing.** Both uploads processed successfully and are assigned to External testing with status **Waiting for Review**. Automatic tester notification is enabled; external access awaits Apple's Beta App Review approval. The previously approved standard-encryption answer and France exclusion are saved on both builds, along with build-specific What to Test notes. The Owner testing Builds list was verified on **November 8, 2026, at approximately 11:53 AM Central**, and the External testing Builds list at **1:43 PM Central**. Existing builds, group membership and public-link settings were retained.

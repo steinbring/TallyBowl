@@ -1,17 +1,21 @@
 # TallyBowl! development status
 
-November 9 candidate **0.1.19 (20)**: gutter marks, intermediate italic lettering
-and overlapping scratch-total OCR fragments now recover all three November 8
-games (**88, 115 and 117**) from the clearer photos on both native engines. The
-distant duplicate remains in review. All prior exact original-photo imports are
-retained across 188 paired row checks, with no incorrect automatic candidate
-observed. **286 Flutter tests and 16 lab tests pass**; analysis is clean. See
-[the evaluation and limits](NOV08_PHOTO_EVALUATION.md). This source change has
-not been distributed yet. A fresh four-photo online evaluation recovers 0/4
-complete games on both engines; the unfamiliar layouts still need review. All
-35 prior exact games per engine are retained across 208 native row checks with
-no incorrect automatic candidates. See [the November 9 check](NOV09_RECOGNITION_CHECK.md).
-The released and installed builds below remain **0.1.18 (19)**.
+November 9 release **0.1.19 (20)** improves gutter marks, intermediate italic
+lettering and overlapping scratch-total fragments. Both native engines recover
+all ten frames in the three clearer November 8 games (**88, 115 and 117**); the
+distant duplicate still needs review. All 35 prior exact imports on each engine
+are retained across 208 native row checks with no incorrect automatic candidates.
+The fresh four-photo online sample recovers 0/4 complete games on both engines;
+unfamiliar layouts remain limited. **286 Flutter tests and 16 lab tests pass**;
+static analysis is clean. See [the verification](NOV09_RECOGNITION_CHECK.md) and
+[the gutter correction](NOV08_PHOTO_EVALUATION.md).
+
+Both iPad and native Mac build 20 are **Testing in Owner testing** and assigned
+to **External testing** with status **Waiting for Review**, with automatic tester
+notification enabled. Packages pass archive/content, signing and asset checks.
+See [the release record](TESTFLIGHT.md). No new Android installation or physical
+iPadOS camera/gallery acceptance was performed for this release; the Samsung
+installation records below remain build 19. Later source changes are separate.
 
 November 8 release **0.1.18 (19)** for the November 7 practice photos: all three originals
 now yield exact frames and totals **93, 148 and 105** through both native engines
@@ -52,7 +56,7 @@ Features are committed on `codex/` branches and merged locally into `main`. The 
 
 | Branch | Feature |
 | --- | --- |
-| `codex/scoreboard-recovery` | Conservative layout/ink/total and italic-glyph recovery, frozen regression/holdout evidence, and build 19 owner/external TestFlight release |
+| `codex/scoreboard-recovery` | Conservative layout/ink/total and italic-glyph recovery, frozen regression/holdout evidence, and build 20 owner/external TestFlight release |
 | `codex/project-roadmap` | Product scope and milestone plan |
 | `codex/flutter-foundation` | Flutter targets, branding, visual theme |
 | `codex/scoring-local-storage` | Ten-pin rules, domain records, SQLite persistence |
