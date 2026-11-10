@@ -1,5 +1,15 @@
 # TallyBowl! development status
 
+November 10 unreleased follow-up: ball labels now include model and weight,
+with an optional nickname kept separate from the catalog model. Matching labels
+use color, then a number in saved bag order, including retired records, so used
+and primary selectors stay distinct. My Bag, history, insights, recaps and CSV
+use the same labels. Nicknames survive storage/backup; existing ball IDs and
+saved game/draft references are preserved. **295 Flutter tests pass**, including
+recognition and 200% text checks; static analysis is clean. Recognition source,
+native helpers and glyph assets are unchanged. This feature was implemented
+after the Apple build-20 release below and is **not in those binaries**.
+
 November 9 release **0.1.19 (20)** improves gutter marks, intermediate italic
 lettering and overlapping scratch-total fragments. Both native engines recover
 all ten frames in the three clearer November 8 games (**88, 115 and 117**); the

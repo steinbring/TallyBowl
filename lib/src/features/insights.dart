@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../app_controller.dart';
+import '../domain/ball_labels.dart';
 import '../domain/models.dart';
 import '../domain/journal_index.dart';
 import '../ui/common.dart';
@@ -18,6 +19,7 @@ class _InsightsPageState extends State<InsightsPage> {
   @override
   Widget build(BuildContext context) {
     final data = widget.controller.data;
+    final ballLabels = BallLabels(data.balls);
     final since = days == 0
         ? null
         : DateTime.now().subtract(Duration(days: days));
@@ -219,7 +221,7 @@ class _InsightsPageState extends State<InsightsPage> {
                 (b) => journal.gamesWithBall(b.id).isNotEmpty,
               ))
                 (
-                  b.name,
+                  ballLabels[b.id],
                   '${journal.gamesWithBall(b.id).where((g) => g.primaryBallId == b.id).length} primary',
                   journal.gamesWithBall(b.id),
                 ),

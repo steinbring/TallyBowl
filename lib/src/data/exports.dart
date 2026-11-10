@@ -10,6 +10,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:uuid/uuid.dart';
 
+import '../domain/ball_labels.dart';
 import '../domain/models.dart';
 import 'bowl_store.dart';
 import 'bounded_file.dart';
@@ -154,6 +155,7 @@ abstract final class BowlExports {
   }
 
   static String gameCsv(BowlData data) {
+    final ballLabels = BallLabels(data.balls);
     final rows = <List<Object?>>[
       [
         'game_id',
@@ -185,8 +187,8 @@ abstract final class BowlExports {
           g.lane,
           i + 1,
           g.score,
-          g.ballIds.map((id) => data.ball(id)!.name).join(' | '),
-          g.primaryBallId == null ? '' : data.ball(g.primaryBallId!)!.name,
+          g.ballIds.map((id) => ballLabels[id]).join(' | '),
+          g.primaryBallId == null ? '' : ballLabels[g.primaryBallId!],
           g.notes,
           ...g.frames,
         ]);

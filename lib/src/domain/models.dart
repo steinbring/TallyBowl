@@ -40,19 +40,21 @@ class BowlingBall {
   const BowlingBall({
     required this.id,
     required this.name,
+    this.nickname = '',
     this.brand = '',
     this.weight = 15,
     this.notes = '',
     this.retired = false,
     this.color,
   });
-  final String id, name, brand, notes;
+  final String id, name, nickname, brand, notes;
   final double weight;
   final bool retired;
   final BallColor? color;
   Map<String, dynamic> toJson() => {
     'id': id,
     'name': name,
+    if (nickname.isNotEmpty) 'nickname': nickname,
     'brand': brand,
     'weight': weight,
     'notes': notes,
@@ -62,6 +64,7 @@ class BowlingBall {
   factory BowlingBall.fromJson(Map<String, dynamic> j) => BowlingBall(
     id: j['id'] as String,
     name: j['name'] as String,
+    nickname: j['nickname'] as String? ?? '',
     brand: j['brand'] as String,
     weight: (j['weight'] as num).toDouble(),
     notes: j['notes'] as String,

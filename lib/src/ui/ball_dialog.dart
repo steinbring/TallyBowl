@@ -17,7 +17,7 @@ class BallDialog extends StatefulWidget {
 class _BallDialogState extends State<BallDialog> {
   final _form = GlobalKey<FormState>();
   final _brandFocus = FocusNode(), _nameFocus = FocusNode();
-  late final TextEditingController _brand, _name, _weight, _notes;
+  late final TextEditingController _brand, _name, _weight, _nickname, _notes;
   late final String _id;
   bool _retired = false, _saving = false;
   BallColor? _color;
@@ -30,6 +30,7 @@ class _BallDialogState extends State<BallDialog> {
     _brand = TextEditingController(text: ball?.brand);
     _name = TextEditingController(text: ball?.name);
     _weight = TextEditingController(text: (ball?.weight ?? 15).toString());
+    _nickname = TextEditingController(text: ball?.nickname);
     _notes = TextEditingController(text: ball?.notes);
     _retired = ball?.retired ?? false;
     _color = ball?.color;
@@ -37,7 +38,7 @@ class _BallDialogState extends State<BallDialog> {
 
   @override
   void dispose() {
-    for (final field in [_brand, _name, _weight, _notes]) {
+    for (final field in [_brand, _name, _weight, _nickname, _notes]) {
       field.dispose();
     }
     _brandFocus.dispose();
@@ -58,6 +59,7 @@ class _BallDialogState extends State<BallDialog> {
           name: _name.text.trim(),
           brand: _brand.text.trim(),
           weight: double.parse(_weight.text),
+          nickname: _nickname.text.trim(),
           notes: _notes.text.trim(),
           retired: _retired,
           color: _color,
@@ -145,6 +147,18 @@ class _BallDialogState extends State<BallDialog> {
                         ? 'Use a weight greater than 0 and up to 16 lb.'
                         : null;
                   },
+                ),
+                const SizedBox(height: 16),
+                TextFormField(
+                  controller: _nickname,
+                  enabled: !_saving,
+                  maxLength: 40,
+                  decoration: const InputDecoration(
+                    labelText: 'Nickname (optional)',
+                    hintText: 'e.g. League or Spare',
+                    helperText: 'Leave blank to use the model and weight.',
+                    helperMaxLines: 3,
+                  ),
                 ),
                 const SizedBox(height: 16),
                 DropdownButtonFormField<BallColor>(

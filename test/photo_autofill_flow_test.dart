@@ -185,7 +185,7 @@ void main() {
               expect(controller.data.draft!['sourceCumulative'], checkpoints);
             }
             if (!resume) {
-              for (final label in ['Ball one', 'Ball two']) {
+              for (final label in ['Ball one · 15 lb', 'Ball two · 15 lb']) {
                 await tester.ensureVisible(find.text(label));
                 await tester.tap(find.widgetWithText(FilterChip, label));
                 await tester.pumpAndSettle();
@@ -194,7 +194,7 @@ void main() {
               await tester.ensureVisible(primary);
               await tester.tap(primary);
               await tester.pumpAndSettle();
-              await tester.tap(find.text('Ball two').last);
+              await tester.tap(find.text('Ball two · 15 lb').last);
               await tester.pumpAndSettle();
               final lane = find.widgetWithText(
                 TextField,

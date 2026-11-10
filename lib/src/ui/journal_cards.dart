@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../domain/ball_labels.dart';
 import '../domain/models.dart';
 import 'common.dart';
 
@@ -18,6 +19,7 @@ class GameCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final muted = Theme.of(context).colorScheme.onSurfaceVariant;
+    final ballLabels = BallLabels(data.balls);
     return MergeSemantics(
       child: Card(
         child: InkWell(
@@ -54,9 +56,7 @@ class GameCard extends StatelessWidget {
                 Text(
                   game.ballIds.isEmpty
                       ? 'No ball tags'
-                      : game.ballIds
-                            .map((id) => data.ball(id)!.name)
-                            .join(' · '),
+                      : game.ballIds.map((id) => ballLabels[id]).join(' · '),
                   style: TextStyle(fontSize: 12, color: muted),
                 ),
                 const SizedBox(height: 4),

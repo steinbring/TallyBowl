@@ -135,6 +135,8 @@ void main() {
       await openBall(tester, controller);
       await tester.enterText(field('Manufacturer'), 'Custom brand');
       await tester.enterText(field('Ball name / model'), 'My vintage ball');
+      await tester.ensureVisible(field('Nickname (optional)'));
+      await tester.enterText(field('Nickname (optional)'), 'League');
       await chooseColor(tester, 'Blue');
       await tester.tap(find.text('Save ball'));
       await tester.pumpAndSettle();
@@ -143,6 +145,7 @@ void main() {
         findsOneWidget,
       );
       expect(find.text('My vintage ball'), findsOneWidget);
+      expect(find.text('League'), findsOneWidget);
       expect(
         tester
             .state<FormFieldState<BallColor>>(
@@ -154,6 +157,7 @@ void main() {
       await tester.tap(find.text('Save ball'));
       await tester.pumpAndSettle();
       expect(controller.data.balls.single.name, 'My vintage ball');
+      expect(controller.data.balls.single.nickname, 'League');
       expect(controller.data.balls.single.color, BallColor.blue);
       expect(tester.takeException(), isNull);
     },
@@ -196,8 +200,10 @@ void main() {
           tester.widget<BallArt>(find.byType(BallArt)).color,
           BallColor.purple.swatch,
         );
-        await tester.tap(find.text('My colorful ball'));
+        await tester.tap(find.text('My colorful ball · 15 lb'));
         await tester.pumpAndSettle();
+        await tester.ensureVisible(field('Nickname (optional)'));
+        await tester.enterText(field('Nickname (optional)'), '  League  ');
         expect(
           tester
               .state<FormFieldState<BallColor>>(
@@ -210,8 +216,12 @@ void main() {
         await tester.tap(find.text('Save ball'));
         await tester.pumpAndSettle();
         expect(controller.data.balls.single.color, BallColor.green);
-        await tester.tap(find.text('My colorful ball'));
+        expect(controller.data.balls.single.nickname, 'League');
+        await tester.tap(find.text('League · My colorful ball · 15 lb'));
         await tester.pumpAndSettle();
+        expect(find.text('League'), findsOneWidget);
+        await tester.ensureVisible(field('Nickname (optional)'));
+        await tester.enterText(field('Nickname (optional)'), '');
         expect(
           tester
               .state<FormFieldState<BallColor>>(
@@ -224,6 +234,8 @@ void main() {
         await tester.tap(find.text('Save ball'));
         await tester.pumpAndSettle();
         expect(controller.data.balls.single.color, isNull);
+        expect(controller.data.balls.single.nickname, '');
+        expect(find.text('My colorful ball · 15 lb'), findsOneWidget);
         expect(find.text('Color: Green'), findsNothing);
         expect(tester.takeException(), isNull);
       },

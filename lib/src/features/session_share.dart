@@ -7,6 +7,7 @@ import 'package:flutter/rendering.dart';
 import '../app_controller.dart';
 import '../config.dart';
 import '../data/exports.dart';
+import '../domain/ball_labels.dart';
 import '../domain/models.dart';
 import '../theme.dart';
 import '../ui/common.dart';
@@ -100,21 +101,24 @@ class _SessionSharePageState extends State<SessionSharePage> {
         'Total: $total. Average: ${averageLabel(games)}.';
   }
 
-  String get _detailsSummary => [
-    'Branded recap image',
-    if (_showName && widget.data.profile.name.isNotEmpty)
-      widget.data.profile.name,
-    if (_showAlley) widget.data.alley(widget.session.alleyId)!.name,
-    if (_showAlley && widget.session.lane.isNotEmpty)
-      'Lane ${widget.session.lane}',
-    if (_showDate) dateLabel(widget.session.startedAt),
-    if (_showBalls)
-      ...widget.data
-          .sessionGames(widget.session.id)
-          .expand((g) => g.ballIds)
-          .toSet()
-          .map((id) => widget.data.ball(id)!.name),
-  ].join('. ');
+  String get _detailsSummary {
+    final ballLabels = BallLabels(widget.data.balls);
+    return [
+      'Branded recap image',
+      if (_showName && widget.data.profile.name.isNotEmpty)
+        widget.data.profile.name,
+      if (_showAlley) widget.data.alley(widget.session.alleyId)!.name,
+      if (_showAlley && widget.session.lane.isNotEmpty)
+        'Lane ${widget.session.lane}',
+      if (_showDate) dateLabel(widget.session.startedAt),
+      if (_showBalls)
+        ...widget.data
+            .sessionGames(widget.session.id)
+            .expand((g) => g.ballIds)
+            .toSet()
+            .map((id) => ballLabels[id]),
+    ].join('. ');
+  }
 
   @override
   Widget build(BuildContext context) => PopScope(
@@ -268,6 +272,7 @@ class RecapCard extends StatelessWidget {
     final games = data.sessionGames(session.id);
     final total = games.fold<int>(0, (n, g) => n + g.score);
     final ballIds = games.expand((g) => g.ballIds).toSet();
+    final ballLabels = BallLabels(data.balls);
     return Container(
       width: 540,
       padding: const EdgeInsets.all(38),
@@ -463,7 +468,7 @@ class RecapCard extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.only(top: 24),
                 child: Text(
-                  'IN THE BAG  ·  ${ballIds.map((id) => data.ball(id)!.name).join(' / ')}',
+                  'IN THE BAG  ·  ${ballIds.map((id) => ballLabels[id]).join(' / ')}',
                   style: const TextStyle(
                     fontSize: 12,
                     color: Color(0xFFD6E3DB),

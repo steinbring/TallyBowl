@@ -81,6 +81,22 @@ void main() {
     expect(csv.split('\r\n').length, 13);
     expect(csv, contains('"g","s","10","3","X","10","300"'));
   });
+  test('CSV distinguishes matching models and escapes nickname formulas', () {
+    final data = exportData().copyWith(
+      balls: const [
+        BowlingBall(id: 'b', name: 'TZone', weight: 12, nickname: '=League'),
+        BowlingBall(id: 'other', name: 'TZone', weight: 14),
+      ],
+    );
+    expect(
+      BowlExports.gameCsv(data),
+      contains('"\'=League · TZone · 12 lb","\'=League · TZone · 12 lb"'),
+    );
+    expect(
+      BowlStore.readBackup(BowlStore.encodeBackup(data)).balls.first.nickname,
+      '=League',
+    );
+  });
   test('CSV treats whitespace-prefixed formulas and leading control characters as text', () {
     for (final text in [
       '  =1+1',

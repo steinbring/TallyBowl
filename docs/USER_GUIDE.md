@@ -1,10 +1,12 @@
 # User guide
 
-Updated 2026-11-03.
+Updated 2026-11-09.
 
 ## Set up your journal
 
 Open Settings and set your bowler name and the names or nicknames shown on scoreboards. TallyBowl tracks one bowler. In My Bag, add your balls using the offline starter suggestions or any custom manufacturer/model. In Alleys, search by name and city, confirm the result, or enter an alley manually. Map and search services need internet access; saved alleys work offline.
+
+Ball labels use the model and weight, such as TZone · 12 lb and TZone · 14 lb. Add an optional nickname such as League or Spare to distinguish identical balls; leave it blank to use the model and weight automatically. Matching entries use color and, if needed, a Ball 1 / Ball 2 number in bag order. Labels stay consistent in ball selections, history, insights, recaps and CSV exports. Nicknames are saved in backups, and changing one keeps the ball’s game history. Older balls start with no nickname.
 
 When adding or editing a ball, Color (optional) lets you choose black, white, gray, red, orange, yellow, green, blue, purple, pink or brown. My Bag uses the selected color for the ball artwork and shows its name. Choose Not set to clear it. Colors are included in journal backups; older balls and backups start with no color selected.
 

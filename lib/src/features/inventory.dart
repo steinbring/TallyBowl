@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../app_controller.dart';
+import '../domain/ball_labels.dart';
 import '../theme.dart';
 import '../ui/common.dart';
 import '../ui/branding.dart';
@@ -15,6 +16,7 @@ class BagPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final data = controller.data;
+    final ballLabels = BallLabels(data.balls);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -95,7 +97,7 @@ class BagPage extends StatelessWidget {
                                   ),
                                   const SizedBox(height: 24),
                                   Text(
-                                    ball.name,
+                                    ballLabels[ball.id],
                                     style: const TextStyle(
                                       fontSize: 22,
                                       fontWeight: FontWeight.w800,
@@ -103,7 +105,9 @@ class BagPage extends StatelessWidget {
                                   ),
                                   const SizedBox(height: 6),
                                   Text(
-                                    '${ball.brand.isEmpty ? 'Your ball' : ball.brand} · ${ball.weight.toStringAsFixed(ball.weight % 1 == 0 ? 0 : 1)} lb',
+                                    ball.brand.isEmpty
+                                        ? 'Your ball'
+                                        : ball.brand,
                                     style: TextStyle(
                                       color: Theme.of(context)
                                           .colorScheme
