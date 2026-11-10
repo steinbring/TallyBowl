@@ -36,6 +36,38 @@ enum BallColor {
   }
 }
 
+enum CoverMaterial {
+  reactiveResin('Reactive resin'),
+  urethane('Urethane'),
+  polyester('Polyester / plastic'),
+  rubber('Rubber'),
+  other('Other');
+
+  const CoverMaterial(this.label);
+  final String label;
+  static CoverMaterial? fromJson(Object? value) =>
+      _enumFromJson(value, values, 'cover material');
+}
+
+enum CoverType {
+  solid('Solid'),
+  pearl('Pearl'),
+  hybrid('Hybrid');
+
+  const CoverType(this.label);
+  final String label;
+  static CoverType? fromJson(Object? value) =>
+      _enumFromJson(value, values, 'cover type');
+}
+
+T? _enumFromJson<T extends Enum>(Object? value, List<T> values, String field) {
+  if (value == null) return null;
+  for (final item in values) {
+    if (item.name == value) return item;
+  }
+  throw FormatException('Unsupported ball $field.');
+}
+
 class BowlingBall {
   const BowlingBall({
     required this.id,
@@ -46,11 +78,15 @@ class BowlingBall {
     this.notes = '',
     this.retired = false,
     this.color,
+    this.coverMaterial,
+    this.coverType,
   });
   final String id, name, nickname, brand, notes;
   final double weight;
   final bool retired;
   final BallColor? color;
+  final CoverMaterial? coverMaterial;
+  final CoverType? coverType;
   Map<String, dynamic> toJson() => {
     'id': id,
     'name': name,
@@ -60,6 +96,8 @@ class BowlingBall {
     'notes': notes,
     'retired': retired,
     if (color != null) 'color': color!.name,
+    if (coverMaterial != null) 'coverMaterial': coverMaterial!.name,
+    if (coverType != null) 'coverType': coverType!.name,
   };
   factory BowlingBall.fromJson(Map<String, dynamic> j) => BowlingBall(
     id: j['id'] as String,
@@ -70,6 +108,8 @@ class BowlingBall {
     notes: j['notes'] as String,
     retired: j['retired'] as bool,
     color: BallColor.fromJson(j['color']),
+    coverMaterial: CoverMaterial.fromJson(j['coverMaterial']),
+    coverType: CoverType.fromJson(j['coverType']),
   );
 }
 

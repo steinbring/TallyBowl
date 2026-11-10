@@ -1,5 +1,19 @@
 # TallyBowl! development status
 
+November 10 unreleased coverstock follow-up: optional **Cover material** and
+**Cover type** fields are editable in the ball form and shown in My Bag. The
+71-entry offline specification table covers all 63 retained Brunswick/Radical
+variants, seven additional starter models and generic TZone, using verified
+manufacturer sources. Exact normalized make/model matches populate untouched
+fields on new balls; manual choices and clears take precedence. Existing balls
+preserve stored fields until the owner chooses **Use model specifications**.
+Optional JSON fields preserve old backups and stable game/draft references.
+**303 Flutter tests pass** and static analysis is clean, including the retained
+recognition suite, save retries, backup/restore and light/dark 200% text checks.
+Recognition helpers, scoring and glyph assets are unchanged. See
+[the specification provenance and rules](DATA_SOURCES.md#offline-coverstock-defaults).
+This feature and the nickname change below are **not in released Apple build 20**.
+
 November 10 unreleased follow-up: ball labels now include model and weight,
 with an optional nickname kept separate from the catalog model. Matching labels
 use color, then a number in saved bag order, including retired records, so used

@@ -46,7 +46,9 @@ Future<void> openBall(WidgetTester tester, BowlController controller) async {
 
 Future<void> chooseColor(WidgetTester tester, String label) async {
   final picker = find.byType(DropdownButtonFormField<BallColor>);
+  await tester.pumpAndSettle();
   await tester.ensureVisible(picker);
+  await tester.pumpAndSettle();
   await tester.tap(picker);
   await tester.pumpAndSettle();
   await tester.ensureVisible(find.text(label).last);
@@ -122,6 +124,11 @@ void main() {
     await tester.pumpAndSettle();
     expect(controller.data.balls.single.name, 'Phaze II');
     expect(controller.data.balls.single.brand, 'Storm');
+    expect(
+      controller.data.balls.single.coverMaterial,
+      CoverMaterial.reactiveResin,
+    );
+    expect(controller.data.balls.single.coverType, CoverType.solid);
     expect(tester.takeException(), isNull);
   });
   testWidgets(

@@ -123,6 +123,16 @@ class BagPage extends StatelessWidget {
                                             .onSurfaceVariant,
                                       ),
                                     ),
+                                  if (ball.coverMaterial != null ||
+                                      ball.coverType != null)
+                                    Text(
+                                      'Cover: ${[ball.coverMaterial?.label, ball.coverType?.label].whereType<String>().join(' · ')}',
+                                      style: TextStyle(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSurfaceVariant,
+                                      ),
+                                    ),
                                   const Padding(
                                     padding: EdgeInsets.symmetric(vertical: 18),
                                     child: Divider(),
