@@ -1,0 +1,147 @@
+{
+  "schema": 1,
+  "date": "2026-11-09",
+  "recognitionSource": "bc110a5df92059c50560413ff3128ff33db3aad5",
+  "productionRecognitionChangedDuringFreshEvaluation": false,
+  "fresh": {
+    "photos": 4,
+    "completeGames": 4,
+    "negativeRows": 6,
+    "labelsFrozenBeforeResults": true
+  },
+  "total": {
+    "photos": 55,
+    "rowsPerEngine": 104,
+    "completeRowsPerEngine": 70,
+    "negativeRowsPerEngine": 34,
+    "nativeRowChecks": 208
+  },
+  "preservationGatePassed": true,
+  "preservation": [
+    {
+      "engine": "apple",
+      "safe": true,
+      "promotable": false,
+      "gains": [],
+      "regressions": [],
+      "wrongAutomatic": [],
+      "failures": [],
+      "scope": "regression",
+      "retainedExact": 35
+    },
+    {
+      "engine": "apple",
+      "safe": true,
+      "promotable": false,
+      "gains": [],
+      "regressions": [],
+      "wrongAutomatic": [],
+      "failures": [],
+      "scope": "holdout",
+      "retainedExact": 0
+    },
+    {
+      "engine": "android",
+      "safe": true,
+      "promotable": false,
+      "gains": [],
+      "regressions": [],
+      "wrongAutomatic": [],
+      "failures": [],
+      "scope": "regression",
+      "retainedExact": 35
+    },
+    {
+      "engine": "android",
+      "safe": true,
+      "promotable": false,
+      "gains": [],
+      "regressions": [],
+      "wrongAutomatic": [],
+      "failures": [],
+      "scope": "holdout",
+      "retainedExact": 0
+    }
+  ],
+  "flutterTests": 286,
+  "labTests": 16,
+  "analysis": "clean",
+  "pipelineSha256": "12be123d4301b156525a2e09d3b22b4e61d80a358f4d442a50cead9b110b2161",
+  "templatesSha256": "776d2e351fd8b00c24a7b538a1d2b2ad134ed510c99c1e9d590e85ed2400c82e",
+  "engines": {
+    "apple": {
+      "nativeFingerprint": "d99dfc7ee2aaf2203a5d43eca347df0e59603850f70fe9264008d995a36f83a3",
+      "earlierExactRetained": 35,
+      "earlierCompleteGames": 64,
+      "freshExact": 0,
+      "holdoutExact": 0,
+      "incorrectAutomatic": 0,
+      "nativeFailures": 0,
+      "maxNativeCalls": 4
+    },
+    "android": {
+      "nativeFingerprint": "3bb7902df0d0283ae2f10f47eeda0b44387f0bdde07e7ba871769b3d9ce6240b",
+      "earlierExactRetained": 35,
+      "earlierCompleteGames": 64,
+      "freshExact": 0,
+      "holdoutExact": 0,
+      "incorrectAutomatic": 0,
+      "nativeFailures": 0,
+      "maxNativeCalls": 4
+    }
+  },
+  "evidence": {
+    "sources.json": {
+      "sha256": "837e44058750042a51b290996fdfe50d85ac9eb7b63d42ae58c35fd6232b1706",
+      "bytes": 2481
+    },
+    "new.json": {
+      "sha256": "52e0f125a39fc37beb5dfa187dcd49ac7137b079ed770fa4c1a1032c2a7ed291",
+      "bytes": 6029
+    },
+    "gold-lock.json": {
+      "sha256": "243efc224b0a72f205413cf0a4cfa2657c5d93f527bd95b86a7bd9465e3553ff",
+      "bytes": 306
+    },
+    "corpus.json": {
+      "sha256": "fa2996f3aa1eff0fbfe5ed0a0ea59946982be4dda17bff29362bb9e6c4836f33",
+      "bytes": 69117
+    },
+    "apple-fresh.json": {
+      "sha256": "0a67cc6a6f21a07baeaa44783cf718b6656d736d411e87b2f756ec7e4cda640c",
+      "bytes": 2681
+    },
+    "apple-regression.json": {
+      "sha256": "d53e9b38e9ef171c7c2a18b3805f2373216274d96fd838e576f61583a8965eff",
+      "bytes": 20096
+    },
+    "apple-holdout.json": {
+      "sha256": "42827a73086fb598c3ddaf6aeb8acfea0b6c0c95ec32bbd74af20dc7b9849897",
+      "bytes": 1864
+    },
+    "android-fresh.json": {
+      "sha256": "af8e0b8582faebb4a8cc6ee58b3b24c5a3abd602a642914d727beeaa2f5995cd",
+      "bytes": 2685
+    },
+    "android-regression.json": {
+      "sha256": "0e81a35f8568971f904709637a8fb5e0768c3fb13139bd7a79c9009095c3515d",
+      "bytes": 20096
+    },
+    "android-holdout.json": {
+      "sha256": "9a6d1bc261388f126307820324a06f3a750b9e3a7379384ac2b98da7f2471038",
+      "bytes": 1865
+    },
+    "flutter-tests.log": {
+      "sha256": "d8091030eb460e191dabc5f1412597faed764f9150596a0e4a4a9f831e420ca5",
+      "bytes": 42505
+    },
+    "flutter-analyze.log": {
+      "sha256": "4cb87e824bbd1d65af1bce7f95a782aa6caed96a8d66816025be9b6309a863fb",
+      "bytes": 96
+    },
+    "lab-tests.log": {
+      "sha256": "8b519f9cc5c43acbdc83da7450db1dd89992c87ba70c48c0060e46ff81b65c7d",
+      "bytes": 115
+    }
+  }
+}

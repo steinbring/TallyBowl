@@ -1,6 +1,6 @@
 # TestFlight metadata
 
-Current release: **0.1.18 (19)** for iPad and native Mac. Both are **Testing in Owner testing** and assigned to **External testing**, with status **Waiting for Review** and automatic tester notification enabled. External access awaits Apple's approval. Both groups' Builds lists were verified November 8, 2026; see the [runbook](TESTFLIGHT.md). Existing group membership is retained. Beta description, feedback email and private reviewer contact/instructions remain in App Store Connect; sign-in is not required.
+Candidate: **0.1.19 (20)** for iPad and native Mac, intended for Owner testing and External testing. Upload, Apple processing and group assignment remain to be verified. The previous release is **0.1.18 (19)**; see the [runbook](TESTFLIGHT.md). Existing group membership is retained. Beta description, feedback email and private reviewer contact/instructions remain in App Store Connect; sign-in is not required.
 
 ## Public contact and remaining account fields
 
@@ -21,9 +21,9 @@ This beta stores your journal locally, has no login or subscription, and include
 
 ## What to test
 
-Build 0.1.18 (19) improves condensed italic scoreboard lettering and alignment when OCR includes background decoration in header boxes. It keeps primary and crop readings separate and preserves conflicting-player identity checks. Earlier successful photo imports remain covered by regression tests; unfamiliar or small scoreboards may still require manual correction.
+Build 0.1.19 (20) improves tinted gutter marks, moderately italic scoreboard lettering and overlapping scratch-total text fragments. The three clearer November 8 game photos recover all ten frames and totals (88, 115 and 117) on both native engines. Earlier successful photo imports remain covered by regression tests. A distant duplicate still needs review. Fresh unfamiliar layouts and stylized symbols also require manual entry; these checks do not establish general recognition accuracy.
 
-Please test importing a final scoreboard with your saved name/alias, compare all ten frames and the scratch total, and resume an interrupted photo draft. Test offline recognition, multiple bowlers, splits, spares, strikes and tenth-frame fills. Confirm uncertain/incomplete images require review rather than inventing rolls. Also check session history, manual scoring, Share image, Export image, dark mode, large text and VoiceOver. Journal and backup formats are unchanged.
+Please test importing a final scoreboard with your saved name/alias, compare all ten frames and the scratch total, and resume an interrupted photo draft. Test leading/trailing gutters, double gutters, a gutter followed by a spare, splits and tenth-frame fills. Test offline recognition and multiple bowlers. Confirm uncertain/incomplete images require review rather than inventing rolls. Also check session history, manual scoring, Share image, Export image, dark mode, large text and VoiceOver. Journal and backup formats are unchanged.
 
 Keep a backup before testing restore or deletion. Report version/build, device/OS, expected and actual results. Use permissioned, redacted photos in feedback.
 

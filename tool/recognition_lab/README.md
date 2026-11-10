@@ -9,11 +9,18 @@ future layout/segmentation changes without changing the installed app.
 All photos, human labels, native OCR text, experimental templates and detailed
 logs belong under ignored `build/recognition-lab/`. No cloud service is used.
 Do not add downloaded scoreboards, private names or EXIF to app assets or Git.
-The latest combined corpus is `build/recognition-lab/practice-nov08/corpus.json`
+The latest combined corpus is `build/recognition-lab/online-nov09/corpus.json`
+(98 cases, 53 originals). It adds four fresh online sources to the November 8
+corpus, including six Baker/team-game negative rows. The independently labeled
+first evaluation is frozen separately as `online-nov09/new.json`; after inspecting
+results, those cases are regression data, not a future unseen test. See
+[the November 9 check](../../docs/NOV09_RECOGNITION_CHECK.md) and
+[the November 8 results](../../docs/NOV08_PHOTO_EVALUATION.md).
+The prior manifest remains at `build/recognition-lab/practice-nov08/corpus.json`
 (88 cases, 49 originals), including both rows in the four November 8 photos,
-the three November 7 practice photos and the
-eight Google Images sources in [the benchmark record](../../docs/GOOGLE_IMAGES_EVALUATION.md).
-All inspected photos are protected regression data. See [the November 8 results](../../docs/NOV08_PHOTO_EVALUATION.md).
+the three November 7 practice photos and the eight Google Images sources in
+[the benchmark record](../../docs/GOOGLE_IMAGES_EVALUATION.md).
+All inspected photos are protected regression data.
 The prior 80-case manifest remains at `build/recognition-lab/practice-nov07/corpus.json`.
 The earlier manifests remain at `build/recognition-lab/corpus-expanded.json`
 (77 cases/42 photos) and `build/recognition-lab/corpus.json` (51 cases/34 photos)
@@ -57,7 +64,7 @@ colored backgrounds, tiny fonts and unrelated adjacent screens. Do not infer
 missing deliveries from a matching total.
 
 ```sh
-python3 tool/recognition_lab/lab.py validate build/recognition-lab/practice-nov08/corpus.json
+python3 tool/recognition_lab/lab.py validate build/recognition-lab/online-nov09/corpus.json
 python3 -m unittest discover -s tool/recognition_lab -p test_lab.py
 ```
 
