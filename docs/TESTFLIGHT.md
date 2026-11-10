@@ -9,7 +9,9 @@ access awaits Apple's Beta App Review approval. The previously approved
 standard-encryption answer and France exclusion, and build-specific testing
 notes, are saved on both builds. Both groups' Builds lists were verified on
 **November 9, 2026, at approximately 9:35 PM Central**. Existing builds, group
-membership and public-link settings were retained.
+membership and public-link settings were retained. Rechecked on **November 10
+at approximately 6:40 AM Central**: both owner builds remain Testing and both
+external builds remain Waiting for Review.
 
 Recognition source **bc110a5** recovers every frame and scratch total in the three
 clearer November 8 game photos (**88, 115 and 117**) on both native engines; the

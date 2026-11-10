@@ -1,6 +1,6 @@
 # TestFlight metadata
 
-Current release: **0.1.19 (20)** for iPad and native Mac. Both are **Testing in Owner testing** and assigned to **External testing**, with status **Waiting for Review** and automatic tester notification enabled. External access awaits Apple's approval. Both groups' Builds lists were verified November 9, 2026; see the [runbook](TESTFLIGHT.md). Existing group membership is retained. Beta description, feedback email and private reviewer contact/instructions remain in App Store Connect; sign-in is not required.
+Current release: **0.1.19 (20)** for iPad and native Mac. Both are **Testing in Owner testing** and assigned to **External testing**, with status **Waiting for Review** and automatic tester notification enabled. External access awaits Apple's approval. Both groups' Builds lists were rechecked November 10, 2026; see the [runbook](TESTFLIGHT.md). Existing group membership is retained. Beta description, feedback email and private reviewer contact/instructions remain in App Store Connect; sign-in is not required.
 
 ## Public contact and remaining account fields
 
