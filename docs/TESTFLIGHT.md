@@ -32,8 +32,9 @@ applying model specifications. Older backups remain supported.
 
 Private archives, exports, tests, signing/asset reports, upload logs, hashes,
 notes and the release record are retained under ignored `build/testflight/build-21/`.
-Physical Apple installation and device acceptance remain separate checks; this
-release did not install a new Android build. Historical release records follow.
+Physical Apple installation and device acceptance remain separate checks. The
+subsequent Android build-21 Fold 8 installation and data-preservation check is
+recorded in [device testing](DEVICE_TESTING.md). Historical release records follow.
 
 ## 0.1.19 (20): gutter-mark recovery and recognition verification
 

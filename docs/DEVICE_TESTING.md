@@ -1,8 +1,14 @@
 # Device testing and owner installations
 
-The Samsung Galaxy Z Fold 8 (SM-F971U1) and Galaxy Z Flip 7 (SM-F766U) both have owner build **0.1.18 (19)**. The last directly verified local Mac/iPad installations are **0.1.7 (8)**; TestFlight distribution status is recorded separately in [TESTFLIGHT.md](TESTFLIGHT.md). A physical Apple TestFlight installation has not been verified. Repeat this checklist on each distribution-signed candidate and record its exact version.
+The Samsung Galaxy Z Fold 8 (SM-F971U1) has owner build **0.1.20 (21)**; the Galaxy Z Flip 7 (SM-F766U) remains on **0.1.18 (19)**. The last directly verified local Mac/iPad installations are **0.1.7 (8)**; TestFlight distribution status is recorded separately in [TESTFLIGHT.md](TESTFLIGHT.md). A physical Apple TestFlight installation has not been verified. Repeat this checklist on each distribution-signed candidate and record its exact version.
 
 Start with the Samsung Galaxy Z Fold 8, then repeat the camera, import, sharing, and accessibility checks on a physical iPad and a supported Mac. Current automated checks are described in [development status](DEVELOPMENT.md). The Samsung was installed with build 0.1.4 (5) and supplied the first real-photo regression. This checklist separates further hardware checks from automated evidence.
+
+## Verified Fold 8 update — November 10, 2026
+
+Updated the attached Galaxy Z Fold 8 (SM-F971U1, Android 17) in place from **0.1.18 (19)** to **0.1.20 (21)** with the normal `lib/main.dart` owner debug APK. Its application source matches release commit **47fe699**, unchanged through the later documentation commit 37ac602; it includes ball nicknames/labels and the Cover material and Cover type fields. The new and installed signing certificates match, permissions are unchanged, and bundled recognition/guide/privacy/branding assets match source. Private photos, fixtures and diagnostic entry points are excluded. The installed APK SHA-256 matches `build/releases/TallyBowl-0.1.20-android-debug.apk` exactly, and the original install time is retained.
+
+Protected copies of the previous APK and stopped-app data, signer/badging reports and installation comparisons are retained under ignored `build/owner-updates/0.1.20/samsung/`. All **12 persistent app-data files** have identical hashes before and immediately after `adb install -r`. After startup, SQLite integrity checks pass and the complete journal's logical dump is unchanged, preserving **3 alleys, 3 balls, 8 sessions and 24 games**, including profile and draft settings. Existing balls keep their stored fields; no model specifications were applied. Android confirms version 0.1.20/build 21, successful activity startup and a running process. The phone was unlocked, and a post-launch screenshot shows the Tonight screen with 24 games recorded; no other in-app screens were exercised. No uninstall, app-data clearing, journal edit or outgoing share occurred. The Flip 7 was not attached and remains on 0.1.18 (19).
 
 ## Verified Flip 7 update — November 8, 2026
 
@@ -82,7 +88,7 @@ The Mac package launched successfully after strict signature and sealed owner-po
 
 - Use the packaged **Android debug APK** for this first local test. Public/store release signing is a separate setup task.
 - If an earlier version contains bowling history, export a JSON backup first. Update in place with the same development signing key. A signature mismatch is a reason to inspect signing, not to uninstall and erase data automatically.
-- Confirm the intended version/build after updating in place (currently 0.1.18/19 on the Fold 8 and Flip 7; the last verified local Mac/iPad installs are 0.1.7/8); retain existing alleys, balls, sessions and drafts.
+- Confirm the intended version/build after updating in place (currently 0.1.20/21 on the Fold 8 and 0.1.18/19 on the Flip 7; the last verified local Mac/iPad installs are 0.1.7/8); retain existing alleys, balls, sessions and drafts.
 
 ## First complete session
 

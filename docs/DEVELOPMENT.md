@@ -15,6 +15,11 @@ Recognition helpers, scoring and glyph assets are unchanged. See
 Both iPad and native Mac are **Testing in Owner testing** and assigned to
 **External testing**, **Waiting for Review**, with automatic notification enabled.
 Signing, package and asset checks pass. See [the release record](TESTFLIGHT.md).
+The Fold 8 was subsequently updated in place to the normal Android owner build
+**0.1.20 (21)** on November 10. Signing, permissions and all 12 persistent
+app-data files are preserved; startup succeeds and the journal remains
+identical, with 24 games across 8 sessions plus profile and draft settings.
+The Flip 7 remains on build 19. See [device evidence](DEVICE_TESTING.md).
 
 Included in build 21: ball labels now include model and weight,
 with an optional nickname kept separate from the catalog model. Matching labels
