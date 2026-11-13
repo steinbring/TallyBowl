@@ -15,9 +15,9 @@ not required.
 - Public support/contact URL: **https://jws.dev/contact** (owner-approved; returned HTTP 200 and the Joe Steinbring contact page on October 25, 2026).
 - TestFlight feedback email: **configured in App Store Connect** with owner approval; private account contact is intentionally omitted here.
 - Beta reviewer contact name: **Joe Steinbring**; email and phone were supplied/approved by the owner and saved privately in App Store Connect. Do not commit private contact details.
-- Privacy policy URL: `https://tallybowl.jws.app/privacy` — planned and still unavailable. The current policy is bundled offline in Settings. Publish and verify the hosted copy before expanding the beta; do not enter a nonexistent URL as a live policy in Apple metadata.
+- Privacy policy URL: `https://tallybowl.jws.app/privacy/` — verified HTTPS 200 on November 13, 2026. The policy is also bundled offline in Settings. Review hosted/bundled consistency and finish the dedicated Apple App Privacy field/declarations before public submission; see [launch readiness](LAUNCH-READINESS.md).
 - Support URL: `https://jws.dev/contact`. The app's bundled user guide remains available offline in Settings.
-- Marketing URL: `https://tallybowl.jws.app` — planned, not currently hosted.
+- Marketing URL: `https://tallybowl.jws.app/` — live.
 - Export-compliance and privacy-label decisions: see [runbook](TESTFLIGHT.md); do not infer them from this draft.
 
 ## Beta description
