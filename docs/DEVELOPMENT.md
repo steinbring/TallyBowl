@@ -1,5 +1,15 @@
 # TallyBowl! development status
 
+November 14 [detection review](NOV14_DETECTION_REVIEW.md): Vision's Cyrillic/Greek
+3 and X lookalikes now read like ML Kit's Latin marks; accented and multi-word
+scoreboard aliases (`JOE S`) match on every recognition path; and a rejected
+photo no longer re-decodes and re-classifies the same ink in every fallback.
+On the 113-row corpus Apple stays at 44 and Android rises from 46 to 47 exact
+complete rows, with no regressions, no incorrect automatic candidates and
+35/35 negatives unselected. Every parsed row is unchanged by the speed work,
+which cuts total recognition time by about a quarter. Source-level
+verification only; no new build, installation or TestFlight upload.
+
 November 14 merge: the build-22 recognition branch is now on main with the
 build-23 store work. Build number 22 was used twice (0.1.20 (22) on the Flip 7,
 0.1.21 (22) on the Fold 8); `pubspec.yaml` stays at the highest used build,
