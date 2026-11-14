@@ -53,8 +53,11 @@ void main() {
           final row = ScoreSheetParser.automaticRow(
             ScoreSheetParser.rows(lines, profile),
           );
+          // The complete Android case 04 now has an independently verified
+          // exact raster reading; require every gold frame below. The complete
+          // Apple case 12 still lacks supported deliveries and needs review.
           if (fixture['complete'] == false ||
-              (platform == 'apple' ? [12] : [4]).contains(number)) {
+              (platform == 'apple' && number == 12)) {
             expect(
               row,
               isNull,

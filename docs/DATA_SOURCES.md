@@ -20,9 +20,9 @@ Research did not identify a documented, maintained public bowling-ball catalog A
 
 Do not turn retail pages, undocumented store endpoints, or a PDF approval list into a scraping dependency. A future public JSON catalog at tallybowl.jws.app could provide key-free updates, once its data source and redistribution rights are settled. Ball suggestions must allow custom, old, and regional models and must not be presented as tournament eligibility or purchasing advice.
 
-The offline catalog contains 11 manufacturer/brand names and 85 model names: the original 22 selected models plus 50 current Brunswick and 13 current Radical names checked on October 30, 2026. Suggestions also include the owner's previously entered brands and models, including retired equipment. Choosing a model fills its manufacturer; both fields remain editable. No catalog request leaves the device. This is a dated name snapshot, not a live stock or eligibility list. Weight, optional basic color, surface and notes remain the owner's entries.
+The offline catalog contains 11 manufacturer/brand names and 85 model names: the original 22 selected models plus 50 current Brunswick and 13 current Radical names checked on October 30, 2026. Suggestions also include the owner's previously entered brands and models, including retired equipment. Choosing a model fills its manufacturer; both fields remain editable. No catalog request leaves the device. This is a dated name snapshot, not a live stock or eligibility list. Weight, optional basic color, nickname, surface and notes remain the owner's entries. Optional coverstock fields use the separate verified defaults below.
 
-Current-name expansion checked October 30, 2026, from the official product listings at the owner's request (names only; no descriptions, images, prices or specifications are bundled):
+The original current-name expansion was checked October 30, 2026, from official listings at the owner's request. That expansion added names only. The November 10 coverstock follow-up below adds selected specification facts, without manufacturer descriptions, images or prices:
 
 - [Brunswick Current](https://brunswickbowling.com/products/balls/current): 50 distinct products across [page 2](https://brunswickbowling.com/products/balls/current/p2), [page 3](https://brunswickbowling.com/products/balls/current/p3) and [page 4](https://brunswickbowling.com/products/balls/current/p4), including the first page. The named color variants, polyester balls and Viz-A-Ball designs are included. The earlier generic Rhino and Mesmerize suggestions remain available.
 - [Radical Current](https://radicalbowling.com/products/balls/current): 13 products. The owner-supplied [All Balls](https://radicalbowling.com/products/balls) listing also includes retired models; those were excluded from the current expansion.
@@ -39,6 +39,45 @@ Original name-only starter references checked October 23, 2026:
 - [Columbia 300](https://columbia300.com/): brand-only suggestion.
 
 Manufacturer suggestions are derived from the starter models plus explicit brand-only entries. Tests check that brands/models are nonempty, unique, and consistent. Keep this reference list and `BallCatalog.starter` in sync when adding manually verified names. Do not imply endorsement or manufacturer affiliation.
+
+## Offline coverstock defaults
+
+Checked **November 10, 2026**. `BallSpecifications` contains **71 exact
+manufacturer/model entries**: the 50 retained Brunswick variants, all 13 retained
+Radical models, seven additional starter models and an explicit generic TZone
+alias. All 63 current variants were read from individual official product spec
+tables; this does not replace the dated name catalog or make it a live feed.
+The [provenance record](catalog/ball-coverstocks-2026-11-10.json) identifies every
+model, source URL, coverstock/type evidence, normalized material/construction,
+check date and downloaded-source hash. HTML/PDF snapshots remain in ignored
+`build/ball-specs/`, outside app assets.
+
+Material and construction are separate facts. For example,
+[Brunswick TZone](https://brunswickbowling.com/products/balls/current/tzone-indigo-swirl)
+and [Radical The Spy](https://radicalbowling.com/products/balls/current/the-spy)
+are polyester with no solid/pearl/hybrid construction assumed. Crown 78U's
+published Urethane Solid 78D coverstock supplies both fields. The
+[Purple/Black Rhino](https://brunswickbowling.com/products/balls/current/rhino-purple-black)
+is solid reactive, while the
+[Purple/Pink/Berry Rhino](https://brunswickbowling.com/products/balls/current/rhino-purple-pink-berry)
+is pearl reactive. Color alone and words such as “Pearl” in an unknown/custom
+model never classify a ball.
+
+The seven additional verified starter models are Brunswick Mesmerize, Ebonite
+Game Breaker 4, Hammer Black Widow 2.0 Hybrid and 3.0, Track Cypher, Storm Phaze II
+and MOTIV Venom Shock. Other starter, retired, custom and regional entries remain
+available for manual attributes. A generic Rhino is intentionally ambiguous;
+its exact variant or a manual choice is needed. Unavailable or unverified source
+sheets do not produce defaults.
+
+Matching normalizes case and punctuation, then requires the full manufacturer
+and model key. New entries receive defaults while fields are untouched. Manual
+choices, including Not set, take precedence. Automatic values clear when a new
+entry changes to an unknown model. Existing records preserve saved fields until
+the user changes them or chooses **Use model specifications**. Nothing is
+backfilled on journal load, no game IDs are rewritten, and there is no runtime
+catalog or metadata request. Fields are optional in the existing JSON record and
+backup format, so old journals remain readable.
 
 ## On-device recognition SDKs
 

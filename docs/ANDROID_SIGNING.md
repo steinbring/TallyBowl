@@ -4,7 +4,7 @@ Owner testing uses `flutter build apk --debug` and the local development key. A 
 
 ## Configure a release
 
-1. Follow the official [Flutter Android signing guide](https://docs.flutter.dev/deployment/android#sign-the-app) and [Android signing documentation](https://developer.android.com/studio/publish/app-signing) to choose and protect the upload/app-signing keys. No production key has been created for this project.
+1. Follow the official [Flutter Android signing guide](https://docs.flutter.dev/deployment/android#sign-the-app) and [Android signing documentation](https://developer.android.com/studio/publish/app-signing) to choose and protect the upload/app-signing keys. Dedicated encrypted app-signing and separate Play-upload keys were created with owner approval on November 13, 2026; see [launch readiness](LAUNCH-READINESS.md) and [recovery](../release/store/SIGNING-RECOVERY.md).
 2. Copy `android/key.properties.example` to `android/key.properties`. Set `storeFile`, `storePassword`, `keyAlias`, and `keyPassword`. Relative keystore paths resolve from **android/**; an absolute path avoids ambiguity. The real file and `.jks`/`.keystore` files are ignored by Git.
 3. For CI or an external protected configuration, set `TALLYBOWL_ANDROID_SIGNING_PROPERTIES` to that properties file's absolute path. It takes precedence over `android/key.properties`; no credentials go into command arguments or the repository.
 4. Run `flutter build apk --release` or `flutter build appbundle --release`. Missing/incomplete properties or a missing keystore produce an explicit signing error before Flutter release compilation. The Android signing task validates the actual alias/password/key.

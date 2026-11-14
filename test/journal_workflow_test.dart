@@ -36,8 +36,8 @@ void main() {
       await tester.enterText(field, '9-');
     }
     await tester.pumpAndSettle();
-    await tester.ensureVisible(find.text('My ball'));
-    await tester.tap(find.text('My ball'));
+    await tester.ensureVisible(find.text('My ball · 15 lb'));
+    await tester.tap(find.text('My ball · 15 lb'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Save game'));
     await tester.pumpAndSettle();

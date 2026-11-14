@@ -1,0 +1,68 @@
+{
+  "app" : "TallyBowl!",
+  "assets" : [
+    {
+      "alpha" : false,
+      "bytes" : 251713,
+      "file" : "google-play-icon-512.png",
+      "height" : 512,
+      "width" : 512
+    },
+    {
+      "alpha" : false,
+      "bytes" : 91946,
+      "file" : "google-play-feature-1024x500.png",
+      "height" : 500,
+      "width" : 1024
+    },
+    {
+      "alpha" : false,
+      "bytes" : 1222708,
+      "file" : "apple-header-5244x2950.png",
+      "height" : 2950,
+      "width" : 5244
+    },
+    {
+      "alpha" : false,
+      "bytes" : 686088,
+      "file" : "mac-light-2880x1800.png",
+      "height" : 1800,
+      "width" : 2880
+    },
+    {
+      "alpha" : false,
+      "bytes" : 910437,
+      "file" : "ipad-light-2732x2048.png",
+      "height" : 2048,
+      "width" : 2732
+    },
+    {
+      "alpha" : false,
+      "bytes" : 392940,
+      "file" : "android-light-1080x1920.png",
+      "height" : 1920,
+      "width" : 1080
+    },
+    {
+      "alpha" : false,
+      "bytes" : 695296,
+      "file" : "mac-dark-2880x1800.png",
+      "height" : 1800,
+      "width" : 2880
+    },
+    {
+      "alpha" : false,
+      "bytes" : 927815,
+      "file" : "ipad-dark-2732x2048.png",
+      "height" : 2048,
+      "width" : 2732
+    },
+    {
+      "alpha" : false,
+      "bytes" : 428851,
+      "file" : "android-dark-1080x1920.png",
+      "height" : 1920,
+      "width" : 1080
+    }
+  ]
+}

@@ -1,0 +1,95 @@
+{
+  "date": "2026-11-09",
+  "captureDate": "2026-11-08",
+  "status": "included in Apple 0.1.19 (20); owner Testing; external Waiting for Review; no new Android installation",
+  "baselineSource": "02b0ae5",
+  "corpus": {
+    "photos": 49,
+    "rowCases": 88,
+    "completeGames": 64,
+    "negativeCases": 24
+  },
+  "baselineComposition": "Frozen prior 80-case reports plus 8 fresh native evaluations; identical baseline pipeline, native/runtime and template fingerprints verified",
+  "baselineCompositionSha256": "c505716917594e4c96f1ff7b704040b41552c2ae971a57f1ae54bacc9c48f577",
+  "newPhotos": {
+    "photos": 4,
+    "rowCases": 8,
+    "clearOwnerGamesExactOnBoth": 3,
+    "distantOwnerDuplicateRequiresReviewOnBoth": true
+  },
+  "engines": [
+    {
+      "engine": "apple",
+      "baselineExactCompleteGames": 30,
+      "candidateExactCompleteGames": 35,
+      "previous80CaseExactBefore": 29,
+      "previous80CaseExactAfter": 29,
+      "newPhotosExactBefore": 1,
+      "newPhotosExactAfter": 6,
+      "lostExactImports": 0,
+      "wrongAutomaticCandidates": 0,
+      "nativeFailures": 0,
+      "maxNativeCalls": 4,
+      "pipelineSha256": "12be123d4301b156525a2e09d3b22b4e61d80a358f4d442a50cead9b110b2161",
+      "baselinePipelineSha256": "da083f8b71c259994fd7f2ad87b72a75018b76140f1b2fca1baa9c41a8796d7d",
+      "nativeFingerprint": "d99dfc7ee2aaf2203a5d43eca347df0e59603850f70fe9264008d995a36f83a3",
+      "templatesSha256": "776d2e351fd8b00c24a7b538a1d2b2ad134ed510c99c1e9d590e85ed2400c82e",
+      "manifestSha256": "e2c8d8d84af1c4dfee8c0a19642b6162a52eaeae1b0b966bfa857e44ec9c328a",
+      "baselineReportSha256": "140b249a79abe4f4b9752dcef3012631470e8ccbb7f25606dfe967443923d537",
+      "candidateReportSha256": "01da980403a18ee27ecdfe8e6fdf4d3619a9cfd177294ff949c40855ad6ed080",
+      "previousHoldout": {
+        "exactCompleteGames": 0,
+        "wrongAutomaticCandidates": 0,
+        "manifestSha256": "3ea4f8f2137676fddd10a70c972c0bf5a20d36013c0381dcd97e43424c28987a",
+        "reportSha256": "73fcf8d8e1b574f5a74cf24e96bd00085691e51a63eade3d32353e797cafb685"
+      }
+    },
+    {
+      "engine": "android",
+      "baselineExactCompleteGames": 33,
+      "candidateExactCompleteGames": 35,
+      "previous80CaseExactBefore": 28,
+      "previous80CaseExactAfter": 28,
+      "newPhotosExactBefore": 5,
+      "newPhotosExactAfter": 7,
+      "lostExactImports": 0,
+      "wrongAutomaticCandidates": 0,
+      "nativeFailures": 0,
+      "maxNativeCalls": 4,
+      "pipelineSha256": "12be123d4301b156525a2e09d3b22b4e61d80a358f4d442a50cead9b110b2161",
+      "baselinePipelineSha256": "da083f8b71c259994fd7f2ad87b72a75018b76140f1b2fca1baa9c41a8796d7d",
+      "nativeFingerprint": "3bb7902df0d0283ae2f10f47eeda0b44387f0bdde07e7ba871769b3d9ce6240b",
+      "templatesSha256": "776d2e351fd8b00c24a7b538a1d2b2ad134ed510c99c1e9d590e85ed2400c82e",
+      "manifestSha256": "e2c8d8d84af1c4dfee8c0a19642b6162a52eaeae1b0b966bfa857e44ec9c328a",
+      "baselineReportSha256": "71128b64a11cf46b489675e1f302d2673b720a747daca3e72f9bcdb4603cc138",
+      "candidateReportSha256": "26e57c37bdac930201c811ddfbd6649eeb77ab1ef84b7245a7304c9b97ad2d47",
+      "previousHoldout": {
+        "exactCompleteGames": 0,
+        "wrongAutomaticCandidates": 0,
+        "manifestSha256": "3ea4f8f2137676fddd10a70c972c0bf5a20d36013c0381dcd97e43424c28987a",
+        "reportSha256": "a415b2a2c84a58147e63fa7195b7427eaf84ad3e85db8a1ea8a2f10bda0ae90b"
+      }
+    }
+  ],
+  "previousHoldout": {
+    "photos": 2,
+    "rowCases": 6,
+    "completeGames": 2,
+    "clippedRows": 4,
+    "previouslyInspected": true,
+    "newUnseenEvaluation": false
+  },
+  "nativeHelpersChanged": false,
+  "templatesChanged": false,
+  "newRasterTests": "synthetic, anonymous",
+  "validation": {
+    "flutterTests": 286,
+    "addedOrExtendedTests": 14,
+    "labTests": 16,
+    "analysis": "clean",
+    "photoGatePassed": true,
+    "photoGateSha256": "da33bc601b809434a9a38b3da8412e98f557e0ab061bb8cecfc96b6a34cd99a3",
+    "flutterTestsLogSha256": "3d99c4cef5a9bf515b3ff7ae8527c4e265980e580942afd57b7c733cf9f2ff14",
+    "analyzerLogSha256": "da6637458b117cfd6ec702b6e48ac8d12e9720b7d42bafb0fd3e09859c947da2"
+  }
+}

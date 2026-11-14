@@ -1,0 +1,43 @@
+{
+  "source": "f13bfbb042fdc1e3983b0347920b358d328a521c",
+  "version": "1.0.0",
+  "build": 22,
+  "packageId": "app.jws.tallybowl",
+  "checks": {
+    "releaseBuilds": "passed",
+    "PlayAABSignature": "dedicated upload certificate verified",
+    "GalaxyAPKSignature": "app-signing certificate verified",
+    "bundletoolValidation": "passed",
+    "targetSdk": "36 or higher",
+    "nonDebuggable": true,
+    "ELF16KiBAlignment": "passed",
+    "APK16KiBZipAlignment": "passed",
+    "privateKeysBundled": false
+  },
+  "artifacts": [
+    {
+      "sha256": "28e78bd631cf592b7273b522ce1c1641008af484e61e4696a5c3219faa15d4d2",
+      "bytes": 71983567,
+      "signingPurpose": "upload",
+      "certificateSha256": "e4d0ffff3e3cce3c6b4ac559c88eed5293b8e766eebd026a25f83aac37a5ad5f",
+      "nativeAlignment": {
+        "librariesChecked": 8,
+        "incompatible16kSegments": []
+      },
+      "fileName": "tallybowl-1.0.0-22-play-upload.aab"
+    },
+    {
+      "sha256": "9fbd9618bf7143283a17f5989c629b90b3ee3f11f64cf14ab1396a39fc61034f",
+      "bytes": 70207318,
+      "signingPurpose": "app-signing",
+      "certificateSha256": "8ab5c3fb3c1d700634e7148a71abc34007bd9f25d84fcc113ecd123ecd4f9790",
+      "nativeAlignment": {
+        "librariesChecked": 6,
+        "incompatible16kSegments": []
+      },
+      "fileName": "tallybowl-1.0.0-22-galaxy.apk"
+    }
+  ],
+  "storeUploadPerformed": false,
+  "phoneInstallPerformed": false
+}

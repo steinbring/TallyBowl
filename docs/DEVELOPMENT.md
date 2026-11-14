@@ -1,12 +1,89 @@
 # TallyBowl! development status
 
-Updated November 1, 2026. The recognition fix recovers every frame in all three October 31 practice originals on both engines and preserves all earlier successful imports. **239 Flutter tests pass**, static analysis is clean, and normal Android/Mac builds pass. See [the three-photo report and full native rerun](OCT31_PHOTO_EVALUATION.md). Samsung owner build **0.1.15 (16)** now includes the fix; TestFlight remains build 15.
+November 13: [public store packets and launch gates](LAUNCH-READINESS.md)
+prepared; [Flip 7 updated to Android owner build 22](NOV13_FLIP7_BUILD22.md).
+Analysis and 303 tests passed again. Apple beta remains build 21; no new
+TallyBowl TestFlight upload was requested or performed.
 
-Apple beta **0.1.14 (15)** adds official social links in Settings, 50 current Brunswick and 13 current Radical model suggestions, and 11 optional basic ball colors. The catalog remains offline and accepts custom/older equipment. Colors update My Bag artwork and labels, persist in the journal and backups, and can be cleared; older records remain unset. Persistence, backup compatibility, save retries and light/dark forms at 200% text remain covered. See [catalog provenance](DATA_SOURCES.md) and [the guide](USER_GUIDE.md).
+November 10 release **0.1.20 (21)**: optional **Cover material** and
+**Cover type** fields are editable in the ball form and shown in My Bag. The
+71-entry offline specification table covers all 63 retained Brunswick/Radical
+variants, seven additional starter models and generic TZone, using verified
+manufacturer sources. Exact normalized make/model matches populate untouched
+fields on new balls; manual choices and clears take precedence. Existing balls
+preserve stored fields until the owner chooses **Use model specifications**.
+Optional JSON fields preserve old backups and stable game/draft references.
+**303 Flutter tests pass** and static analysis is clean, including the retained
+recognition suite, save retries, backup/restore and light/dark 200% text checks.
+Recognition helpers, scoring and glyph assets are unchanged. See
+[the specification provenance and rules](DATA_SOURCES.md#offline-coverstock-defaults).
+Both iPad and native Mac are **Testing in Owner testing** and assigned to
+**External testing**, **Waiting for Review**, with automatic notification enabled.
+Signing, package and asset checks pass. See [the release record](TESTFLIGHT.md).
+The Fold 8 was subsequently updated in place to the normal Android owner build
+**0.1.20 (21)** on November 10. Signing, permissions and all 12 persistent
+app-data files are preserved; startup succeeds and the journal remains
+identical, with 24 games across 8 sessions plus profile and draft settings.
+The Flip 7 at that checkpoint retained build 19; the November 13 update is recorded above. See [device evidence](DEVICE_TESTING.md).
 
-Both signed iPad and native Mac build-15 packages are **Testing** in Owner testing and **Waiting for Review** in External testing in the last recorded distribution check, with saved testing notes, compliance and automatic notification. The Mac package includes arm64 and x86_64; archive/content and exported certificate/profile checks pass for both targets. Evidence and assignments are in [TESTFLIGHT.md](TESTFLIGHT.md). The Samsung was updated in place to the normal Android owner build **0.1.15 (16)** on November 1. All 12 backed-up app-data files were unchanged immediately after installation; the post-startup journal also has an identical logical dump and passes SQLite integrity checks, retaining 9 games across 3 sessions. Android reports a successful launch and running process; the locked phone prevented visual verification. See [device evidence](DEVICE_TESTING.md).
+Included in build 21: ball labels now include model and weight,
+with an optional nickname kept separate from the catalog model. Matching labels
+use color, then a number in saved bag order, including retired records, so used
+and primary selectors stay distinct. My Bag, history, insights, recaps and CSV
+use the same labels. Nicknames survive storage/backup; existing ball IDs and
+saved game/draft references are preserved. The full **303-test** release suite
+passes, including recognition and 200% text checks; static analysis is clean.
+Recognition source, native helpers and glyph assets are unchanged.
 
-Released build 15 retains build 14 recognition. The local fix's native checks cover 51 row cases per engine across 34 retained original images, with no incorrect automatic import observed. It preserves every earlier exact match and additionally recovers Android's earlier 103- and 112-pin personal photos. Apple's earlier 114-pin image remains uncertain. First-set online recovery remains Apple 1/9 and Android 0/9; second-set recovery remains 0/8 on both. Two additional second-set rows contain conflicting/incomplete visible scoring. These results do not establish reliable recognition across unfamiliar layouts or a perfect live experience. See [online evaluation](ONLINE_PHOTO_EVALUATION.md), [personal-photo results](FIVE_PHOTO_EVALUATION.md) and [recognition safeguards](FRAME_RECOGNITION.md). Physical Apple TestFlight installation, Google Chat composer acceptance, camera workflows and public privacy-policy hosting remain open. Results below retain historical build labels.
+November 9 release **0.1.19 (20)** improves gutter marks, intermediate italic
+lettering and overlapping scratch-total fragments. Both native engines recover
+all ten frames in the three clearer November 8 games (**88, 115 and 117**); the
+distant duplicate still needs review. All 35 prior exact imports on each engine
+are retained across 208 native row checks with no incorrect automatic candidates.
+The fresh four-photo online sample recovers 0/4 complete games on both engines;
+unfamiliar layouts remain limited. **286 Flutter tests and 16 lab tests pass**;
+static analysis is clean. See [the verification](NOV09_RECOGNITION_CHECK.md) and
+[the gutter correction](NOV08_PHOTO_EVALUATION.md).
+
+Both iPad and native Mac build 20 are **Testing in Owner testing** and assigned
+to **External testing** with status **Waiting for Review**, with automatic tester
+notification enabled. Packages pass archive/content, signing and asset checks.
+See [the release record](TESTFLIGHT.md). No new Android installation or physical
+iPadOS camera/gallery acceptance was performed for this release; the Samsung
+installation records below remain build 19. Later source changes are separate.
+
+November 8 release **0.1.18 (19)** for the November 7 practice photos: all three originals
+now yield exact frames and totals **93, 148 and 105** through both native engines
+and the shared production pipeline. The additional fallback corrects condensed
+italic glyphs, independently supported header heights and primary/crop evidence
+handling. Existing validated paths run first; native helpers, the 78-template
+glyph bank, confidence thresholds, journal and backup formats are unchanged.
+All **272 Flutter tests and 16 lab safety/training tests pass**; static analysis
+is clean, including the retained conflicting-player identity check.
+See [the evaluation and regression evidence](NOV07_PHOTO_EVALUATION.md).
+Both iPad and native Mac build 19 are **Testing in Owner testing** and assigned
+to **External testing** with status **Waiting for Review**. Automatic tester
+notification is enabled; external access awaits Apple approval. Signing,
+archive/content and bundled-asset checks pass. See [the release record](TESTFLIGHT.md).
+The Fold 8 was subsequently updated in place to the normal Android owner build
+**0.1.18 (19)** on November 8. Signing, permissions and all 12 persistent app-data
+files are preserved; startup succeeds and the journal remains identical, with
+15 games across 5 sessions plus profile and draft settings. The locked phone
+prevented visual acceptance. The Flip 7 (SM-F766U) was also updated in place to
+the same build 19 APK on November 8, preserving all 8 persistent files and its
+empty journal. Startup succeeds; the lock screen prevented visual acceptance.
+See [device evidence](DEVICE_TESTING.md). No new physical Apple acceptance was
+performed. The following build-18 paragraphs retain their historical scope.
+
+Updated November 6, 2026. Build **0.1.17 (18)** improves scoreboard row alignment, light/dark and mixed delivery ink, and current-game scratch-total selection. **259 Flutter tests and 16 lab safety/training tests pass**, and static analysis is clean. Across 77 regression row cases from 42 original photos per native engine, all 24 prior exact complete games are preserved on each engine. Apple now recovers 26/53 complete games and Android 25/53; no incorrect automatic candidate is observed and all 24 negative cases remain unselected. The two complete games in a separate frozen holdout still need review, and its four clipped rows remain unselected. See [scoreboard recovery and limits](SCOREBOARD_RECOVERY.md).
+
+Build 18 retains the official social links in Settings, the 50 Brunswick and 13 Radical suggestions checked for build 15, and 11 optional basic ball colors. The catalog remains offline and accepts custom/older equipment. Colors update My Bag artwork and labels, persist in the journal and backups, and can be cleared; older records remain unset. Persistence, backup compatibility, save retries and light/dark forms at 200% text remain covered. See [catalog provenance](DATA_SOURCES.md) and [the guide](USER_GUIDE.md).
+
+Both signed iPad and native Mac build-18 packages are **Testing in Owner testing**, verified November 5. This release was assigned only to Owner testing as requested. Both targets pass archive/content and exported distribution certificate/profile checks; the universal Mac package also passes installer-chain and payload-readability checks. Approved encryption/France answers and build notes are saved. Existing external assignments and group settings were retained. See [TESTFLIGHT.md](TESTFLIGHT.md). The Samsung Galaxy Z Fold 8 was updated in place to the normal Android owner build **0.1.17 (18)** on November 6, with matching signing certificates, unchanged permissions and all 12 persistent app-data files unchanged immediately after installation. Startup succeeds and its journal remains identical, preserving 12 games across 4 sessions, profile and draft settings. The locked phone prevented visual in-app acceptance. See [device evidence](DEVICE_TESTING.md).
+
+Build 18 also retains the build-17 Android export fix: Export image saves directly to Pictures/TallyBowl on Android 10+, with a save-location picker on older Android; Share image opens the chooser. That release passed seven Android native checks and Lint with no errors. See [the quick audit](NOV03_QUICK_AUDIT.md). Journal and backup formats are unchanged. Recognition continues to require review for many unfamiliar or small scoreboards; see [recognition safeguards](FRAME_RECOGNITION.md). Physical Apple TestFlight installation, Google Chat composer acceptance, camera workflows and public privacy-policy hosting remain separate work. Results below retain historical build labels.
+
+The same verified Android build 18 was also installed fresh on a separately attached Samsung SM-F766U running Android 17 on November 6. Its installed APK matches the release artifact and activity startup succeeds. No other device's journal was copied; the locked phone prevented visual acceptance. See [the installation record](DEVICE_TESTING.md).
 
 ## Feature branches
 
@@ -14,6 +91,7 @@ Features are committed on `codex/` branches and merged locally into `main`. The 
 
 | Branch | Feature |
 | --- | --- |
+| `codex/scoreboard-recovery` | Conservative layout/ink/total and italic-glyph recovery, frozen regression/holdout evidence, and build 20 owner/external TestFlight release |
 | `codex/project-roadmap` | Product scope and milestone plan |
 | `codex/flutter-foundation` | Flutter targets, branding, visual theme |
 | `codex/scoring-local-storage` | Ten-pin rules, domain records, SQLite persistence |
@@ -67,6 +145,8 @@ Features are committed on `codex/` branches and merged locally into `main`. The 
 | `codex/testflight-0-1-12` | Build 13 packages, signing checks and owner/external TestFlight update |
 | `codex/oct31-practice-recognition` | Color-cast and outlined-glyph recovery, sparse ruling spacing, name/checkpoint binding and 102 native regression checks |
 | `codex/samsung-owner-0-1-15` | Normal build 16 and verified in-place Samsung installation with unchanged journal, profile and draft |
+| `codex/testflight-0-1-15` | Build 16 Apple packages, Mac payload readability guard, owner availability and external beta-review submission |
+| `codex/android-image-export-audit` | Direct Android recap saves, export/audit hardening, build 17 packages and owner/external TestFlight assignments |
 
 The completed stack is integrated into local `main` after verification. Feature branches are retained. All work is local until explicitly pushed to the remote repository.
 

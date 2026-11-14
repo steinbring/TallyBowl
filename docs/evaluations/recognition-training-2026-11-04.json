@@ -1,0 +1,149 @@
+{
+  "schema": 1,
+  "date": "2026-11-04",
+  "originalPhotos": 34,
+  "rowCasesPerEngine": 51,
+  "completeRows": 41,
+  "negativeRows": 10,
+  "productionChanged": false,
+  "reports": {
+    "apple": {
+      "baseline": {
+        "schema": 1,
+        "manifestSha256": "8c73ab25d986850193b9f51da38966b3ca8c86995521f45722c0a302b8b8866d",
+        "engine": "apple",
+        "nativeFingerprint": "d99dfc7ee2aaf2203a5d43eca347df0e59603850f70fe9264008d995a36f83a3",
+        "pipelineSha256": "520047f098b55d4cd399545bed650ff9ab73724e0947b19411b2dd4a53d9bcb8",
+        "templatesSha256": "776d2e351fd8b00c24a7b538a1d2b2ad134ed510c99c1e9d590e85ed2400c82e",
+        "expectedCases": 51,
+        "complete": true,
+        "reportSha256": "1016bf86c251f16dcffd26d3902c70fad596b9fc1ababcc9d78de16ac30739db",
+        "exact": 24,
+        "wrongAutomatic": 0,
+        "errors": 0,
+        "maxNativeCalls": 4,
+        "negativeRows": 10
+      },
+      "candidate": {
+        "schema": 1,
+        "manifestSha256": "8c73ab25d986850193b9f51da38966b3ca8c86995521f45722c0a302b8b8866d",
+        "engine": "apple",
+        "nativeFingerprint": "d99dfc7ee2aaf2203a5d43eca347df0e59603850f70fe9264008d995a36f83a3",
+        "pipelineSha256": "520047f098b55d4cd399545bed650ff9ab73724e0947b19411b2dd4a53d9bcb8",
+        "templatesSha256": "8a418dd76b0b3fc160c6466382396168e3bcb990399e003eb105286e5b37dc76",
+        "expectedCases": 51,
+        "complete": true,
+        "reportSha256": "16b77069557c02b4090dbf9d9166f64aff8c17dc1227dc5fc3ddf64a8d89525e",
+        "exact": 24,
+        "wrongAutomatic": 0,
+        "errors": 0,
+        "maxNativeCalls": 4,
+        "negativeRows": 10
+      }
+    },
+    "android": {
+      "baseline": {
+        "schema": 1,
+        "manifestSha256": "8c73ab25d986850193b9f51da38966b3ca8c86995521f45722c0a302b8b8866d",
+        "engine": "android",
+        "nativeFingerprint": "3bb7902df0d0283ae2f10f47eeda0b44387f0bdde07e7ba871769b3d9ce6240b",
+        "pipelineSha256": "520047f098b55d4cd399545bed650ff9ab73724e0947b19411b2dd4a53d9bcb8",
+        "templatesSha256": "776d2e351fd8b00c24a7b538a1d2b2ad134ed510c99c1e9d590e85ed2400c82e",
+        "expectedCases": 51,
+        "complete": true,
+        "reportSha256": "a0937b861c2168a095a207bf8cea34733c1cee3c2b64d9d055cb1f6497c541a6",
+        "exact": 24,
+        "wrongAutomatic": 0,
+        "errors": 0,
+        "maxNativeCalls": 4,
+        "negativeRows": 10
+      },
+      "candidate": {
+        "schema": 1,
+        "manifestSha256": "8c73ab25d986850193b9f51da38966b3ca8c86995521f45722c0a302b8b8866d",
+        "engine": "android",
+        "nativeFingerprint": "3bb7902df0d0283ae2f10f47eeda0b44387f0bdde07e7ba871769b3d9ce6240b",
+        "pipelineSha256": "520047f098b55d4cd399545bed650ff9ab73724e0947b19411b2dd4a53d9bcb8",
+        "templatesSha256": "8a418dd76b0b3fc160c6466382396168e3bcb990399e003eb105286e5b37dc76",
+        "expectedCases": 51,
+        "complete": true,
+        "reportSha256": "d39ab66cbaec1588639a064ca40f38263b3fab06735857e74787825ae7a3f3fb",
+        "exact": 24,
+        "wrongAutomatic": 0,
+        "errors": 0,
+        "maxNativeCalls": 4,
+        "negativeRows": 10
+      }
+    }
+  },
+  "photoGate": {
+    "photoGatePassed": false,
+    "engines": [
+      {
+        "engine": "apple",
+        "safe": true,
+        "promotable": false,
+        "gains": [],
+        "regressions": [],
+        "wrongAutomatic": [],
+        "failures": []
+      },
+      {
+        "engine": "android",
+        "safe": true,
+        "promotable": false,
+        "gains": [],
+        "regressions": [],
+        "wrongAutomatic": [],
+        "failures": []
+      }
+    ],
+    "note": "Also require held-out glyph safety and fresh layout-family tests before release."
+  },
+  "glyphExperiment": {
+    "catalogSha256": "f97abaf03c922da7eaa84d6a08702f7ac213ec782508b422997db4a7d0c972f8",
+    "baselineTemplates": 78,
+    "candidateTemplates": 222,
+    "glyphGatePassed": false,
+    "metrics": {
+      "validation": {
+        "baseline": {
+          "samples": 216,
+          "correct": 209,
+          "rejected": 7,
+          "wrong": 0,
+          "confusions": {}
+        },
+        "candidate": {
+          "samples": 216,
+          "correct": 208,
+          "rejected": 8,
+          "wrong": 0,
+          "confusions": {}
+        },
+        "lostCorrectGlyphs": 1
+      },
+      "test": {
+        "baseline": {
+          "samples": 216,
+          "correct": 154,
+          "rejected": 60,
+          "wrong": 2,
+          "confusions": {
+            "6->8": 2
+          }
+        },
+        "candidate": {
+          "samples": 216,
+          "correct": 157,
+          "rejected": 56,
+          "wrong": 3,
+          "confusions": {
+            "7->/": 3
+          }
+        },
+        "lostCorrectGlyphs": 11
+      }
+    }
+  }
+}

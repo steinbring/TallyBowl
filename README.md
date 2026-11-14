@@ -1,8 +1,8 @@
 # TallyBowl!
 
-**How you bowled, tonight.** A Flutter bowling journal for native macOS, iPadOS, and Android. Planned website: [tallybowl.jws.app](https://tallybowl.jws.app).
+**How you bowled, tonight.** A Flutter bowling journal for native macOS, iPadOS, and Android. Website: [tallybowl.jws.app](https://tallybowl.jws.app).
 
-The current beta is **0.1.14 (15)**, developed and published by **Joe Steinbring**. [Contact Joe for support](https://jws.dev/contact). It adds official social-profile links in Settings, the current Brunswick/Radical ball-name snapshot, and optional basic colors saved with each ball. Both iPad and native Mac builds are Testing in Owner testing and Waiting for Review in External testing. The Samsung has the matching Android owner build, with its saved journal verified unchanged after the update. Recognition is unchanged; unfamiliar online scoreboards still expose substantial gaps. See [measured results](docs/ONLINE_PHOTO_EVALUATION.md) and [TestFlight readiness](docs/TESTFLIGHT.md).
+The latest application source is **0.1.20**, with Apple beta **build 21** and the Flip 7 Android owner **build 22**, developed and published by **Joe Steinbring**. [Contact Joe for support](https://jws.dev/contact). Public launch preparation targets March 1, 2027; account, signing-recovery, privacy and final-review gates remain open. See [launch readiness](docs/LAUNCH-READINESS.md) and the [TestFlight runbook](docs/TESTFLIGHT.md). Recognition remains an aid to review: unfamiliar scoreboards can require manual correction. See [measured results](docs/ONLINE_PHOTO_EVALUATION.md).
 
 ## What works
 
@@ -27,6 +27,7 @@ There is no cloud AI fallback, account, automatic sync, or iPhone target. Real-p
 | --- | --- |
 | Learn recording, sharing, backup and recovery | [User guide](docs/USER_GUIDE.md), also available offline in Settings |
 | Prepare an Apple beta and understand remaining gates | [TestFlight readiness and release runbook](docs/TESTFLIGHT.md) |
+| Prepare public store launch and listings | [Launch readiness](docs/LAUNCH-READINESS.md), [store packet](release/store/README.md) |
 | Fill in beta/reviewer information | [TestFlight metadata](docs/TESTFLIGHT_METADATA.md) |
 | Understand architecture and change it safely | [Architecture and maintenance](docs/ARCHITECTURE.md) |
 | Investigate score-photo recognition | [Shared frame recognition](docs/FRAME_RECOGNITION.md) |

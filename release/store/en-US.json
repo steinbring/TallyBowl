@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "appName": "TallyBowl!",
+  "packageId": "app.jws.tallybowl",
+  "plannedPublicVersion": "1.0.0",
+  "launchDate": "2027-03-01",
+  "launchTimeZone": "America/Chicago",
+  "baseCountry": "US",
+  "baseCurrency": "USD",
+  "basePrice": "9.95",
+  "territoryIntent": "all eligible territories; verification/export holds must be resolved",
+  "primaryCategory": "Sports",
+  "localizations": {
+    "en-US": {
+      "title": "TallyBowl!",
+      "subtitle": "How you bowled, tonight.",
+      "shortDescription": "Bowling scores, equipment and progress, with on-device scoreboard recognition.",
+      "promotionalText": "Record frames, track your equipment and review on-device scoreboard recognition. Keep your bowling journal locally, then share a recap.",
+      "description": "TallyBowl! is a personal ten-pin bowling journal for the games, equipment and progress you want to remember.\n\nRECORD TONIGHT’S GAMES\nKeep league and practice sessions, frames, scores and notes. Enter deliveries manually or import a scoreboard photo and let on-device recognition help fill the scorecard. Always compare every delivery with the original before saving; unfamiliar or unclear scoreboards may need correction.\n\nKNOW YOUR BAG\nTrack your bowling balls, weights, colors, optional nicknames and coverstock details. Distinguish similar balls and record which one you used. Manage bowling centers and keep your history together.\n\nSEE AND SHARE YOUR PROGRESS\nBrowse past sessions and insights, create branded recap images, and choose what to include before sharing through your device’s share sheet. Export records and keep portable backups.\n\nYOUR JOURNAL ON YOUR DEVICE\nThere is no TallyBowl account or subscription and no automatic cloud sync. Your journal is stored locally. Scoreboard recognition runs on your device; photos are not sent to a cloud AI service for recognition. Optional map and alley searches contact their providers, and Android recognition SDKs may send diagnostics as explained in the privacy policy.\n\nManual recording and saved records work offline. Keep backups of the journal you want to retain. TallyBowl! supports scratch ten-pin recording; recognition is an aid to review, not a guarantee of scoring accuracy.\n\nPrivacy: https://tallybowl.jws.app/privacy/\nSupport: https://jws.dev/contact",
+      "keywords": "bowling,tenpin,scorecard,scores,journal,league,practice,balls,equipment,statistics",
+      "supportUrl": "https://jws.dev/contact",
+      "marketingUrl": "https://tallybowl.jws.app/",
+      "privacyPolicyUrl": "https://tallybowl.jws.app/privacy/",
+      "copyright": "2027 Joe Steinbring",
+      "reviewNotes": "No account, demo credentials, in-app purchase or hardware accessory is required. Camera/photo access is optional. In Settings, set a bowler name; add an alley manually in Alleys and a ball in My Bag; then start practice in Tonight. Manual entry of 9- in each of ten frames gives a 90 game. Save, finish the session, open its recap and test Share image. Manual recording works offline. Recognition runs on device; compare every delivery with the original and correct uncertain results. Privacy policy and User guide are available offline in Settings. iOS is iPad-only; macOS is a separate native universal app.",
+      "appleDescription": "TallyBowl! is a personal ten-pin bowling journal for the games, equipment and progress you want to remember.\n\nRECORD TONIGHT’S GAMES\nKeep league and practice sessions, frames, scores and notes. Enter deliveries manually or import a scoreboard photo and let on-device recognition help fill the scorecard. Always compare every delivery with the original before saving; unfamiliar or unclear scoreboards may need correction.\n\nKNOW YOUR BAG\nTrack your bowling balls, weights, colors, optional nicknames and coverstock details. Distinguish similar balls and record which one you used. Manage bowling centers and keep your history together.\n\nSEE AND SHARE YOUR PROGRESS\nBrowse past sessions and insights, create branded recap images, and choose what to include before sharing through your device’s share sheet. Export records and keep portable backups.\n\nYOUR JOURNAL ON YOUR DEVICE\nThere is no TallyBowl account or subscription and no automatic cloud sync. Your journal is stored locally. Scoreboard recognition runs on your device; photos are not sent to a cloud AI service for recognition. Optional map and alley searches contact their providers as explained in the privacy policy.\n\nManual recording and saved records work offline. Keep backups of the journal you want to retain. TallyBowl! supports scratch ten-pin recording; recognition is an aid to review, not a guarantee of scoring accuracy.\n\nPrivacy: https://tallybowl.jws.app/privacy/\nSupport: https://jws.dev/contact"
+    }
+  },
+  "publicationState": "draft only; no public release or review submission authorized by this file"
+}

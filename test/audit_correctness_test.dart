@@ -122,15 +122,15 @@ void main() {
       await tester.pumpAndSettle();
       final dropdown = find.byType(DropdownButtonFormField<String>);
       final state = tester.state<FormFieldState<String>>(dropdown);
-      await tester.ensureVisible(find.widgetWithText(FilterChip, 'Ball A'));
-      await tester.tap(find.widgetWithText(FilterChip, 'Ball A'));
+      await tester.ensureVisible(find.widgetWithText(FilterChip, 'Ball A · 15 lb'));
+      await tester.tap(find.widgetWithText(FilterChip, 'Ball A · 15 lb'));
       await tester.pumpAndSettle();
       expect(tester.state(dropdown), same(state));
       expect(state.value, '');
       await tester.ensureVisible(dropdown);
       await tester.tap(dropdown);
       await tester.pumpAndSettle();
-      await tester.tap(find.text('Ball B').last);
+      await tester.tap(find.text('Ball B · 15 lb').last);
       await tester.pumpAndSettle();
       await tester.tap(find.text('Save game'));
       await tester.pumpAndSettle();

@@ -9,6 +9,7 @@ class BallModelSuggestion {
 /// Offline name-only suggestions. Current Brunswick/Radical lists were checked
 /// against their official catalogs on 2026-10-30; see DATA_SOURCES.md.
 /// Older starter and owned/custom models remain available. No runtime feed.
+/// Coverstock facts are separately maintained in ball_specifications.dart.
 abstract final class BallCatalog {
   // Brands represented by models are derived, so the two lists cannot drift.
   static const additionalBrands = ['Columbia 300'];

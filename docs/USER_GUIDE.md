@@ -1,10 +1,14 @@
 # User guide
 
-Updated 2026-10-30.
+Updated 2026-11-10.
 
 ## Set up your journal
 
 Open Settings and set your bowler name and the names or nicknames shown on scoreboards. TallyBowl tracks one bowler. In My Bag, add your balls using the offline starter suggestions or any custom manufacturer/model. In Alleys, search by name and city, confirm the result, or enter an alley manually. Map and search services need internet access; saved alleys work offline.
+
+Ball labels use the model and weight, such as TZone · 12 lb and TZone · 14 lb. Add an optional nickname such as League or Spare to distinguish identical balls; leave it blank to use the model and weight automatically. Matching entries use color and, if needed, a Ball 1 / Ball 2 number in bag order. Labels stay consistent in ball selections, history, insights, recaps and CSV exports. Nicknames are saved in backups, and changing one keeps the ball’s game history. Older balls start with no nickname.
+
+Cover material (optional) records reactive resin, urethane, polyester / plastic, rubber or other. Cover type (optional) records solid, pearl or hybrid when known. Verified manufacturer/model matches suggest these fields for new balls; unknown or ambiguous variants stay Not set. Manual choices take precedence. Existing balls keep their saved choices, including unset fields: in Edit your ball, choose Use model specifications to apply a verified match. Both fields are saved in backups and can be cleared. TZone defaults to polyester / plastic with no solid, pearl or hybrid type assumed.
 
 When adding or editing a ball, Color (optional) lets you choose black, white, gray, red, orange, yellow, green, blue, purple, pink or brown. My Bag uses the selected color for the ball artwork and shows its name. Choose Not set to clear it. Colors are included in journal backups; older balls and backups start with no color selected.
 
@@ -30,7 +34,9 @@ To remove an entire session, open it in History and choose Delete session (the t
 
 ## Share a branded recap
 
-Open the session recap and check the preview. Your name, alley/lane, balls, and date each have a privacy switch. Choose Share image to send a PNG attachment using the system share sheet, or use the export/save action to keep a copy. Hiding the date also removes it from the attachment filename.
+Open the session recap and check the preview. Your name, alley/lane, balls, and date each have a privacy switch. Choose Share image to send a PNG attachment using the system share sheet. Hiding the date also removes it from the attachment filename.
+
+Export image saves a PNG directly to Pictures/TallyBowl on Android 10 or later; look for it in your gallery or Files app after the save confirmation. Android 9 and earlier use a system save-location picker. No photo-library or storage permission is requested. On Mac, choose a location in the save dialog. On iPad, choose Save Image or Save to Files from the system sheet. Repeated Android exports keep earlier copies. Images you save outside the app remain until you remove them, including after uninstalling TallyBowl.
 
 Choose Google Chat, AeroSloth, Messages, Mail, or another installed image-compatible app when the system offers it. Recipient availability depends on that app’s platform share support and setup. If it is absent, save the PNG and attach it from the recipient app. Canceling the sheet does not delete the session. TallyBowl never posts to an account automatically.
 

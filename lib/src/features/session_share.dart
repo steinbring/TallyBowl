@@ -1,3 +1,4 @@
+import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
@@ -6,6 +7,7 @@ import 'package:flutter/rendering.dart';
 import '../app_controller.dart';
 import '../config.dart';
 import '../data/exports.dart';
+import '../domain/ball_labels.dart';
 import '../domain/models.dart';
 import '../theme.dart';
 import '../ui/common.dart';
@@ -34,16 +36,16 @@ class SessionSharePage extends StatefulWidget {
   State<SessionSharePage> createState() => _SessionSharePageState();
 }
 
+enum _RecapAction { share, export }
+
 class _SessionSharePageState extends State<SessionSharePage> {
   final _imageKey = GlobalKey();
-  bool _showName = true,
-      _showAlley = true,
-      _showBalls = true,
-      _showDate = true,
-      _busy = false;
+  bool _showName = true, _showAlley = true, _showBalls = true, _showDate = true;
+  _RecapAction? _action;
+  bool get _busy => _action != null;
   Future<void> _export(BuildContext buttonContext, {bool share = true}) async {
     if (_busy) return;
-    setState(() => _busy = true);
+    setState(() => _action = share ? _RecapAction.share : _RecapAction.export);
     final anchor = BowlExports.origin(buttonContext);
     try {
       // Asset decoding can outlast the first frame on a cold image cache.
@@ -53,9 +55,14 @@ class _SessionSharePageState extends State<SessionSharePage> {
       final boundary =
           _imageKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
       final image = await boundary.toImage(pixelRatio: 2);
-      final encoded = await image.toByteData(format: ui.ImageByteFormat.png);
-      image.dispose();
-      final bytes = encoded!.buffer.asUint8List();
+      late final ByteData? encoded;
+      try {
+        encoded = await image.toByteData(format: ui.ImageByteFormat.png);
+      } finally {
+        image.dispose();
+      }
+      if (encoded == null) throw StateError('The image could not be encoded.');
+      final bytes = encoded.buffer.asUint8List();
       final name = _showDate
           ? 'tallybowl-${widget.session.startedAt.toIso8601String().substring(0, 10)}.png'
           : 'tallybowl-recap.png';
@@ -63,17 +70,27 @@ class _SessionSharePageState extends State<SessionSharePage> {
         final file = await BowlExports.temporaryFile(name, bytes);
         await BowlExports.shareImage(file, name, anchor);
       } else if (buttonContext.mounted) {
-        await BowlExports.exportFile(
+        final destination = await BowlExports.exportFile(
           buttonContext,
           name: name,
           mime: 'image/png',
           bytes: bytes,
         );
+        if (mounted && destination != null) {
+          message(context, 'Image saved to $destination.');
+        }
       }
-    } catch (e) {
-      if (mounted) message(context, 'Could not share or export the recap. $e');
+    } catch (_) {
+      if (mounted) {
+        message(
+          context,
+          share
+              ? 'Could not open the share sheet. Try again or export the image.'
+              : 'Could not save the image. Check available storage and try again.',
+        );
+      }
     } finally {
-      if (mounted) setState(() => _busy = false);
+      if (mounted) setState(() => _action = null);
     }
   }
 
@@ -84,21 +101,24 @@ class _SessionSharePageState extends State<SessionSharePage> {
         'Total: $total. Average: ${averageLabel(games)}.';
   }
 
-  String get _detailsSummary => [
-    'Branded recap image',
-    if (_showName && widget.data.profile.name.isNotEmpty)
-      widget.data.profile.name,
-    if (_showAlley) widget.data.alley(widget.session.alleyId)!.name,
-    if (_showAlley && widget.session.lane.isNotEmpty)
-      'Lane ${widget.session.lane}',
-    if (_showDate) dateLabel(widget.session.startedAt),
-    if (_showBalls)
-      ...widget.data
-          .sessionGames(widget.session.id)
-          .expand((g) => g.ballIds)
-          .toSet()
-          .map((id) => widget.data.ball(id)!.name),
-  ].join('. ');
+  String get _detailsSummary {
+    final ballLabels = BallLabels(widget.data.balls);
+    return [
+      'Branded recap image',
+      if (_showName && widget.data.profile.name.isNotEmpty)
+        widget.data.profile.name,
+      if (_showAlley) widget.data.alley(widget.session.alleyId)!.name,
+      if (_showAlley && widget.session.lane.isNotEmpty)
+        'Lane ${widget.session.lane}',
+      if (_showDate) dateLabel(widget.session.startedAt),
+      if (_showBalls)
+        ...widget.data
+            .sessionGames(widget.session.id)
+            .expand((g) => g.ballIds)
+            .toSet()
+            .map((id) => ballLabels[id]),
+    ].join('. ');
+  }
 
   @override
   Widget build(BuildContext context) => PopScope(
@@ -190,7 +210,11 @@ class _SessionSharePageState extends State<SessionSharePage> {
                       builder: (c) => FilledButton.icon(
                         onPressed: _busy ? null : () => _export(c),
                         icon: const Icon(Icons.ios_share_rounded),
-                        label: Text(_busy ? 'Creating image…' : 'Share image'),
+                        label: Text(
+                          _action == _RecapAction.share
+                              ? 'Sharing…'
+                              : 'Share image',
+                        ),
                       ),
                     ),
                     Builder(
@@ -199,7 +223,11 @@ class _SessionSharePageState extends State<SessionSharePage> {
                             ? null
                             : () => _export(c, share: false),
                         icon: const Icon(Icons.download_outlined),
-                        label: const Text('Export image'),
+                        label: Text(
+                          _action == _RecapAction.export
+                              ? 'Saving…'
+                              : 'Export image',
+                        ),
                       ),
                     ),
                   ],
@@ -244,6 +272,7 @@ class RecapCard extends StatelessWidget {
     final games = data.sessionGames(session.id);
     final total = games.fold<int>(0, (n, g) => n + g.score);
     final ballIds = games.expand((g) => g.ballIds).toSet();
+    final ballLabels = BallLabels(data.balls);
     return Container(
       width: 540,
       padding: const EdgeInsets.all(38),
@@ -439,7 +468,7 @@ class RecapCard extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.only(top: 24),
                 child: Text(
-                  'IN THE BAG  ·  ${ballIds.map((id) => data.ball(id)!.name).join(' / ')}',
+                  'IN THE BAG  ·  ${ballIds.map((id) => ballLabels[id]).join(' / ')}',
                   style: const TextStyle(
                     fontSize: 12,
                     color: Color(0xFFD6E3DB),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 
 import '../app_controller.dart';
+import '../domain/ball_labels.dart';
 import '../domain/models.dart';
 import '../domain/scoring.dart';
 import '../ui/common.dart';
@@ -251,6 +252,7 @@ class _GameEditorState extends State<GameEditor> {
         .where((f) => f.complete && f.error == null)
         .length;
     final data = widget.controller.data;
+    final ballLabels = BallLabels(data.balls);
     final availableBalls = data.balls
         .where((b) => !b.retired || _balls.contains(b.id))
         .toList();
@@ -395,7 +397,9 @@ class _GameEditorState extends State<GameEditor> {
                         children: [
                           for (final b in availableBalls)
                             FilterChip(
-                              label: Text(b.name),
+                              key: ValueKey('ball-tag-${b.id}'),
+                              label: Text(ballLabels[b.id]),
+                              tooltip: ballLabels[b.id],
                               selected: _balls.contains(b.id),
                               onSelected: (selected) {
                                 if (selected) {
@@ -427,9 +431,12 @@ class _GameEditorState extends State<GameEditor> {
                           ))
                             DropdownMenuItem(
                               value: b.id,
-                              child: Text(
-                                b.name,
-                                overflow: TextOverflow.ellipsis,
+                              child: Tooltip(
+                                message: ballLabels[b.id],
+                                child: Text(
+                                  ballLabels[b.id],
+                                  overflow: TextOverflow.ellipsis,
+                                ),
                               ),
                             ),
                         ],

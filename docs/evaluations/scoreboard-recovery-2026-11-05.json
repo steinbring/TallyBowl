@@ -1,0 +1,84 @@
+{
+  "date": "2026-11-05",
+  "corpus": {
+    "photos": 42,
+    "rowCases": 77,
+    "completeGames": 53,
+    "negativeCases": 24
+  },
+  "engines": [
+    {
+      "engine": "apple",
+      "baselineExact": 24,
+      "candidateExact": 26,
+      "gainCaseIds": [
+        "g08r1",
+        "g08r3"
+      ],
+      "lostExactImports": 0,
+      "wrongAutomaticCandidates": 0,
+      "nativeFailures": 0,
+      "maxNativeCalls": 4,
+      "pipelineSha256": "4df443ccc2f9c351e6bab0b44e05fec3136c80d545d936d9b8befedd4bf23483",
+      "baselinePipelineSha256": "520047f098b55d4cd399545bed650ff9ab73724e0947b19411b2dd4a53d9bcb8",
+      "templatesSha256": "776d2e351fd8b00c24a7b538a1d2b2ad134ed510c99c1e9d590e85ed2400c82e",
+      "nativeFingerprint": "d99dfc7ee2aaf2203a5d43eca347df0e59603850f70fe9264008d995a36f83a3",
+      "manifestSha256": "06181f499ef1100a43aa53adb4ade40947d8d4fa0b5a25ce3d38a9c3e3516720",
+      "baselineReportSha256": "1d13b400c32eb2cefca052e0057c36f3e1d5f9c2ad60a056c25ac7ecca48ad90",
+      "candidateReportSha256": "177bfc2f1620870ded22fd083377bd9ffb8a8d1b85c8e16ab58c88e41b754290",
+      "holdout": {
+        "exactCompleteGames": 0,
+        "wrongAutomaticCandidates": 0,
+        "manifestSha256": "3ea4f8f2137676fddd10a70c972c0bf5a20d36013c0381dcd97e43424c28987a",
+        "reportSha256": "d48d0a00edc11e0b57e2a0a9ca1ac5ea75bae03d7a135b3841761eda0751884d"
+      }
+    },
+    {
+      "engine": "android",
+      "baselineExact": 24,
+      "candidateExact": 25,
+      "gainCaseIds": [
+        "g08r3"
+      ],
+      "lostExactImports": 0,
+      "wrongAutomaticCandidates": 0,
+      "nativeFailures": 0,
+      "maxNativeCalls": 4,
+      "pipelineSha256": "4df443ccc2f9c351e6bab0b44e05fec3136c80d545d936d9b8befedd4bf23483",
+      "baselinePipelineSha256": "520047f098b55d4cd399545bed650ff9ab73724e0947b19411b2dd4a53d9bcb8",
+      "templatesSha256": "776d2e351fd8b00c24a7b538a1d2b2ad134ed510c99c1e9d590e85ed2400c82e",
+      "nativeFingerprint": "3bb7902df0d0283ae2f10f47eeda0b44387f0bdde07e7ba871769b3d9ce6240b",
+      "manifestSha256": "06181f499ef1100a43aa53adb4ade40947d8d4fa0b5a25ce3d38a9c3e3516720",
+      "baselineReportSha256": "7cfa07b983940820f5097da0fdf1ae7fdb9d2f071a01d5412b30a2f829f3f90b",
+      "candidateReportSha256": "404552b7b8b5a2b27d003bb01d333af78147af314bfe79ee1631fee4307c41c6",
+      "holdout": {
+        "exactCompleteGames": 0,
+        "wrongAutomaticCandidates": 0,
+        "manifestSha256": "3ea4f8f2137676fddd10a70c972c0bf5a20d36013c0381dcd97e43424c28987a",
+        "reportSha256": "fe7cce2c1697020bf96ad19aa514f144d8e3f9d389701e870d1c6989bfb185c8"
+      }
+    }
+  ],
+  "holdout": {
+    "photos": 2,
+    "rowCases": 6,
+    "completeGames": 2,
+    "clippedCases": 4,
+    "frozenBeforeEvaluation": true,
+    "tunedAgainstResults": false,
+    "sources": [
+      {
+        "id": "h01",
+        "page": "https://www.maldonanddengieramblers.org/bowling.html",
+        "url": "https://www.maldonanddengieramblers.org/uploads/6/4/3/1/64317143/whatsapp-image-2024-09-08-at-16-27-05-b6e98ae8.jpg",
+        "sha256": "3ee38fe84d7410709e069dfdb3d79a02436c54212475fc325b32ae93cdf1aef0"
+      },
+      {
+        "id": "h02",
+        "page": "https://www.tripadvisor.be/Attraction_Review-g294265-d24963705-Reviews-Superbowl-Singapore.html",
+        "url": "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/25/a6/8d/a3/lanes-for-young-and-old.jpg?h=-1&s=1&w=1200",
+        "sha256": "a094f4578d76b7e342001a1f837a07c73ad69ff856c3f7a0e0a9467d9fd56c60"
+      }
+    ]
+  }
+}

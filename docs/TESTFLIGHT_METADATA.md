@@ -1,6 +1,13 @@
 # TestFlight metadata
 
-Current beta: **0.1.12 (13)**. Both iPad and native Mac uploads processed successfully. Both show **Testing** in Owner testing and **Waiting for Review** in External testing; automatic tester notification is enabled. The existing external group contains the two requested email testers. Build-specific testing notes, beta description, feedback email and private reviewer contact/instructions are saved in App Store Connect; sign-in is marked as not required. See the [runbook](TESTFLIGHT.md) for current external-review and installation status.
+Current release: **0.1.20 (21)** for iPad and native Mac. Both are **Testing** in
+Owner testing and assigned to External testing with status **Waiting for Review**,
+verified November 10, 2026. Automatic tester notification is enabled; external
+access awaits Apple approval. Existing group membership is retained. Testing
+notes and the owner-approved export-compliance answers are saved on both builds.
+See the [release record](TESTFLIGHT.md). Beta description, feedback email and
+private reviewer contact/instructions remain in App Store Connect; sign-in is
+not required.
 
 ## Public contact and remaining account fields
 
@@ -8,9 +15,9 @@ Current beta: **0.1.12 (13)**. Both iPad and native Mac uploads processed succes
 - Public support/contact URL: **https://jws.dev/contact** (owner-approved; returned HTTP 200 and the Joe Steinbring contact page on October 25, 2026).
 - TestFlight feedback email: **configured in App Store Connect** with owner approval; private account contact is intentionally omitted here.
 - Beta reviewer contact name: **Joe Steinbring**; email and phone were supplied/approved by the owner and saved privately in App Store Connect. Do not commit private contact details.
-- Privacy policy URL: `https://tallybowl.jws.app/privacy` — planned and still unavailable. The current policy is bundled offline in Settings. Publish and verify the hosted copy before expanding the beta; do not enter a nonexistent URL as a live policy in Apple metadata.
+- Privacy policy URL: `https://tallybowl.jws.app/privacy/` — verified HTTPS 200 on November 13, 2026. The policy is also bundled offline in Settings. Review hosted/bundled consistency and finish the dedicated Apple App Privacy field/declarations before public submission; see [launch readiness](LAUNCH-READINESS.md).
 - Support URL: `https://jws.dev/contact`. The app's bundled user guide remains available offline in Settings.
-- Marketing URL: `https://tallybowl.jws.app` — planned, not currently hosted.
+- Marketing URL: `https://tallybowl.jws.app/` — live.
 - Export-compliance and privacy-label decisions: see [runbook](TESTFLIGHT.md); do not infer them from this draft.
 
 ## Beta description
@@ -21,17 +28,13 @@ This beta stores your journal locally, has no login or subscription, and include
 
 ## What to test
 
-Build 0.1.12 (13) improves small tables, sparse stylized headers, border-merged numbers, bright rulings and colored strikes. All five latest original photos fill exactly on both engines. The combined 20-original rerun preserves previous exact examples: 17/18 complete on Apple and 16/18 on Android, with two incomplete games left for review and no incorrect automatic result observed. These tuned development examples do not establish general recognition accuracy. See [the per-photo follow-up](FIVE_PHOTO_EVALUATION.md).
+Build 0.1.20 (21) adds optional ball nicknames and consistent model/weight labels in used-ball and primary-ball selections, My Bag, history, insights, recaps and CSV. Matching balls use color and a numbered label when needed. Please test two TZone balls at different weights, identical-weight/color balls, editing or clearing a nickname, retiring a ball, and saving/resuming a game with the correct primary ball.
 
-- Add scoreboard aliases, two balls and an alley; try both suggestions and manual entry.
-- Start practice or league, capture/import a final scoreboard, verify the correct bowler and all ten frames, select balls/primary ball, lane and notes, then save.
-- Resume after closing during an unfinished game. Test photo-picker cancel, permission denial and offline recording/recognition.
-- In Tonight or History session details, test Delete session, cancellation, and removal of the session's games and unfinished draft. Keep a backup before deletion.
-- Finish a session and share the PNG to an installed recipient such as Messages, Mail or AeroSloth; test cancellation and hiding each identifying detail.
-- Export a backup and verify restore/recovery on an isolated journal. Restore replaces the whole journal, so keep your original backup outside the app.
-- Try VoiceOver, large text, dark appearance, iPad rotation/multitasking and Mac keyboard navigation. Report clipped controls or lost focus/data.
+New optional Cover material and Cover type fields record reactive resin, urethane, polyester/plastic, rubber or other, plus solid/pearl/hybrid when known. The offline table has 71 verified manufacturer/model defaults. TZone defaults to polyester/plastic with no construction assumed. New entries receive known defaults until manually edited; unknown variants stay unset. Existing balls retain saved choices: Use model specifications applies a known match. Please test manual overrides, clearing fields, reopening, save retries, backups/restores and older backups.
 
-Include version/build, device/OS, steps, expected/actual outcome and whether it repeats. Use permissioned, redacted scoreboard photos in feedback.
+The build-20 recognition pipeline is unchanged. Compare every delivery and scratch total with the original photo, including gutters, spares, splits and tenth-frame fills. Unfamiliar or small scoreboards may require manual correction. Also check offline use, Share image, Export image, dark mode, large text and VoiceOver.
+
+Keep a backup before testing restore or deletion. Report version/build, device/OS, expected and actual results. Use permissioned, redacted photos in feedback.
 
 ## Beta review notes
 

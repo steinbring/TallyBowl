@@ -1,0 +1,40 @@
+{
+  "purpose": "Store draft artwork using the already-public synthetic/demo screenshots; no private account captures",
+  "files": {
+    "logo.png": {
+      "sourceRepository": "TallyBowl-Website",
+      "originalPath": "art/logo.png",
+      "sha256": "45e77b49c66ba5a8d8ffe3f9c9068df28f80730c119c0a6a84e37df4779282e2"
+    },
+    "android-dark.jpg": {
+      "sourceRepository": "TallyBowl-Website",
+      "originalPath": "art/screens/android-dark.jpg",
+      "sha256": "44b84337c2436336c6004d24359d4af22d21f84f831bdaaf63e449e7d07093d4"
+    },
+    "android-light.jpg": {
+      "sourceRepository": "TallyBowl-Website",
+      "originalPath": "art/screens/android-light.jpg",
+      "sha256": "28b0fab7cee33e0f18a53b5db77ae7ed2424db5e8bffd062d9af2a744f0c8215"
+    },
+    "ipad-dark.jpg": {
+      "sourceRepository": "TallyBowl-Website",
+      "originalPath": "art/screens/ipad-dark.jpg",
+      "sha256": "eb2e6a6260a324f79e2bbfba104454743f3ace63a8df9d624f3b48029e0f86e8"
+    },
+    "ipad-light.jpg": {
+      "sourceRepository": "TallyBowl-Website",
+      "originalPath": "art/screens/ipad-light.jpg",
+      "sha256": "48d744ccfa04792df8d86f9b12589b8f6dca6b6e5e5533f7fdbe78bc708b8fcb"
+    },
+    "mac-dark.jpg": {
+      "sourceRepository": "TallyBowl-Website",
+      "originalPath": "art/screens/mac-dark.jpg",
+      "sha256": "ea36def43d08fe7809a4725eded2e1f568da0c893442318ed48d890fe6832239"
+    },
+    "mac-light.jpg": {
+      "sourceRepository": "TallyBowl-Website",
+      "originalPath": "art/screens/mac-light.jpg",
+      "sha256": "a0997a77d110815e948168a87a3b8b304635467bf52fc1f62472213409049cc8"
+    }
+  }
+}

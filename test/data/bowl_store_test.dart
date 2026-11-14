@@ -84,6 +84,47 @@ void main() {
     );
     expect((await store.load()).games.single.score, 90);
   });
+  test(
+    'nicknames survive storage and backup without changing game or draft IDs',
+    () async {
+      final original = sample();
+      expect(original.balls.single.toJson().containsKey('nickname'), isFalse);
+      final data = original.copyWith(
+        balls: const [
+          BowlingBall(id: 'b1', name: 'TZone', weight: 12, nickname: 'League'),
+        ],
+        draft: {
+          ...original.draft!,
+          'ballIds': ['b1'],
+          'primaryBallId': 'b1',
+        },
+      );
+      await store.save(data);
+      final restored = BowlStore.readBackup(store.backup(await store.load()));
+      expect(restored.balls.single.nickname, 'League');
+      expect(restored.balls.single.name, 'TZone');
+      expect(restored.balls.single.weight, 12);
+      expect(restored.games.single.ballIds, ['b1']);
+      expect(restored.games.single.primaryBallId, 'b1');
+      expect(restored.draft!['primaryBallId'], 'b1');
+      await store.save(
+        restored.copyWith(
+          balls: const [BowlingBall(id: 'b1', name: 'TZone', weight: 12)],
+        ),
+      );
+      final cleared = await store.load();
+      expect(cleared.balls.single.nickname, '');
+      expect(cleared.balls.single.toJson().containsKey('nickname'), isFalse);
+      expect(cleared.games.single.toJson(), original.games.single.toJson());
+      expect(
+        BowlStore.readBackup(BowlStore.encodeBackup(original))
+            .balls
+            .single
+            .nickname,
+        '',
+      );
+    },
+  );
   test('ball colors survive database, backup and color removal', () async {
     for (final color in BallColor.values) {
       final data = sample().copyWith(
@@ -105,6 +146,60 @@ void main() {
     expect((await store.load()).balls.single.color, isNull);
     expect((await store.load()).games.single.score, 90);
   });
+  test(
+    'coverstock choices survive storage, backup and explicit clearing',
+    () async {
+      for (final material in CoverMaterial.values) {
+        for (final type in CoverType.values) {
+          final data = sample().copyWith(
+            balls: [
+              BowlingBall(
+                id: 'b1',
+                name: 'Custom',
+                nickname: 'League',
+                coverMaterial: material,
+                coverType: type,
+              ),
+            ],
+          );
+          await store.save(data);
+          final restored = BowlStore.readBackup(
+            store.backup(await store.load()),
+          );
+          expect(restored.balls.single.coverMaterial, material);
+          expect(restored.balls.single.coverType, type);
+          expect(restored.balls.single.nickname, 'League');
+          expect(restored.games.single.toJson(), data.games.single.toJson());
+        }
+      }
+      final legacy = BowlStore.readBackup(BowlStore.encodeBackup(sample()));
+      expect(legacy.balls.single.coverMaterial, isNull);
+      expect(legacy.balls.single.coverType, isNull);
+      await store.save(legacy);
+      final cleared = (await store.load()).balls.single;
+      expect(cleared.coverMaterial, isNull);
+      expect(cleared.coverType, isNull);
+      expect(cleared.toJson().containsKey('coverMaterial'), isFalse);
+      expect(cleared.toJson().containsKey('coverType'), isFalse);
+    },
+  );
+  test(
+    'invalid coverstock backup values leave the saved journal intact',
+    () async {
+      await store.save(sample());
+      for (final key in ['coverMaterial', 'coverType']) {
+        final document = sample().toJson();
+        (document['balls'] as List).first[key] = 'invented cover';
+        expect(
+          () => BowlStore.readBackup(
+            jsonEncode({'format': 'tallybowl', 'version': 1, 'data': document}),
+          ),
+          throwsFormatException,
+        );
+      }
+      expect((await store.load()).toJson(), sample().toJson());
+    },
+  );
   test(
     'backup rejects unsupported ball colors without changing the journal',
     () async {

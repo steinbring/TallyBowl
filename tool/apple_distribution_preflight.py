@@ -12,6 +12,7 @@ import hashlib
 import json
 from pathlib import Path
 import plistlib
+import stat
 import subprocess
 import tempfile
 
@@ -61,6 +62,18 @@ def inspect(app):
         errors.append("Provisioning profile permits debugging")
     if profile["ExpirationDate"] <= datetime.now(timezone.utc).replace(tzinfo=None):
         errors.append("Provisioning profile has expired")
+    if mac:
+        # Installer payload ownership becomes root. Restrictive staging umasks
+        # can leave a correctly signed CodeResources file unreadable at runtime.
+        # Check the expanded package's actual modes without changing the bundle.
+        for path in [app, *app.rglob("*")]:
+            if path.is_symlink():
+                continue
+            mode = stat.S_IMODE(path.stat().st_mode)
+            needs_execute = path.is_dir() or bool(mode & stat.S_IXUSR)
+            if not mode & stat.S_IROTH or (needs_execute and not mode & stat.S_IXOTH):
+                relative = "." if path == app else str(path.relative_to(app))
+                errors.append(f"Mac installer payload unreadable/untraversable by other users: {relative}")
     command("codesign", "--verify", "--deep", "--strict", str(app))
     entitlements = plistlib.loads(command("codesign", "-d", "--entitlements", ":-", "--xml", str(app)))
     if entitlements.get(identifier_key) != f"{team}.{bundle_id}":
@@ -107,6 +120,7 @@ def inspect(app):
         "profile_certificate_sha256": hashlib.sha256(root_leaf).hexdigest() if root_leaf else None,
         "signed_bundles_checked": signed,
         "unsigned_resource_bundles": unsigned_resources,
+        "macos_payload_modes_checked": mac,
         "errors": errors,
         "passed": not errors,
     }

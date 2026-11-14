@@ -86,3 +86,43 @@ Uint8List withoutBoundaryRulings(Uint8List mask, int width, int height) {
   }
   return cleaned;
 }
+
+/// Solid delivery-box backgrounds are not foreground glyphs. Remove only
+/// large, dense, roughly rectangular islands; thin misses and digits remain.
+Uint8List withoutSolidPanels(Uint8List mask, int width, int height) {
+  final cleaned = Uint8List.fromList(mask), seen = Uint8List(mask.length);
+  for (var seed = 0; seed < mask.length; seed++) {
+    if (mask[seed] == 0 || seen[seed] != 0) continue;
+    final pixels = <int>[seed];
+    seen[seed] = 1;
+    var left = seed % width, right = left, top = seed ~/ width, bottom = top;
+    for (var i = 0; i < pixels.length; i++) {
+      final p = pixels[i], x = p % width, y = p ~/ width;
+      if (x < left) left = x;
+      if (x > right) right = x;
+      if (y < top) top = y;
+      if (y > bottom) bottom = y;
+      for (final next in [
+        if (x > 0) p - 1,
+        if (x + 1 < width) p + 1,
+        if (y > 0) p - width,
+        if (y + 1 < height) p + width,
+      ]) {
+        if (mask[next] != 0 && seen[next] == 0) {
+          seen[next] = 1;
+          pixels.add(next);
+        }
+      }
+    }
+    final w = right - left + 1, h = bottom - top + 1;
+    if (w > width * .35 &&
+        h > height * .6 &&
+        w > h * .9 &&
+        pixels.length / (w * h) > .65) {
+      for (final p in pixels) {
+        cleaned[p] = 0;
+      }
+    }
+  }
+  return cleaned;
+}

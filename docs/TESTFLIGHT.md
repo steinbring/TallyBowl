@@ -1,5 +1,151 @@
 # TestFlight readiness and release runbook
 
+## 0.1.20 (21): ball identities and coverstock specifications
+
+**Both iPad and native Mac 0.1.20 (21) are Testing in Owner testing.** Both
+uploads processed successfully and are assigned to **External testing**, with
+status **Waiting for Review** and automatic tester notification enabled. External
+access awaits Apple's Beta App Review approval. Both groups' Builds lists were
+verified on **November 10, 2026, at approximately 12:08 PM Central**. Existing
+builds, group membership and public-link settings were retained. Build-specific
+testing notes and the previously approved standard-encryption answer and France
+exclusion are saved on both builds.
+
+This release adds optional ball nicknames and shared model/weight labels, with
+color and numbered fallbacks for identical balls. Used-ball and primary-ball
+choices, My Bag, history, insights, recaps and CSV consistently distinguish
+owned balls while preserving their IDs. Optional Cover material and Cover type
+fields use 71 verified offline make/model defaults; manual edits take precedence,
+unknown models remain unset, and existing balls change only when explicitly
+applying model specifications. Older backups remain supported.
+
+| Evidence | Result |
+| --- | --- |
+| iPad ASC build | `25def465-726e-46e7-9736-5a2b244b0286`, owner Testing; external Waiting for Review |
+| Native Mac ASC build | `66e9fb1d-0e84-45bf-ae15-4fe595d6dfd2`, owner Testing; external Waiting for Review |
+| Source | Nicknames `649c769`, coverstocks `8fb4060`, release `47fe699`; normal `lib/main.dart` |
+| Regression checks | 303 Flutter tests pass; static analysis clean; production/test/native/assets sources identical to the tested feature commit |
+| Recognition | Pipeline, native helpers, scoring and glyph assets unchanged from build 20; prior photo evaluation and limitations still apply |
+| Apple packages | iPad App Store IPA and universal x86_64/arm64 Mac installer; archive/content, distribution profile, nested signing, installer-chain and payload-readability checks pass |
+| Bundled assets | Recognition assets and guide/privacy match source; private photos, fixtures and diagnostic entry points excluded |
+| Distribution proof | Private `build/testflight/build-21/owner-testing.png` and `external-testing.png` show both platform builds and group-specific status |
+
+Private archives, exports, tests, signing/asset reports, upload logs, hashes,
+notes and the release record are retained under ignored `build/testflight/build-21/`.
+Physical Apple installation and device acceptance remain separate checks. The
+subsequent Android build-21 Fold 8 installation and data-preservation check is
+recorded in [device testing](DEVICE_TESTING.md). Historical release records follow.
+
+## 0.1.19 (20): gutter-mark recovery and recognition verification
+
+**Both iPad and native Mac 0.1.19 (20) are Testing in Owner testing.** Both
+uploads processed successfully and are assigned to **External testing**, with
+status **Waiting for Review** and automatic tester notification enabled. External
+access awaits Apple's Beta App Review approval. The previously approved
+standard-encryption answer and France exclusion, and build-specific testing
+notes, are saved on both builds. Both groups' Builds lists were verified on
+**November 9, 2026, at approximately 9:35 PM Central**. Existing builds, group
+membership and public-link settings were retained. Rechecked on **November 10
+at approximately 6:40 AM Central**: both owner builds remain Testing and both
+external builds remain Waiting for Review.
+
+Recognition source **bc110a5** recovers every frame and scratch total in the three
+clearer November 8 game photos (**88, 115 and 117**) on both native engines; the
+distant duplicate remains in review. All 35 prior exact complete-game imports
+per engine are preserved. The fresh online sample recovers **0/4 complete games**
+on each engine and leaves six unsupported team-game rows unselected. Across
+**208 native row checks** from 55 originals, no incorrect automatic candidate or
+native failure is observed. Unfamiliar layouts still require manual correction;
+see [the verification and limits](NOV09_RECOGNITION_CHECK.md).
+
+| Evidence | Result |
+| --- | --- |
+| iPad ASC build | `be0dff5a-0a57-492a-89ad-52407f8b1ba0`, owner Testing; external Waiting for Review |
+| Native Mac ASC build | `48a75820-e0d2-46ac-a4cc-6f78fc824bb7`, owner Testing; external Waiting for Review |
+| Source | Recognition `bc110a5`; version and evaluation record `65f401e`; normal `lib/main.dart` |
+| Regression checks | 286 Flutter tests, 16 lab safety/training tests, clean static analysis; all prior exact photo imports retained |
+| Apple packages | iPad App Store IPA and universal x86_64/arm64 native Mac installer; archive/content, distribution profile, nested certificate, installer-chain and payload-readability checks pass |
+| Bundled assets | Recognition assets and guide/privacy documents match source in both exports; private photos, fixtures and diagnostic entry points excluded |
+| Distribution proof | Private `build/testflight/build-20/owner-testing.png` and `external-testing.png` show both platform builds and group-specific status |
+
+Private archives, exports, test/signing/asset reports, upload logs, testing notes,
+hashes and release record are retained under ignored `build/testflight/build-20/`.
+Journal and backup formats are unchanged. This request did not install a new
+Android build or perform physical iPadOS camera/gallery acceptance. Later
+source-only changes are separate from these distributed binaries. The following
+sections retain their historical release status.
+
+## 0.1.18 (19): November 7 practice-photo recovery
+
+**Both iPad and native Mac 0.1.18 (19) are Testing in Owner testing.** Both uploads processed successfully and are assigned to External testing with status **Waiting for Review**. Automatic tester notification is enabled; external access awaits Apple's Beta App Review approval. The previously approved standard-encryption answer and France exclusion are saved on both builds, along with build-specific What to Test notes. The Owner testing Builds list was verified on **November 8, 2026, at approximately 11:53 AM Central**, and the External testing Builds list at **1:43 PM Central**. Existing builds, group membership and public-link settings were retained.
+
+Recognition source **394b3c9** improves condensed italic glyphs, header sizing and separation of primary/crop observations while preserving conflicting-player identity checks. All three November 7 games now produce exact frames and scratch totals of **93, 148 and 105** on both native engines. The combined regression and previously inspected holdout cover **86 row cases from 47 original photos per engine**: no earlier exact import is lost and no incorrect automatic candidate is observed across 172 checks. Many unfamiliar or small scoreboards still require review. See [the evaluation and limits](NOV07_PHOTO_EVALUATION.md).
+
+| Evidence | Result |
+| --- | --- |
+| iPad ASC build | `4714b385-e4aa-485b-b0f5-c21941a1973b`, owner Testing; external Waiting for Review |
+| Native Mac ASC build | `797bc1d2-b8a1-42ab-b07c-128babdc95f8`, owner Testing; external Waiting for Review |
+| Source | Recognition `394b3c9`; release version and notes `a7cb05a`; normal `lib/main.dart` |
+| Regression checks | 272 Flutter tests and 16 lab safety/training tests pass; static analysis clean |
+| Apple packages | iPad App Store IPA and universal arm64/x86_64 native Mac installer; archive/content, exported distribution profile/nested certificate, Mac installer-chain and payload-readability checks pass |
+| Bundled assets | Recognition assets and guide/privacy documents match source in both exports; private photos, fixtures and diagnostic entry points excluded |
+| Distribution proof | Private `build/testflight/build-19/owner-testing.png` and `external-testing.png` show both platform builds and their group-specific status |
+
+Private archives, exports, signing/asset reports, test and upload logs, testing notes, hashes and the release record are retained under ignored `build/testflight/build-19/`. Journal and backup formats are unchanged. The subsequent Android build-19 Fold 8 and Flip 7 installations and data-preservation checks are recorded in [device testing](DEVICE_TESTING.md); physical Apple and visual Samsung acceptance remain separate checks. The following sections preserve historical release status.
+
+## 0.1.17 (18): scoreboard recovery, owner testing
+
+**Both iPad and native Mac 0.1.17 (18) are Testing in Owner testing.** Both uploads processed successfully, the previously approved standard-encryption answer and France exclusion are saved, and build-specific What to Test notes are saved. Both platforms were verified in the Owner testing group's Builds list on **November 5, 2026, at approximately 9:30 PM Central**. This release was assigned only to Owner testing as requested; existing external assignments, tester membership and public-link settings were retained.
+
+Recognition source **03069f0** improves row alignment, light/dark and mixed delivery ink, and selection of the current game's scratch total. The frozen regression corpus covers 77 row cases from 42 original photos on each native engine. All 24 earlier exact complete games remain exact on each engine; Apple improves to 26/53 complete games and Android to 25/53, with no incorrect automatic candidate observed and all 24 negative cases unselected. A separate frozen two-photo holdout still requires review for its two complete games, while its four clipped rows remain unselected. These are measured gains with remaining layout limitations, not a guarantee of recognition on unfamiliar scoreboards. See [the evaluation](SCOREBOARD_RECOVERY.md).
+
+| Evidence | Result |
+| --- | --- |
+| iPad ASC build | `739e1798-eba2-4f91-b415-07454b6a4963`, Owner testing: Testing |
+| Native Mac ASC build | `ef6079d0-ee9d-461f-b0c0-a9906844b004`, Owner testing: Testing |
+| Source | Recognition `03069f0`; release version and notes `444a335`; normal `lib/main.dart` |
+| Regression checks | 259 Flutter tests and 16 lab safety/training tests pass; static analysis clean |
+| Apple packages | iPad App Store IPA and universal arm64/x86_64 native Mac installer; archive/content, exported distribution profile/nested certificate, Mac installer-chain and payload-readability checks pass |
+| Bundled assets | Recognition assets and guide/privacy documents match source in both exports; private photos, fixtures and diagnostic entry points excluded |
+| Distribution proof | Private `build/testflight/build-18/owner-testing.png` shows both platform builds as Testing |
+
+Private archives, exports, signing/asset reports, test logs, upload logs, testing notes, hashes and release record are retained under ignored `build/testflight/build-18/`. Journal and backup formats are unchanged. Physical Apple TestFlight installation, live camera/import latency and physical Samsung acceptance remain separate checks; no new Samsung installation was performed for this owner TestFlight request. The following sections preserve historical release status.
+
+## 0.1.16 (17): recap export and quick audit
+
+**Both iPad and native Mac 0.1.16 (17) are Testing in Owner testing.** Both uploads processed successfully and are assigned to External testing with status **Waiting for Review**. Automatic tester notification is enabled; external access awaits Apple's Beta App Review approval. The existing owner-approved standard-encryption answer and France exclusion are saved on both builds. Build-specific testing notes are saved. Both groups' Builds lists were verified on **November 3, 2026**. Existing group membership and public-link settings were retained.
+
+Source **2a9a1df** separates Android Export image from Share image. Android 10+ saves a new PNG directly to Pictures/TallyBowl; older Android uses a save-location picker. Sharing retains its chooser and read-only grants. The update adds confirmed-save feedback, action-specific busy labels, retry messages, filename boundary checks, failed-write cleanup and reliable rendered-image disposal. The bundled guide/policy describe each platform's behavior. Recognition and journal formats are unchanged. See [the quick audit](NOV03_QUICK_AUDIT.md).
+
+| Evidence | Result |
+| --- | --- |
+| iPad ASC build | `ba9e7878-2f29-4c87-bf3a-d6a247243aa0`, owner Testing; external Waiting for Review |
+| Native Mac ASC build | `17eb6197-cadf-4a56-9773-5e4ac193d091`, owner Testing; external Waiting for Review |
+| Regression checks | 242 Flutter tests pass, including all retained recognition fixtures and import/resume flows; static analysis clean |
+| Android checks | 7 native tests pass on the isolated API-37 emulator, including real saved PNGs, repeated saves, failure rollback and separate-UID read-only sharing; Lint has 0 errors and 10 advisory warnings |
+| Apple packages | Normal `lib/main.dart`; iPad App Store IPA and universal arm64/x86_64 native Mac installer; archive/content, distribution profile/nested certificate, Mac payload readability and installer-chain checks pass |
+| Bundled assets | Recognition assets/licenses and updated guide/policy match source in both exports; private photos and fixtures excluded |
+| Android artifact | `build/releases/TallyBowl-0.1.16-android-debug.apk`, version/code 0.1.16/17; normal entry point, verified signer, no storage/photo-library permission; no new physical Samsung installation |
+
+Private archives, packages, hashes, testing notes, test/signing reports and upload logs are retained under ignored `build/testflight/build-17/`. Physical Apple TestFlight installation and physical Samsung gallery/Chat acceptance remain separate checks. The following sections preserve historical release status.
+
+## 0.1.15 (16): owner Testing, external review submitted
+
+Both signed **iPad and native Mac 0.1.15 (16)** uploads succeeded and finished Apple processing. **Both are Testing in Owner testing.** Both are assigned to External testing and show **Waiting for Review**, with automatic tester notification enabled. External access awaits Apple's Beta App Review approval. The owner explicitly approved reusing the standard-encryption answer and France exclusion; both questionnaires are cleared and build-specific What to Test notes are saved. Verified in both groups' Builds lists on **November 1, 2026**, at approximately **10:03 PM Central**. Existing build 15 remains Testing in both groups on both platforms. Group membership and public-link settings were retained.
+
+Recognition source **1dfb9c4** recovers all ten frames in the three October 31 originals on both engines and preserves earlier successful imports. **239 unit/widget tests pass**, analysis is clean, and **102 native photo checks** across 34 retained originals observe no incorrect automatic import. Small online images and unfamiliar layouts remain limited; see [the evaluation](OCT31_PHOTO_EVALUATION.md). Source version **0.1.15 (16)** is already installed on the Samsung with unchanged journal, profile and draft.
+
+| Evidence | Result |
+| --- | --- |
+| iPad ASC build | `cfc4b014-5082-432a-b0ed-dcbb373b5745`, owner Testing; external Waiting for Review |
+| Native Mac ASC build | `b92ecdf9-ea5b-4303-ab0f-a183c9469c3f`, owner Testing; external Waiting for Review |
+| Source | Recognition `1dfb9c4`, version `93d53a3`, release source `57bb585`; normal `lib/main.dart` |
+| Packages | iPad App Store IPA; universal arm64/x86_64 native Mac installer; both archive/content and exported nested-certificate/profile checks pass |
+| Mac upload correction | Initial upload rejected because `Contents/_CodeSignature/CodeResources` was mode 0600; archive mode corrected to 0644, re-exported with umask 022, installer/app signatures and every payload mode rechecked, corrected upload succeeded |
+| Packaging regression check | Read-only distribution preflight now rejects the original unreadable package and accepts the corrected package |
+
+Private archives, export/signing reports, hashes, upload logs and testing notes are under ignored `build/testflight/build-16/`. The final Mac artifact is `macos-export-readable/TallyBowl!.pkg`; the earlier rejected export is retained as diagnostic evidence. No private photo targets, original JPEGs or test fixtures are distributed. The following sections retain historical release status.
+
 ## 0.1.14 (15): social links, expanded catalog and ball colors
 
 Feature sources **e4d0bfc** and **b6f73bc** add TallyBowl!'s Bluesky/GoToSocial links in Settings, all 50 Brunswick and 13 Radical names in their official Current catalogs checked October 30, 2026, and 11 optional basic ball colors. My Bag shows each saved color; colors survive journal persistence and backups, and older records remain unset. Existing/custom models remain available. The bundled guide documents the color controls. **221 Flutter tests pass; static analysis is clean**, including recognition regressions, database/backup compatibility, save retries and light/dark 200% text checks. Recognition code is unchanged from build 14; its documented limitations remain.
@@ -188,6 +334,7 @@ Xcode 27 exported an Apple Distribution-signed iPad IPA and an App Store install
 The following commands produce signed archives/exports (normal `lib/main.dart`; they require an authorized Xcode account). The corrected Mac command uses **app-target-scoped** overrides. Do not pass `CODE_SIGN_IDENTITY` or `DEVELOPMENT_TEAM` globally: that signed Swift Package privacy resource bundles with the development certificate, which Xcode did not replace during build 8 export:
 
 ```sh
+umask 022
 flutter build ipa --release --target lib/main.dart \
   --export-options-plist release/apple/ExportOptions.plist
 flutter build macos --release --target lib/main.dart
@@ -204,7 +351,7 @@ xcodebuild -exportArchive \
   -allowProvisioningUpdates
 ```
 
-After export, expand the Mac package with `pkgutil --expand-full` (or unzip the IPA), then run `python3 tool/apple_distribution_preflight.py <exported.app> --output <ignored-report.json>`. This checks App Store profile/team/identifier, root protections and the distribution certificate on every signed nested bundle/framework. Resource-only bundles can be unsigned and remain sealed by the app signature. The check reproduced exactly the five ITMS-90284 mismatches in the rejected Mac export, passed the known-good iPad export, and passed both new build-9 exports. Keep `tool/testflight_preflight.py --archive ...` for source/archive contents as a separate check.
+After export, expand the Mac package with `pkgutil --expand-full` (or unzip the IPA), then run `python3 tool/apple_distribution_preflight.py <exported.app> --output <ignored-report.json>`. This checks App Store profile/team/identifier, root protections and the distribution certificate on every signed nested bundle/framework. Mac payload files must also be readable by other users, with traversable directories and executable binaries. Use umask 022 for packaging; a private parent output directory can remain restricted without embedding owner-only permissions into the installer. Resource-only bundles can be unsigned and remain sealed by the app signature. The check reproduced exactly the five ITMS-90284 mismatches in the rejected Mac export, passed the known-good iPad export, and passed both new build-9 exports. It also reproduces the build-16 unreadable-CodeResources rejection and passes the corrected package. Keep `tool/testflight_preflight.py --archive ...` for source/archive contents as a separate check.
 
 The committed options export locally. For build-9 uploads, an ignored copy at `build/testflight/build-9/UploadOptions.plist` set `destination=upload`, leaving the committed template unchanged. Each platform used `xcodebuild -exportArchive` with its signed archive, separate export directory, upload options and `-allowProvisioningUpdates`. Never repeat a successful upload to check processing; inspect the existing build in App Store Connect instead. The build-8 iPad archive/IPA were preserved under ignored `build/testflight/setup/` before rebuilding build 9. Flutter replaces `build/ios/archive/Runner.xcarchive`; label retained artifacts by version/build.
 

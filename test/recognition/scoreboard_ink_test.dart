@@ -96,4 +96,34 @@ void main() {
     }
     expect(identical(withoutBoundaryRulings(mask, w, h), mask), isTrue);
   });
+  test('solid delivery panels disappear without erasing digits or misses', () {
+    const w = 120, h = 60;
+    final mask = Uint8List(w * h);
+    for (var y = 8; y < 53; y++) {
+      for (var x = 60; x < 110; x++) {
+        mask[y * w + x] = 1;
+      }
+      // A separate narrow digit stroke.
+      for (var x = 20; x < 27; x++) {
+        mask[y * w + x] = 1;
+      }
+    }
+    for (var x = 32; x < 50; x++) {
+      mask[30 * w + x] = 1;
+    }
+    final cleaned = withoutSolidPanels(mask, w, h);
+    expect(cleaned[30 * w + 80], 0);
+    expect(cleaned[30 * w + 23], 1);
+    expect(cleaned[30 * w + 40], 1);
+    expect(mask[30 * w + 80], 1);
+  });
+  test('a large sparse glyph is not mistaken for a filled panel', () {
+    const w = 120, h = 60;
+    final mask = Uint8List(w * h);
+    for (var y = 8; y < 53; y++) {
+      mask[y * w + 45 + y] = 1;
+      mask[y * w + 105 - y] = 1;
+    }
+    expect(withoutSolidPanels(mask, w, h), mask);
+  });
 }
