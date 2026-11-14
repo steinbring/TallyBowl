@@ -19,6 +19,12 @@ for item in manifest['assets']:
  assert len(data)==item['bytes'],item['file']
 provenance=json.loads((root/'asset-provenance.json').read_text())
 # Certificate fingerprints are public; private signing files must never enter this packet.
+certificates=json.loads((root/'signing-certificates.json').read_text())['certificates']
+assert len(certificates)==2
+for certificate in certificates:
+ pem=(root/'certificates'/(certificate['purpose']+'.pem')).read_text()
+ der=base64.b64decode(''.join(line for line in pem.splitlines() if not line.startswith('---')))
+ assert hashlib.sha256(der).hexdigest()==certificate['certificateSha256'],certificate['purpose']
 for file in root.rglob('*'):
  if file.is_file():
   assert file.suffix.lower() not in ['.p12','.pfx','.jks','.keystore','.mobileprovision'],file
