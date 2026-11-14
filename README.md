@@ -31,6 +31,7 @@ There is no cloud AI fallback, account, automatic sync, or iPhone target. Real-p
 | Fill in beta/reviewer information | [TestFlight metadata](docs/TESTFLIGHT_METADATA.md) |
 | Understand architecture and change it safely | [Architecture and maintenance](docs/ARCHITECTURE.md) |
 | Investigate score-photo recognition | [Shared frame recognition](docs/FRAME_RECOGNITION.md) |
+| Review detection findings across both engines | [November 14 detection review](docs/NOV14_DETECTION_REVIEW.md) |
 | Verify Android image handoff | [Android sharing](docs/ANDROID_SHARING.md) |
 | Verify hardware workflows | [Device testing](docs/DEVICE_TESTING.md) |
 | Understand scope and what comes next | [Roadmap](docs/ROADMAP.md) |

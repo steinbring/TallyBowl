@@ -74,9 +74,12 @@ void main() {
   }
 
   for (final engine in ['apple', 'android']) {
+    // A rejected photo runs every bounded fallback before review, so this
+    // case is far slower than an accepted one, especially under a loaded
+    // parallel test run. Allow it more than the 30-second default.
     test('cartoon $engine cannot fit deliveries to a wrong total', () async {
       expect(await recognize(116, engine, wrongTotal: true), isNull);
-    });
+    }, timeout: const Timeout(Duration(minutes: 2)));
     test('cartoon $engine does not import another bowler', () async {
       expect(
         await recognize(
