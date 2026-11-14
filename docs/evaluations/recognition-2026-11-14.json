@@ -1,0 +1,333 @@
+{
+  "schema": 1,
+  "date": "2026-11-14",
+  "baselineRecognitionSource": "bc110a5df92059c50560413ff3128ff33db3aad5",
+  "baselinePipelineSha256": "12be123d4301b156525a2e09d3b22b4e61d80a358f4d442a50cead9b110b2161",
+  "pipelineSha256": "b4eeeea8c96b4ab7da8e92dff113bb2b07dec8c183c53f786be392ecffd2bc03",
+  "templatesSha256": "776d2e351fd8b00c24a7b538a1d2b2ad134ed510c99c1e9d590e85ed2400c82e",
+  "newPhotos": {
+    "photos": 9,
+    "completeViews": 8,
+    "uniqueCompleteGames": 6,
+    "partialViews": 1,
+    "labelsFrozenBeforeNativeResults": true
+  },
+  "total": {
+    "photos": 64,
+    "rowsPerEngine": 113,
+    "completeRowsPerEngine": 78,
+    "negativeRowsPerEngine": 35,
+    "nativeRowChecks": 226
+  },
+  "photoGatePassed": true,
+  "gate": [
+    {
+      "engine": "apple",
+      "safe": true,
+      "promotable": true,
+      "gains": [
+        "h02r2",
+        "n13p02",
+        "n13p03",
+        "n13p04",
+        "n13p05",
+        "n13p06",
+        "n13p07",
+        "n13p08",
+        "n13p09"
+      ],
+      "regressions": [],
+      "wrongAutomatic": [],
+      "failures": []
+    },
+    {
+      "engine": "android",
+      "safe": true,
+      "promotable": true,
+      "gains": [
+        "r028",
+        "r029",
+        "g05r3",
+        "n13p02",
+        "n13p03",
+        "n13p04",
+        "n13p05",
+        "n13p07",
+        "n13p09"
+      ],
+      "regressions": [],
+      "wrongAutomatic": [],
+      "failures": []
+    }
+  ],
+  "flutterTests": 318,
+  "labTests": 16,
+  "analysis": "clean",
+  "engines": {
+    "apple": {
+      "nativeFingerprint": "4007bf92018f336778f175451cc3f431f1ea6cde02d2bcfd98e8b01e22e2f189",
+      "baselineExact": 35,
+      "candidateExact": 44,
+      "priorExactRetained": 35,
+      "priorAdditionalExact": [
+        "h02r2"
+      ],
+      "newBaselineExact": 0,
+      "newCandidateExact": 8,
+      "negativeRowsUnselected": 35,
+      "incorrectAutomatic": 0,
+      "nativeFailures": 0,
+      "maxNativeCalls": 4,
+      "totalMilliseconds": 257788,
+      "maxMilliseconds": 18642
+    },
+    "android": {
+      "nativeFingerprint": "3bb7902df0d0283ae2f10f47eeda0b44387f0bdde07e7ba871769b3d9ce6240b",
+      "baselineExact": 37,
+      "candidateExact": 46,
+      "priorExactRetained": 35,
+      "priorAdditionalExact": [
+        "r028",
+        "r029",
+        "g05r3"
+      ],
+      "newBaselineExact": 2,
+      "newCandidateExact": 8,
+      "negativeRowsUnselected": 35,
+      "incorrectAutomatic": 0,
+      "nativeFailures": 0,
+      "maxNativeCalls": 4,
+      "totalMilliseconds": 201420,
+      "maxMilliseconds": 18320
+    }
+  },
+  "newCaseResults": [
+    {
+      "id": "n13p01",
+      "status": "incomplete",
+      "apple": {
+        "exact": false,
+        "wrongAutomatic": false
+      },
+      "android": {
+        "exact": false,
+        "wrongAutomatic": false
+      }
+    },
+    {
+      "id": "n13p02",
+      "status": "complete",
+      "total": 108,
+      "apple": {
+        "exact": true,
+        "wrongAutomatic": false
+      },
+      "android": {
+        "exact": true,
+        "wrongAutomatic": false
+      }
+    },
+    {
+      "id": "n13p03",
+      "status": "complete",
+      "total": 102,
+      "apple": {
+        "exact": true,
+        "wrongAutomatic": false
+      },
+      "android": {
+        "exact": true,
+        "wrongAutomatic": false
+      }
+    },
+    {
+      "id": "n13p04",
+      "status": "complete",
+      "total": 108,
+      "apple": {
+        "exact": true,
+        "wrongAutomatic": false
+      },
+      "android": {
+        "exact": true,
+        "wrongAutomatic": false
+      }
+    },
+    {
+      "id": "n13p05",
+      "status": "complete",
+      "total": 77,
+      "apple": {
+        "exact": true,
+        "wrongAutomatic": false
+      },
+      "android": {
+        "exact": true,
+        "wrongAutomatic": false
+      }
+    },
+    {
+      "id": "n13p06",
+      "status": "complete",
+      "total": 77,
+      "apple": {
+        "exact": true,
+        "wrongAutomatic": false
+      },
+      "android": {
+        "exact": true,
+        "wrongAutomatic": false
+      }
+    },
+    {
+      "id": "n13p07",
+      "status": "complete",
+      "total": 97,
+      "apple": {
+        "exact": true,
+        "wrongAutomatic": false
+      },
+      "android": {
+        "exact": true,
+        "wrongAutomatic": false
+      }
+    },
+    {
+      "id": "n13p08",
+      "status": "complete",
+      "total": 90,
+      "apple": {
+        "exact": true,
+        "wrongAutomatic": false
+      },
+      "android": {
+        "exact": true,
+        "wrongAutomatic": false
+      }
+    },
+    {
+      "id": "n13p09",
+      "status": "complete",
+      "total": 89,
+      "apple": {
+        "exact": true,
+        "wrongAutomatic": false
+      },
+      "android": {
+        "exact": true,
+        "wrongAutomatic": false
+      }
+    }
+  ],
+  "baselineComposition": {
+    "method": "Frozen native outcomes projected onto the identical combined labels. Only inspected online cases change split from test to regression; no outcome, original, identity, frame, cumulative score or status changes.",
+    "sources": [
+      {
+        "report": "online-nov09/android-regression.json",
+        "reportSha256": "0e81a35f8568971f904709637a8fb5e0768c3fb13139bd7a79c9009095c3515d",
+        "manifest": "practice-nov08/corpus.json",
+        "manifestSha256": "e2c8d8d84af1c4dfee8c0a19642b6162a52eaeae1b0b966bfa857e44ec9c328a",
+        "goldAndOriginalsIdentical": true
+      },
+      {
+        "report": "online-nov09/android-fresh.json",
+        "reportSha256": "af8e0b8582faebb4a8cc6ee58b3b24c5a3abd602a642914d727beeaa2f5995cd",
+        "manifest": "online-nov09/new.json",
+        "manifestSha256": "52e0f125a39fc37beb5dfa187dcd49ac7137b079ed770fa4c1a1032c2a7ed291",
+        "goldAndOriginalsIdentical": true
+      },
+      {
+        "report": "online-nov09/android-holdout.json",
+        "reportSha256": "9a6d1bc261388f126307820324a06f3a750b9e3a7379384ac2b98da7f2471038",
+        "manifest": "recovery-nov05/holdout/corpus.json",
+        "manifestSha256": "3ea4f8f2137676fddd10a70c972c0bf5a20d36013c0381dcd97e43424c28987a",
+        "goldAndOriginalsIdentical": true
+      },
+      {
+        "report": "league-practice-nov13/android-baseline.json",
+        "reportSha256": "9c2a7f26bf77881f6cb985b6d99cc906b3edcc08f5d0b5529fce0e87a62ae757",
+        "manifest": "league-practice-nov13/new.json",
+        "manifestSha256": "47777073ce9f2ecec223566c81f1c28ee757fe1828dd02608790cbc97cfb2943",
+        "goldAndOriginalsIdentical": true
+      }
+    ],
+    "retaggedAsRegression": [
+      "on09c1",
+      "on09c2",
+      "on09c3",
+      "on09c4",
+      "on09n1",
+      "on09n2",
+      "on09n3",
+      "on09n4",
+      "on09n5",
+      "on09n6"
+    ]
+  },
+  "evidence": {
+    "new.json": {
+      "sha256": "47777073ce9f2ecec223566c81f1c28ee757fe1828dd02608790cbc97cfb2943",
+      "bytes": 7186
+    },
+    "previous.json": {
+      "sha256": "6a5b81f2914dc41978f1b0b22c2659fc9b7b1b1f2cd492e78d71fecf74006891",
+      "bytes": 72770
+    },
+    "corpus.json": {
+      "sha256": "422a9b1eb3f216ebd437301579447b028f20106d4b1ac47e46402babceaac46a",
+      "bytes": 79896
+    },
+    "gold-lock.json": {
+      "sha256": "22eb768d1ff624d986c3341c0a0dea283853496931a84e05f8eb1fcaa130985a",
+      "bytes": 336
+    },
+    "apple-full-baseline.json": {
+      "sha256": "4f6fe426bfb4c022e81b06a21396732f7a74f0c0fefcdeab55db83d2ad65d306",
+      "bytes": 25814
+    },
+    "android-full-baseline.json": {
+      "sha256": "623574c6c750bd639e50539b43d8f7561472fe2799281bbf43887567939a3147",
+      "bytes": 27701
+    },
+    "apple-full-candidate.json": {
+      "sha256": "cc8e8dd0c2e1c1526c3e9482abe2ae783d0aa48ef227155646a186072e24b5a8",
+      "bytes": 25796
+    },
+    "android-full-candidate.json": {
+      "sha256": "b91093140bc78eea01bfc0443ca2dd628da737c0fdc5df28b07a9af56d588e67",
+      "bytes": 25786
+    },
+    "gate.json": {
+      "sha256": "8427b27f76845f2eda462aa240242a6d7042527a57bb1133dc0fcf5cbeab307d",
+      "bytes": 829
+    },
+    "baseline-composition-audit.json": {
+      "sha256": "69f420cd5e0a1947aa5493b1b56acdf07f4f9f6781fee251f7c60448ce6654ec",
+      "bytes": 1781
+    },
+    "compose-android-baseline.py": {
+      "sha256": "b2e91e20a049f39f79179a7ccb9be48361840bd0fef347d3d77495df036a62d2",
+      "bytes": 2920
+    },
+    "android-full-baseline-preprojection.json": {
+      "sha256": "37e50ed817530479857a828b44330ee64a038c713124ed72890e83bdd98948ae",
+      "bytes": 25866
+    },
+    "full-tests.log": {
+      "sha256": "91eb40c56d6d1086dce95bc3ba561db09065f042450c3c1746ed56b45216eef1",
+      "bytes": 46163
+    },
+    "analyze.log": {
+      "sha256": "435b7bf231bf38223854d2122af169c85d3018036511ac6304c18abc6d13e3d6",
+      "bytes": 96
+    },
+    "lab-tests.log": {
+      "sha256": "fc924f6e1fea3cec579bda3420051891bdf01c960fe5ca7e49fdfc8005bd9c0c",
+      "bytes": 112
+    },
+    "training-tests.log": {
+      "sha256": "8eae2b9341a0dcb125032f79cad90f202e4eb531cdb3380fe7f24c8dd0b7dda6",
+      "bytes": 101
+    }
+  }
+}

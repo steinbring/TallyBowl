@@ -4,9 +4,37 @@ Latest Flip 7 update: **0.1.20 (23)** installed in place on November 13,
 2026, with startup/Settings checks and database integrity/count retention.
 See [final build 23 evidence](NOV13_FLIP7_BUILD23.md) for scope and limitations.
 
-The Samsung Galaxy Z Fold 8 (SM-F971U1) has owner build **0.1.20 (21)**; the Galaxy Z Flip 7 (SM-F766U) remains on **0.1.18 (19)**. The last directly verified local Mac/iPad installations are **0.1.7 (8)**; TestFlight distribution status is recorded separately in [TESTFLIGHT.md](TESTFLIGHT.md). A physical Apple TestFlight installation has not been verified. Repeat this checklist on each distribution-signed candidate and record its exact version.
+The Samsung Galaxy Z Fold 8 (SM-F971U1) has owner build **0.1.21 (22)**; the Galaxy Z Flip 7 (SM-F766U) has **0.1.20 (23)**. Build 22 was used for two different owner APKs: 0.1.20 (22) on the Flip 7, superseded by 23, and 0.1.21 (22) on the Fold 8. The last directly verified local Mac/iPad installations are **0.1.7 (8)**; TestFlight distribution status is recorded separately in [TESTFLIGHT.md](TESTFLIGHT.md). A physical Apple TestFlight installation has not been verified. Repeat this checklist on each distribution-signed candidate and record its exact version.
 
 Start with the Samsung Galaxy Z Fold 8, then repeat the camera, import, sharing, and accessibility checks on a physical iPad and a supported Mac. Current automated checks are described in [development status](DEVELOPMENT.md). The Samsung was installed with build 0.1.4 (5) and supplied the first real-photo regression. This checklist separates further hardware checks from automated evidence.
+
+## Verified Fold 8 update — November 14, 2026
+
+Updated the attached Galaxy Z Fold 8 (SM-F971U1, Android 17) in place from
+**0.1.20 (21)** to **0.1.21 (22)** with the normal `lib/main.dart` owner debug APK.
+Source **a7a40c0** includes the November 10/13 photo-recognition fix in **5cc391c**.
+The new and installed signing certificates match; permissions and the original
+install time are unchanged. Bundled recognition, licensing, guide, privacy and
+branding assets match source, with private fixtures and diagnostic targets
+excluded. The installed APK SHA-256 exactly matches
+`build/releases/TallyBowl-0.1.21-android-debug.apk`, and the extracted running Dart
+kernel matches the same artifact after launch.
+
+Protected copies of the previous APK and stopped-app data, package/signature
+reports, snapshots and comparisons are retained under ignored
+`build/owner-updates/0.1.21/samsung/`. All **12 persistent app-data files** have
+identical hashes before and immediately after installation. After startup,
+SQLite integrity checks pass and the entire journal logical dump is unchanged,
+preserving **3 alleys, 3 balls, 9 sessions and 27 games**, including profile and
+draft settings. Normal startup replaces Flutter kernel/resource markers and
+Android runtime metadata; it does not change journal records. Android confirms
+version 0.1.21/build 22, successful activity startup and a running app process.
+The unlocked phone's Tonight screen was visually checked and shows 27 games
+recorded. The app was left open. No uninstall, data clearing, saved-game change,
+outgoing share, physical score-photo import or TestFlight upload was performed.
+Recognition accuracy evidence remains the separate
+[paired Mac Vision and Android emulator evaluation](NOV13_PHOTO_EVALUATION.md).
+The Flip 7 was not attached and remains on build 19.
 
 ## Verified Fold 8 update — November 10, 2026
 
@@ -92,7 +120,7 @@ The Mac package launched successfully after strict signature and sealed owner-po
 
 - Use the packaged **Android debug APK** for this first local test. Public/store release signing is a separate setup task.
 - If an earlier version contains bowling history, export a JSON backup first. Update in place with the same development signing key. A signature mismatch is a reason to inspect signing, not to uninstall and erase data automatically.
-- Confirm the intended version/build after updating in place (currently 0.1.20/21 on the Fold 8 and 0.1.18/19 on the Flip 7; the last verified local Mac/iPad installs are 0.1.7/8); retain existing alleys, balls, sessions and drafts.
+- Confirm the intended version/build after updating in place (currently 0.1.21/22 on the Fold 8 and 0.1.18/19 on the Flip 7; the last verified local Mac/iPad installs are 0.1.7/8); retain existing alleys, balls, sessions and drafts.
 
 ## First complete session
 

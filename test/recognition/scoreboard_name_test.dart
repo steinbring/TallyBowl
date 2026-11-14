@@ -4,6 +4,25 @@ import 'package:tallybowl/src/recognition/score_parser.dart';
 import 'package:tallybowl/src/recognition/scoreboard_name.dart';
 
 void main() {
+  test(
+    'score-attached alias exception does not accept other names or typos',
+    () {
+      const aliases = {'JOE', 'JOSE'};
+      for (final text in ['194Joe18', 'Joe18', '194Jose']) {
+        expect(scoreAttachedAlias(text, aliases), isTrue);
+      }
+      for (final text in [
+        'Joe',
+        '194Jane18',
+        '19J0E18',
+        'JoeSmith18',
+        'J19oe',
+      ]) {
+        expect(scoreAttachedAlias(text, aliases), isFalse);
+      }
+    },
+  );
+
   test('mixed-script OCR lookalikes match a visible Latin bowler name', () {
     expect(normalizedBowlerName('KАT'), 'KAT'); // Cyrillic A.
     expect(normalizedBowlerName('JОЕ'), 'JOE'); // Cyrillic O/E.

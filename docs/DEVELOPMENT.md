@@ -1,5 +1,34 @@
 # TallyBowl! development status
 
+November 14 merge: the build-22 recognition branch is now on main with the
+build-23 store work. Build number 22 was used twice (0.1.20 (22) on the Flip 7,
+0.1.21 (22) on the Fold 8); `pubspec.yaml` stays at the highest used build,
+0.1.20 (23), so the next owner or store build needs build 24 or later and a
+marketing version of at least 0.1.21.
+
+November 14 Android owner build **0.1.21 (22)** is installed and launched on the
+attached Fold 8. It includes the recognition correction below, uses the same
+installed development signer and permissions, and preserves all 12 app-data
+files during installation. Post-launch integrity and complete logical-journal
+comparisons preserve **27 games, 9 sessions, 3 balls**, profile and draft settings.
+The installed APK and running kernel match the verified normal-entry-point
+artifact; the Tonight screen was visually checked. This step makes no TestFlight
+upload or physical recognition-accuracy claim. See [device evidence](DEVICE_TESTING.md).
+
+November 14 source correction for the November 10/13 photos: both native
+engines now recover all ten frames and scratch totals in **8/8 finished views**,
+covering **6/6 unique games**. The six-frame view remains in Review. The final
+measured-band retry handles tall delivery ink, compact/merged frame headings,
+right-aligned totals, sparse console headings and repeated stacked scratch/
+handicap totals without changing native helpers, glyph assets or thresholds.
+Across **113 regression cases / 64 originals per engine**, all **35 prior exact
+imports on each engine** are preserved. Apple gains one additional older case;
+Android gains three. Both leave all **35 negative rows** unselected, with no
+incorrect automatic candidates, evaluation errors or excess native calls.
+**318 Flutter tests and 16 lab tests pass**; static analysis is clean. This is
+source-level verification, separate from the build-21 release and installation
+records below. See [the results and limits](NOV13_PHOTO_EVALUATION.md).
+
 November 13: [public store packets and launch gates](LAUNCH-READINESS.md)
 prepared; [Flip 7 updated to final Android owner build 23](NOV13_FLIP7_BUILD23.md).
 Analysis and 303 tests passed again. Apple beta remains build 21; no new

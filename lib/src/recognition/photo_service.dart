@@ -195,6 +195,25 @@ abstract final class PhotoService {
           recognized = [...recognized, ...recoveredSlant];
         }
       }
+      if (ScoreSheetParser.automaticRow(
+            ScoreSheetParser.rows(recognized, profile),
+          ) ==
+          null) {
+        // Preserve every established path before extending a measured score
+        // band's crop for tall delivery ink. This adds no native request and
+        // retains the same identity, glyph, checkpoint and scratch-total gates.
+        final extended = await FrameGlyphReader.read(
+          bytes,
+          originalLines,
+          profile,
+          alternatives: fullReadings,
+          supplemental: regionalReading,
+          recovery: true,
+          deskew: true,
+          extendDeliveryBand: true,
+        );
+        recognized = [...recognized, ...extended];
+      }
       return recognized;
     } catch (_) {
       return recognized;

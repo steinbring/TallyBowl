@@ -21,6 +21,7 @@ class RecoveryScoreBand {
     required double headerY,
     required double headerSlope,
     required double headerHeight,
+    bool allowCompactScores = false,
   }) {
     if (pitch <= 0 || headerHeight <= 0) return null;
     final numbers = <(int, RecognizedLine)>[];
@@ -40,7 +41,7 @@ class RecoveryScoreBand {
           atName > name.y + word.height * 1.8 + name.height * .5 ||
           atName > name.y + math.max(name.height * 2.5, headerHeight * 4) ||
           projected < headerY + headerHeight * 2 ||
-          word.height < headerHeight * 1.15) {
+          word.height < headerHeight * (allowCompactScores ? .75 : 1.15)) {
         continue;
       }
       numbers.add((index, word));
@@ -101,7 +102,9 @@ class RecoveryScoreBand {
           final above =
               firstY + (w.centerX - first) / pitch * slope - w.centerY;
           return above > height * .65 &&
-              above < height * 1.8 &&
+              above < height * (allowCompactScores ? 2.5 : 1.8) &&
+              (!allowCompactScores ||
+                  w.centerY > headerY + headerHeight * .5) &&
               w.height > height * .35 &&
               w.height < height * 1.4;
         }).toList();
@@ -168,11 +171,19 @@ class RecoveryScoreBand {
     return (start, step);
   }
 
+  /// The final crop retry also permits a right-aligned numeral whose native
+  /// box overlaps its heading. The row bounds and first-column ambiguity
+  /// checks still apply; no calculated score chooses a total's position.
   List<RecognizedLine> totals(
     List<RecognizedLine> words,
     double first,
-    double pitch,
-  ) {
+    double pitch, {
+    bool allowOffsetTotal = false,
+  }) {
+    if (allowOffsetTotal) {
+      final stacked = _stackedTotals(words, first, pitch);
+      if (stacked.isNotEmpty) return stacked;
+    }
     final last = first + 9 * pitch;
     final outside = words.where(
       (w) =>
@@ -200,7 +211,10 @@ class RecoveryScoreBand {
       final column = outside
           .where(
             (w) =>
-                (w.centerX - header.centerX).abs() < pitch * .5 &&
+                ((w.centerX - header.centerX).abs() < pitch * .5 ||
+                    (allowOffsetTotal &&
+                        w.x < header.x + header.width &&
+                        w.x + w.width > header.x)) &&
                 w.centerY > y(w.centerX, first, pitch) - height * 1.8 &&
                 w.centerY < y(w.centerX, first, pitch) + height * .6 &&
                 w.y > header.y + header.height * .8,
@@ -217,6 +231,88 @@ class RecoveryScoreBand {
         .where((w) => (w.centerX - all.first.centerX).abs() < pitch * .4)
         .toList();
     return firstColumn.length == 1 ? firstColumn : [];
+  }
+
+  /// Some consoles stack scratch above handicap under one TOTAL heading.
+  /// Require three separately observed row pairs whose upper entries repeat
+  /// their frame-ten checkpoints. No calculated delivery score selects a row.
+  List<RecognizedLine> _stackedTotals(
+    List<RecognizedLine> words,
+    double first,
+    double pitch,
+  ) {
+    final last = first + 9 * pitch;
+    final matches = <RecognizedLine>[];
+    for (final label in words.where(
+      (w) =>
+          w.text.toUpperCase() == 'TOTAL' &&
+          w.x > last + pitch * .55 &&
+          w.x < last + pitch * 3 &&
+          w.y < firstY,
+    )) {
+      if (!words.any(
+        (w) =>
+            w.text.toUpperCase() == 'PLAYER' &&
+            w.x < first &&
+            (w.centerY - label.centerY).abs() <
+                math.max(w.height, label.height),
+      )) {
+        continue;
+      }
+      final column = words
+          .where(
+            (w) =>
+                _number(w) != null &&
+                (w.centerX - label.centerX).abs() < pitch * .5 &&
+                w.y > label.y + label.height,
+          )
+          .toList();
+      final pairs = <(RecognizedLine, RecognizedLine)>[];
+      for (final check in words.where(
+        (w) =>
+            _number(w) != null &&
+            (w.centerX - last).abs() < pitch * .48 &&
+            w.y > label.y + label.height * 2 &&
+            w.height > height * .65 &&
+            w.height < height * 1.5,
+      )) {
+        final baseline =
+            check.centerY + (label.centerX - check.centerX) / pitch * slope;
+        final lower = column
+            .where((w) => (w.centerY - baseline).abs() < height * .4)
+            .toList();
+        final upper = column
+            .where(
+              (w) =>
+                  baseline - w.centerY > height * 1.15 &&
+                  baseline - w.centerY < height * 2.5,
+            )
+            .toList();
+        if (lower.length != 1 ||
+            upper.length != 1 ||
+            _number(upper.single) != _number(check)) {
+          continue;
+        }
+        if (pairs.any((p) => (p.$1.centerY - check.centerY).abs() < height)) {
+          continue;
+        }
+        pairs.add((check, upper.single));
+      }
+      if (pairs.length < 3 || pairs.length > 8) continue;
+      final gaps = pairs.map((p) => p.$1.centerY - p.$2.centerY).toList()
+        ..sort();
+      if (gaps.last - gaps.first > height * .45) continue;
+      matches.addAll(
+        pairs
+            .where(
+              (p) =>
+                  (p.$1.centerY - y(p.$1.centerX, first, pitch)).abs() <
+                  height * .35,
+            )
+            .map((p) => p.$2),
+      );
+    }
+    return matches.length == 1 ? matches : [];
   }
 
   static int? _number(RecognizedLine w) {
