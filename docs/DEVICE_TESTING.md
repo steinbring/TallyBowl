@@ -1,8 +1,8 @@
 # Device testing and owner installations
 
-Latest Flip 7 update: **0.1.20 (22)** installed in place on November 13,
+Latest Flip 7 update: **0.1.20 (23)** installed in place on November 13,
 2026, with startup/Settings checks and database integrity/count retention.
-See [build 22 evidence](NOV13_FLIP7_BUILD22.md) for scope and limitations.
+See [final build 23 evidence](NOV13_FLIP7_BUILD23.md) for scope and limitations.
 
 The Samsung Galaxy Z Fold 8 (SM-F971U1) has owner build **0.1.20 (21)**; the Galaxy Z Flip 7 (SM-F766U) remains on **0.1.18 (19)**. The last directly verified local Mac/iPad installations are **0.1.7 (8)**; TestFlight distribution status is recorded separately in [TESTFLIGHT.md](TESTFLIGHT.md). A physical Apple TestFlight installation has not been verified. Repeat this checklist on each distribution-signed candidate and record its exact version.
 

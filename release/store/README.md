@@ -9,7 +9,7 @@ Prepared November 13, 2026. Target: **March 1, 2027**, **US$9.95**, all eligible
 - `certificates/` and `signing-certificates.json`: public certificates only. [Signing recovery](SIGNING-RECOVERY.md) explains custody and the required off-device backup.
 - [Privacy review](PRIVACY-DISCLOSURE-REVIEW.md): source-based assessment that must inform final store declarations; no privacy labels were submitted by this packet.
 
-Validate metadata and artwork with `python3 release/store/check_store_packet.py`. To also verify local package hashes, add `--artifacts "/Users/joe/Code/TallyBowl/build/store-prep/2026-11-13-build-22"`.
+Validate metadata and artwork with `python3 release/store/check_store_packet.py`. To also verify local package hashes, add `--artifacts "/Users/joe/Code/TallyBowl/build/store-prep/2026-11-13-build-23"`.
 
 To reproduce artwork on macOS, copy `source/` into an empty temporary packet directory, compile `render-store-assets.swift` with `swiftc -framework AppKit`, and run the resulting tool with `tallybowl` and that directory. It deliberately refuses to overwrite existing PNGs. Review the output before replacing draft artwork. Never overwrite an archived release export.
 
