@@ -1,5 +1,14 @@
 # TallyBowl! development status
 
+November 14 follow-up: a dismissible [retake prompt](PHOTO_QUALITY.md) explains
+calibrated photo problems when nothing imports automatically. Seven new public
+r/Bowling monitor photos exposed a pre-existing ML Kit wrong automatic import
+(an 8 read as 3 in a spare frame); a native character can no longer overwrite a
+confident pixel reading. On those 10 complete rows Apple imports 3 and Android 4,
+with no wrong import and all 7 unfinished rows unselected; the 113-row corpus
+gate still passes. Source-level verification only. See the
+[detection review](NOV14_DETECTION_REVIEW.md).
+
 November 14 [detection review](NOV14_DETECTION_REVIEW.md): Vision's Cyrillic/Greek
 3 and X lookalikes now read like ML Kit's Latin marks; accented and multi-word
 scoreboard aliases (`JOE S`) match on every recognition path; and a rejected

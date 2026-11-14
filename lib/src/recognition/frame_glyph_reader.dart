@@ -4,6 +4,7 @@ import 'dart:math' as math;
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 
+import 'package:flutter/foundation.dart' show visibleForTesting;
 import 'package:flutter/services.dart';
 
 import '../domain/models.dart';
@@ -1758,6 +1759,22 @@ abstract final class FrameGlyphReader {
     ];
   }
 
+  /// Template classification of one binary cell mask with optional native
+  /// characters observed inside it, for deterministic glyph tests.
+  @visibleForTesting
+  static Future<String> classifyMaskForTesting(
+    Uint8List mask,
+    int width,
+    int height, {
+    Set<String> observed = const {},
+  }) async => _classify(
+    mask,
+    width,
+    height,
+    await (_templates ??= _loadTemplates()),
+    observed: observed.isEmpty ? null : (_, _, _, _) => observed,
+  );
+
   /// Exposed for deterministic raster regression tests. Unknown ink stays blank.
   static String _classify(
     Uint8List mask,
@@ -1891,7 +1908,15 @@ abstract final class FrameGlyphReader {
           .toSet();
       // Fill omissions; keep an independently observed native character in
       // this component even when thresholding has broken its photographed ink.
+      // It cannot overwrite a confident, different pixel winner: artwork over
+      // a digit can fool a crop's OCR (an 8 read as 3 in a spare frame keeps
+      // every checkpoint), so two disagreeing readings leave the frame blank.
       if (known.length == 1) {
+        if (known.single != best.key &&
+            best.value >= .68 &&
+            best.value - ranked[1].value >= .06) {
+          return '';
+        }
         result.write(known.single);
         continue;
       }

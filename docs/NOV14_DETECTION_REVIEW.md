@@ -27,6 +27,34 @@ error and at most four native calls.
 Combined result: Apple 44/78 and Android 47/78 complete rows exact, 35/35
 negative rows unselected, zero incorrect automatic candidates.
 
+## New web photos and a safety fix
+
+Seven new photos of finished games on real alley monitors were taken from public
+r/Bowling posts (QubicaAMF, Brunswick, AccuVision and Bowland-style screens).
+They give 10 complete rows and 7 unfinished rows, transcribed by hand and
+checked with the production scorer before any engine ran. They are kept
+privately under ignored `build/recognition-lab/online-nov14/`. A Commons
+perfect-game photo was already in the corpus and was excluded.
+
+| | Apple Vision | ML Kit |
+| --- | --- | --- |
+| Code before November 14 | 3/10, no wrong import | 3/10, **one wrong automatic import** |
+| Current main | 3/10, no wrong import | 4/10, no wrong import |
+
+All 7 unfinished rows stay unselected on both engines. The wrong import was
+a two-player screen where antler artwork crosses the second bowler's first-frame 8. The
+full-photo ML Kit passes read 8, but the per-cell crop read 3. The glyph
+fallback always kept a native character seen inside the ink, even a secondary
+crop's, over its own confident 8 (.76–.82, leading by more than .11). Because
+`8/` and `3/` score identically in frame 1, every checkpoint and the 220 total
+agreed. A native character now cannot overwrite a confident, different pixel
+reading; the disagreement leaves the frame for review. On that photo another
+reading then imports the correct row. The fix passes the strict gate on the
+113-row corpus (Apple 44, Android 47, no regressions or wrong candidates).
+
+The retake prompt appears on the low-resolution 828 px photo (scores too
+small) and stays silent on the sharp photos that fail for layout reasons.
+
 ## Checked and ruled out
 
 - **Vision minimum text height.** `VNRecognizeTextRequest.minimumTextHeight`
