@@ -18,6 +18,8 @@ In Tonight, start a practice or league session. Choose the alley, date, lane or 
 
 Scan or import one final scoreboard photo at a time. Aim straight at the scoreboard, include all ten frames and your name, and avoid glare and cropped marks. Recognition runs locally. A unique matching name with a complete, validated frame sequence can fill the editor automatically; ambiguous rows or marks open a review step. If the photo is unclear, select your row and correct the frames manually.
 
+If a photo can’t be imported automatically, TallyBowl checks for problems another photo could fix: no readable scoreboard text, scores that are too small or blurry, dim scores, or your name missing from the board. It explains what it found and offers Take another photo or Choose another. Tap Use this photo anyway, or close the message, to keep the photo and pick your row or enter frames yourself.
+
 Always compare the deliveries and calculated total with the original. Recognized cumulative numbers alone cannot determine every delivery. Before saving, select the balls used, an optional primary ball, the lane/pair, and game notes. If you unselect the primary ball, choose another primary if needed. Only complete, legal ten-pin games can be saved.
 
 ## Read and correct frames

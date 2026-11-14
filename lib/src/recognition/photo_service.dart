@@ -12,6 +12,7 @@ import '../domain/models.dart';
 import '../domain/scoring.dart';
 import 'scoreboard_grid.dart';
 import 'frame_glyph_reader.dart';
+import 'photo_quality.dart';
 import 'score_parser.dart';
 import 'scoreboard_focus.dart';
 
@@ -467,6 +468,15 @@ abstract final class PhotoService {
       return lines; // A failed regional pass keeps the original/manual review.
     }
   }
+
+  /// Likely photo problems for a photo that was not imported automatically.
+  static Future<PhotoQualityReport> assessQuality(
+    String path,
+    List<RecognizedLine> lines,
+    List<ScoreRow> rows,
+    BowlerProfile profile,
+  ) async =>
+      PhotoQuality.assess(await readPhoto(XFile(path)), lines, rows, profile);
 
   static Future<String?> recover() async {
     if (!Platform.isAndroid) return null;
