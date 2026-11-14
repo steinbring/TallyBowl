@@ -32,6 +32,71 @@ RecoveryScoreBand? fit(
 );
 
 void main() {
+  test('compact headings still need an independently observed score band', () {
+    final words = [
+      for (var i = 0; i < 10; i++) ...[
+        word('${9 * (i + 1)}', .19 + .06 * i, .35),
+        word('9-', .18 + .06 * i, .27, .04, .03),
+      ],
+    ];
+    RecoveryScoreBand? compact(List<RecognizedLine> input, bool enabled) =>
+        RecoveryScoreBand.fit(
+          input,
+          name: word('Bowler', .01, .28, .1),
+          first: .2,
+          pitch: .06,
+          headerY: .20,
+          headerSlope: 0,
+          headerHeight: .04,
+          allowCompactScores: enabled,
+        );
+    expect(compact(words, false), isNull);
+    expect(compact(words, true), isNotNull);
+    expect(compact(words.where((w) => w.text != '90').toList(), true), isNull);
+    expect(compact(words.where((w) => w.text != '9-').toList(), true), isNull);
+  });
+  test(
+    'stacked scratch totals require three repeated observed console rows',
+    () {
+      const band = RecoveryScoreBand(.46, 0, .02, .40);
+      final words = [
+        word('PLAYER', .01, .20, .08, .015),
+        word('TOTAL', .81, .20, .05, .015),
+        for (final row in [
+          (30, 100, .36),
+          (90, 162, .46),
+          (120, 200, .56),
+        ]) ...[
+          word('${row.$1}', .73, row.$3 - .01, .02, .02),
+          word('${row.$1}', .82, row.$3 - .046, .025, .02),
+          word('${row.$2}', .82, row.$3 - .01, .025, .02),
+        ],
+      ];
+      List<String> totals(List<RecognizedLine> input) => band
+          .totals(input, .2, .06, allowOffsetTotal: true)
+          .map((w) => w.text)
+          .toList();
+      expect(band.totals(words, .2, .06).map((w) => w.text), ['162']);
+      expect(totals(words), ['90']);
+      expect(
+        totals(words.where((w) => w.text != 'PLAYER').toList()),
+        isNot(contains('90')),
+      );
+      expect(
+        totals(words.where((w) => w.centerY < .50).toList()),
+        isNot(contains('90')),
+      );
+      expect(
+        totals([...words, word('91', .82, .414, .025, .02)]),
+        isNot(contains('90')),
+      );
+      expect(
+        totals(words.where((w) => w.text != '30').toList()),
+        isNot(contains('90')),
+      );
+    },
+  );
+
   test('observed cumulative centers correct right-aligned headers', () {
     final words = observed();
     final band = fit(words, first: .21)!;
@@ -71,6 +136,53 @@ void main() {
         [word('90', .81, .32, .04), word('91', .82, .325, .04)],
         .2,
         .06,
+      ),
+      isEmpty,
+    );
+  });
+  test('offset total needs an observed overlapping heading', () {
+    final band = fit(observed())!;
+    final words = [
+      word('TOTAL', .81, .22, .05, .02),
+      word('90', .855, .27, .035, .02),
+      word('162', .90, .27, .035, .02),
+    ];
+    expect(band.totals(words, .2, .06), isEmpty);
+    expect(
+      band.totals(words, .2, .06, allowOffsetTotal: true).map((w) => w.text),
+      ['90'],
+    );
+    expect(
+      band.totals(words.skip(1).toList(), .2, .06, allowOffsetTotal: true),
+      isEmpty,
+    );
+  });
+  test('offset-total heading cannot claim an adjacent numeric column', () {
+    final band = fit(observed())!;
+    expect(
+      band.totals(
+        [word('TOTAL', .81, .22, .05, .02), word('90', .89, .27, .03, .02)],
+        .2,
+        .06,
+        allowOffsetTotal: true,
+      ),
+      isEmpty,
+    );
+  });
+  test('offset totals keep competing values and later rows ambiguous', () {
+    final band = fit(observed())!;
+    final words = [
+      word('TOTAL', .81, .22, .05, .02),
+      word('90', .855, .27, .035, .02),
+      word('91', .85, .275, .035, .02),
+    ];
+    expect(band.totals(words, .2, .06, allowOffsetTotal: true), isEmpty);
+    expect(
+      band.totals(
+        [words.first, word('90', .855, .44, .035, .02)],
+        .2,
+        .06,
+        allowOffsetTotal: true,
       ),
       isEmpty,
     );

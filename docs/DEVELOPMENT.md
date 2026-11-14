@@ -1,5 +1,20 @@
 # TallyBowl! development status
 
+November 14 source correction for the November 10/13 photos: both native
+engines now recover all ten frames and scratch totals in **8/8 finished views**,
+covering **6/6 unique games**. The six-frame view remains in Review. The final
+measured-band retry handles tall delivery ink, compact/merged frame headings,
+right-aligned totals, sparse console headings and repeated stacked scratch/
+handicap totals without changing native helpers, glyph assets or thresholds.
+Across **113 regression cases / 64 originals per engine**, all **35 prior exact
+imports on each engine** are preserved. Apple gains one additional older case;
+Android gains three. Both leave all **35 negative rows** unselected, with no
+incorrect automatic candidates, evaluation errors or excess native calls.
+**318 Flutter tests and 16 lab tests pass**; static analysis is clean. This is
+source-level verification, separate from the build-21 release and installation
+records below. See [the results and limits](NOV13_PHOTO_EVALUATION.md).
+
+
 November 10 release **0.1.20 (21)**: optional **Cover material** and
 **Cover type** fields are editable in the ball form and shown in My Bag. The
 71-entry offline specification table covers all 63 retained Brunswick/Radical

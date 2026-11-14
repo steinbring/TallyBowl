@@ -9,7 +9,14 @@ future layout/segmentation changes without changing the installed app.
 All photos, human labels, native OCR text, experimental templates and detailed
 logs belong under ignored `build/recognition-lab/`. No cloud service is used.
 Do not add downloaded scoreboards, private names or EXIF to app assets or Git.
-The latest combined corpus is `build/recognition-lab/online-nov09/corpus.json`
+The latest combined corpus is
+`build/recognition-lab/league-practice-nov13/corpus.json` (113 cases, 64 originals).
+It includes all 104 prior cases (including the previously inspected holdout),
+eight finished-game views from the new photos, and one partial game. The nine
+new rows are frozen separately in `league-practice-nov13/new.json`. See
+[the November 13 recovery](../../docs/NOV13_PHOTO_EVALUATION.md).
+
+The preceding combined corpus is `build/recognition-lab/online-nov09/corpus.json`
 (98 cases, 53 originals). It adds four fresh online sources to the November 8
 corpus, including six Baker/team-game negative rows. The independently labeled
 first evaluation is frozen separately as `online-nov09/new.json`; after inspecting
@@ -64,7 +71,7 @@ colored backgrounds, tiny fonts and unrelated adjacent screens. Do not infer
 missing deliveries from a matching total.
 
 ```sh
-python3 tool/recognition_lab/lab.py validate build/recognition-lab/online-nov09/corpus.json
+python3 tool/recognition_lab/lab.py validate build/recognition-lab/league-practice-nov13/corpus.json
 python3 -m unittest discover -s tool/recognition_lab -p test_lab.py
 ```
 
@@ -133,12 +140,12 @@ Run these **sequentially**, once for `apple` and once for `android`:
 
 ```sh
 flutter test --no-pub tool/recognition_lab/evaluate_test.dart \
-  --dart-define=LAB_MANIFEST=build/recognition-lab/practice-nov08/corpus.json \
+  --dart-define=LAB_MANIFEST=build/recognition-lab/league-practice-nov13/corpus.json \
   --dart-define=LAB_ENGINE=apple \
   --dart-define=LAB_OUTPUT=build/recognition-lab/next-trial/apple-baseline.json
 
 flutter test --no-pub tool/recognition_lab/evaluate_test.dart \
-  --dart-define=LAB_MANIFEST=build/recognition-lab/practice-nov08/corpus.json \
+  --dart-define=LAB_MANIFEST=build/recognition-lab/league-practice-nov13/corpus.json \
   --dart-define=LAB_ENGINE=apple \
   --dart-define=LAB_OUTPUT=build/recognition-lab/next-trial/apple-candidate.json \
   --dart-define=LAB_TEMPLATES=build/recognition-lab/candidate-new.json

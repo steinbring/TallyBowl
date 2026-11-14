@@ -42,3 +42,12 @@ bool isBowlerNameCandidate(String text) {
   if (!RegExp(r'[A-Z]{2,}').hasMatch(normalized)) return false;
   return !RegExp(r'^(FR\d*|TOT|TOTAL|PLAYER|MPH)$').hasMatch(normalized);
 }
+
+/// A merged OCR token such as "194Joe18" adds score digits to a saved alias.
+/// This is only used to avoid a false conflicting-name veto when another pass
+/// independently reads the clean alias; it never establishes row ownership.
+bool scoreAttachedAlias(String text, Set<String> aliases) {
+  final name = normalizedBowlerName(text);
+  final stripped = name.replaceAll(RegExp(r'^\d+|\d+$'), '');
+  return stripped != name && aliases.contains(stripped);
+}

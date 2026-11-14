@@ -35,6 +35,8 @@ List<RecognizedLine> observations(List<int> checks, {bool spare = false}) => [
 Future<Uint8List> board(
   List<String> frames, {
   bool missingGutter = false,
+  bool tallDeliveries = false,
+  bool rulings = false,
   String? totalInk,
 }) async {
   final bank = jsonDecode(
@@ -73,12 +75,22 @@ Future<Uint8List> board(
         for (var xx = 0; xx < 24; xx++) {
           if (glyph[y * 24 + xx] == '1') {
             canvas.drawRect(
-              ui.Rect.fromLTWH(x + xx * .8, top + y * 1.5, .8, 1.5),
+              ui.Rect.fromLTWH(
+                x + xx * .8,
+                top + y * (tallDeliveries ? 2 : 1.5),
+                .8,
+                tallDeliveries ? 2 : 1.5,
+              ),
               ink,
             );
           }
         }
       }
+    }
+  }
+  if (rulings) {
+    for (var i = 0; i < 9; i++) {
+      canvas.drawRect(ui.Rect.fromLTWH(187.5 + 75 * i, 120, 3, 200), ink);
     }
   }
   if (totalInk != null) {
@@ -113,13 +125,20 @@ Future<Uint8List> board(
   }
 }
 
-Future<ScoreRow?> read(Uint8List bytes, List<RecognizedLine> lines) async {
+Future<ScoreRow?> read(
+  Uint8List bytes,
+  List<RecognizedLine> lines, {
+  bool extendDeliveryBand = false,
+  List<List<RecognizedLine>> alternatives = const [],
+}) async {
   final recovered = await FrameGlyphReader.read(
     bytes,
     lines,
     profile,
+    alternatives: alternatives,
     recovery: true,
     deskew: true,
+    extendDeliveryBand: extendDeliveryBand,
   );
   return ScoreSheetParser.automaticRow(
     ScoreSheetParser.rows([...lines, ...recovered], profile),
@@ -128,6 +147,118 @@ Future<ScoreRow?> read(Uint8List bytes, List<RecognizedLine> lines) async {
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
+  test(
+    'score digits attached to an alias do not veto an independent clean name',
+    () async {
+      final bytes = await board(spareFrames, tallDeliveries: true);
+      final lines = observations(spareChecks, spare: true);
+      final row = await read(
+        bytes,
+        lines,
+        extendDeliveryBand: true,
+        alternatives: [
+          [box('194Bowler18', .01, .31, .09, .06)],
+        ],
+      );
+      expect(row?.frames, spareFrames);
+      expect(
+        await read(
+          bytes,
+          lines,
+          extendDeliveryBand: true,
+          alternatives: [
+            [box('194Other18', .01, .31, .09, .06)],
+          ],
+        ),
+        isNull,
+      );
+      expect(
+        await read(bytes, [
+          box('194Bowler18', .01, .31, .09, .06),
+        ], extendDeliveryBand: true),
+        isNull,
+      );
+    },
+  );
+  test(
+    'sparse console headings need labels, separate anchors and pixel rulings',
+    () async {
+      final all = observations(spareChecks, spare: true);
+      final lines = all.where((w) => w.y != .2 || w.text == '1').toList()
+        ..addAll([
+          box('PLAYER', .01, .2, .09, .02),
+          box('TOTAL', .92, .2, .05, .02),
+        ]);
+      final other = [
+        [all.firstWhere((w) => w.y == .2 && w.text == '10')],
+      ];
+      final bytes = await board(
+        spareFrames,
+        tallDeliveries: true,
+        rulings: true,
+      );
+      expect(
+        (await read(
+          bytes,
+          lines,
+          alternatives: other,
+          extendDeliveryBand: true,
+        ))?.frames,
+        spareFrames,
+      );
+      for (final label in ['PLAYER', 'TOTAL']) {
+        expect(
+          await read(
+            bytes,
+            lines.where((w) => w.text != label).toList(),
+            alternatives: other,
+            extendDeliveryBand: true,
+          ),
+          isNull,
+        );
+      }
+      expect(await read(bytes, lines, extendDeliveryBand: true), isNull);
+      expect(
+        await read(
+          await board(spareFrames, tallDeliveries: true),
+          lines,
+          alternatives: other,
+          extendDeliveryBand: true,
+        ),
+        isNull,
+      );
+    },
+  );
+  test('tall spare ink needs the extended measured delivery band', () async {
+    final bytes = await board(spareFrames, tallDeliveries: true);
+    final lines = observations(spareChecks, spare: true);
+    expect(await read(bytes, lines), isNull);
+    final row = await read(bytes, lines, extendDeliveryBand: true);
+    expect(row?.frames, spareFrames);
+    expect(row?.displayedTotal, 115);
+  });
+  test('extended delivery band cannot invent a missing gutter', () async {
+    expect(
+      await read(
+        await board(spareFrames, tallDeliveries: true, missingGutter: true),
+        observations(spareChecks, spare: true),
+        extendDeliveryBand: true,
+      ),
+      isNull,
+    );
+  });
+  test('extended delivery band retains scratch-total conflicts', () async {
+    final lines = observations(spareChecks, spare: true)..removeLast();
+    lines.add(box('116', .92, .41, .05, .06));
+    expect(
+      await read(
+        await board(spareFrames, tallDeliveries: true),
+        lines,
+        extendDeliveryBand: true,
+      ),
+      isNull,
+    );
+  });
   test(
     'tinted gutters retain leading, trailing and double-miss order',
     () async {
@@ -202,41 +333,49 @@ void main() {
       );
     },
   );
-  test(
-    'photo service recovers tinted gutters within four native calls',
-    () async {
-      final directory = await Directory.systemTemp.createTemp('cast-gutters-');
-      addTearDown(() => directory.delete(recursive: true));
-      final file = File('${directory.path}/anonymous.png');
-      await file.writeAsBytes(await board(openFrames));
-      var calls = 0;
-      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-          .setMockMethodCallHandler(PhotoService.channel, (call) async {
-            calls++;
-            final args = call.arguments as Map;
-            if (args['regions'] != null && args['context'] != true) return [];
-            return [
-              for (final word in observations(openChecks))
-                {
-                  'text': word.text,
-                  'x': word.x,
-                  'y': word.y,
-                  'width': word.width,
-                  'height': word.height,
-                },
-            ];
-          });
-      addTearDown(
-        () => TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-            .setMockMethodCallHandler(PhotoService.channel, null),
-      );
-      final lines = await PhotoService.recognize(file.path, profile: profile);
-      final row = ScoreSheetParser.automaticRow(
-        ScoreSheetParser.rows(lines, profile),
-      );
-      expect(row?.frames, openFrames);
-      expect(row?.displayedTotal, 41);
-      expect(calls, lessThanOrEqualTo(4));
-    },
-  );
+  for (final tall in [false, true]) {
+    test(
+      'photo service recovers ${tall ? 'tall spare ink' : 'tinted gutters'} within four native calls',
+      () async {
+        final frames = tall ? spareFrames : openFrames;
+        final checks = tall ? spareChecks : openChecks;
+        final directory = await Directory.systemTemp.createTemp(
+          'cast-gutters-',
+        );
+        addTearDown(() => directory.delete(recursive: true));
+        final file = File('${directory.path}/anonymous.png');
+        await file.writeAsBytes(await board(frames, tallDeliveries: tall));
+        var calls = 0;
+        TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+            .setMockMethodCallHandler(PhotoService.channel, (call) async {
+              calls++;
+              final args = call.arguments as Map;
+              if (args['regions'] != null && args['context'] != true) return [];
+              return [
+                for (final word in observations(checks, spare: tall))
+                  {
+                    'text': word.text,
+                    'x': word.x,
+                    'y': word.y,
+                    'width': word.width,
+                    'height': word.height,
+                  },
+              ];
+            });
+        addTearDown(
+          () => TestDefaultBinaryMessengerBinding
+              .instance
+              .defaultBinaryMessenger
+              .setMockMethodCallHandler(PhotoService.channel, null),
+        );
+        final lines = await PhotoService.recognize(file.path, profile: profile);
+        final row = ScoreSheetParser.automaticRow(
+          ScoreSheetParser.rows(lines, profile),
+        );
+        expect(row?.frames, frames);
+        expect(row?.displayedTotal, checks.last);
+        expect(calls, lessThanOrEqualTo(4));
+      },
+    );
+  }
 }

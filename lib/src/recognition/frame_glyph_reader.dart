@@ -12,6 +12,7 @@ import 'scoreboard_name.dart';
 import 'scoreboard_ink.dart';
 import 'scoreboard_grid.dart';
 import 'recovery_layout.dart';
+import 'merged_frame_headers.dart';
 
 /// Conservative local fallback for separated delivery cells on monitor grids.
 /// Templates classify photographed ink; score totals only validate the result.
@@ -27,14 +28,28 @@ abstract final class FrameGlyphReader {
     List<RecognizedLine> supplemental = const [],
     bool recovery = false,
     bool deskew = false,
+    bool extendDeliveryBand = false,
   }) async {
-    final sources = [
+    var sources = [
       lines,
       ...alternatives.where((s) => !identical(s, lines)).take(3),
     ];
+    // Native OCR can merge an entire heading strip. Only the final retry
+    // separates a verified consecutive run at its photographed ink columns.
+    if (extendDeliveryBand) sources = await _mergedHeaders(bytes, sources);
+    final headerSupport = extendDeliveryBand
+        ? _distinctWords(sources.expand((s) => s).toList())
+        : const <RecognizedLine>[];
     final sourceLayouts = [
       for (final source in sources)
-        _tables(source, profile, recovery: recovery, deskew: deskew),
+        _tables(
+          source,
+          profile,
+          recovery: recovery,
+          deskew: deskew,
+          compact: extendDeliveryBand,
+          headerSupport: headerSupport,
+        ),
     ];
     final layouts = sourceLayouts
         .expand((s) => s)
@@ -67,6 +82,8 @@ abstract final class FrameGlyphReader {
                   (word) =>
                       isBowlerNameCandidate(word.text) &&
                       !aliases.contains(_name(word.text)) &&
+                      !(extendDeliveryBand &&
+                          scoreAttachedAlias(word.text, aliases)) &&
                       (word.centerX - table.name.centerX).abs() <
                           table.name.width * .5 &&
                       (word.centerY - table.name.centerY).abs() <
@@ -108,6 +125,7 @@ abstract final class FrameGlyphReader {
                     supportingWords,
                     white,
                     deskew,
+                    extendDeliveryBand: extendDeliveryBand,
                   ),
               ],
             ));
@@ -129,6 +147,7 @@ abstract final class FrameGlyphReader {
                       supportingWords,
                       null,
                       deskew,
+                      extendDeliveryBand: extendDeliveryBand,
                     ),
                 ],
               ));
@@ -158,7 +177,11 @@ abstract final class FrameGlyphReader {
             }
             final last = aligned.first + 9 * aligned.pitch;
             Future<List<int>> totalsFor(List<RecognizedLine> input) async {
-              final totals = _scratchTotals(input, aligned);
+              final totals = _scratchTotals(
+                input,
+                aligned,
+                allowOffsetTotal: extendDeliveryBand,
+              );
               if (!deskew || aligned.band == null || totals.isNotEmpty) {
                 return totals;
               }
@@ -172,7 +195,11 @@ abstract final class FrameGlyphReader {
                   templates,
                 ),
               );
-              return _scratchTotals(resolved, aligned);
+              return _scratchTotals(
+                resolved,
+                aligned,
+                allowOffsetTotal: extendDeliveryBand,
+              );
             }
 
             final directTotals = await totalsFor(words);
@@ -430,7 +457,11 @@ abstract final class FrameGlyphReader {
     }
   }
 
-  static RecognitionRegion _region(_Table table, int i) {
+  static RecognitionRegion _region(
+    _Table table,
+    int i, {
+    bool extendDeliveryBand = false,
+  }) {
     final center = table.first + i * table.pitch;
     final headerY = table.y + i * table.slope;
     final gap = table.rowY(center) - headerY;
@@ -440,7 +471,12 @@ abstract final class FrameGlyphReader {
           ? math.max(center + table.pitch * .47, table.tenthRight!)
           : center + table.pitch * .47;
       final top = headerY + table.height * .55;
-      final bottom = table.rowY(center) - table.band!.height * .6;
+      // Tall slashes and split digits can reach the cumulative numeral's
+      // upper margin. The final fallback leaves room for that photographed
+      // ink; edge-connected fragments of cumulative text are still removed.
+      final bottom =
+          table.rowY(center) -
+          table.band!.height * (extendDeliveryBand ? .3 : .6);
       return RecognitionRegion(
         left,
         top,
@@ -466,6 +502,8 @@ abstract final class FrameGlyphReader {
     BowlerProfile profile, {
     bool recovery = false,
     bool deskew = false,
+    bool compact = false,
+    List<RecognizedLine> headerSupport = const [],
   }) {
     final words = recovery
         ? recoveryNameWords(_distinctWords(lines), profile)
@@ -570,8 +608,111 @@ abstract final class FrameGlyphReader {
         tables.add(table);
       }
     }
+    if (compact) {
+      for (final name in names) {
+        tables.addAll(_anchoredTables(headerSupport, name));
+      }
+    }
     if (!recovery) return tables;
-    return [for (final table in tables) ..._recoverTable(table, words)];
+    return [
+      for (final table in tables)
+        ..._recoverTable(table, words, compact: compact),
+    ];
+  }
+
+  /// Split a long, explicitly recognized consecutive header run using its
+  /// photographed ink columns. Character positions are never interpolated.
+  static Future<List<List<RecognizedLine>>> _mergedHeaders(
+    Uint8List bytes,
+    List<List<RecognizedLine>> sources,
+  ) async {
+    final image = await _decode(bytes);
+    try {
+      final rgba = (await image.toByteData(format: ui.ImageByteFormat.rawRgba))!
+          .buffer
+          .asUint8List();
+      final width = image.width, height = image.height;
+      return await Isolate.run(() {
+        return [
+          for (final source in sources)
+            [
+              ...source,
+              for (final word in _distinctWords(source))
+                ...splitMergedFrameHeaders(word, rgba, width, height),
+            ],
+        ];
+      });
+    } finally {
+      image.dispose();
+    }
+  }
+
+  // Two widely separated frame-number boxes can locate a small console grid
+  // only when PLAYER and TOTAL independently identify the heading strip.
+  // Recovery still requires six checkpoints and photographed cell rulings.
+  static List<_Table> _anchoredTables(
+    List<RecognizedLine> support,
+    RecognizedLine name,
+  ) {
+    final output = <_Table>[];
+    for (final label in support.where(
+      (w) =>
+          RegExp(r'^TOTAL$', caseSensitive: false).hasMatch(w.text) &&
+          w.x > name.x + name.width &&
+          w.centerY < name.y,
+    )) {
+      if (!support.any(
+        (w) =>
+            w.text.toUpperCase() == 'PLAYER' &&
+            w.x < label.x &&
+            (w.centerY - label.centerY).abs() < label.height,
+      )) {
+        continue;
+      }
+      final headers = support.where((w) {
+        final n = int.tryParse(w.text);
+        return n != null &&
+            n >= 1 &&
+            n <= 10 &&
+            w.centerX > name.x + name.width &&
+            w.x + w.width < label.x &&
+            (w.centerY - label.centerY).abs() < label.height * .75;
+      }).toList();
+      for (final a in headers) {
+        for (final b in headers) {
+          final ai = int.parse(a.text) - 1, bi = int.parse(b.text) - 1;
+          if (bi != 9 || bi - ai < 5) continue;
+          final pitch = (b.centerX - a.centerX) / (bi - ai);
+          final slope = (b.centerY - a.centerY) / (bi - ai);
+          final first = a.centerX - ai * pitch;
+          if (pitch <= 0 ||
+              pitch > .1 ||
+              first < name.x + name.width ||
+              (slope / pitch).abs() > .4) {
+            continue;
+          }
+          if (output.any(
+            (t) =>
+                (t.first - first).abs() < pitch * .1 &&
+                (t.pitch - pitch).abs() < pitch * .05,
+          )) {
+            continue;
+          }
+          output.add(
+            _Table(
+              name,
+              first,
+              pitch,
+              a.centerY - ai * slope,
+              slope,
+              math.min(a.height, b.height),
+              2,
+            ),
+          );
+        }
+      }
+    }
+    return output.take(4).toList();
   }
 
   static double _headerHeight(List<RecognizedLine> matches, bool deskew) {
@@ -592,7 +733,11 @@ abstract final class FrameGlyphReader {
     return heights[heights.length ~/ 2];
   }
 
-  static List<_Table> _recoverTable(_Table table, List<RecognizedLine> words) {
+  static List<_Table> _recoverTable(
+    _Table table,
+    List<RecognizedLine> words, {
+    bool compact = false,
+  }) {
     var band = RecoveryScoreBand.fit(
       words,
       name: table.name,
@@ -601,6 +746,7 @@ abstract final class FrameGlyphReader {
       headerY: table.y,
       headerSlope: table.slope,
       headerHeight: table.height,
+      allowCompactScores: compact,
     );
     if (band == null) return [];
     final columns = band.columns(words, table.first, table.pitch);
@@ -662,10 +808,19 @@ abstract final class FrameGlyphReader {
     return result;
   }
 
-  static List<int> _scratchTotals(List<RecognizedLine> words, _Table table) {
+  static List<int> _scratchTotals(
+    List<RecognizedLine> words,
+    _Table table, {
+    bool allowOffsetTotal = false,
+  }) {
     if (table.band != null) {
       return table.band!
-          .totals(words, table.first, table.pitch)
+          .totals(
+            words,
+            table.first,
+            table.pitch,
+            allowOffsetTotal: allowOffsetTotal,
+          )
           .map((w) => int.parse(w.text))
           .toList();
     }
@@ -892,11 +1047,12 @@ abstract final class FrameGlyphReader {
     List<_Template> templates,
     List<RecognizedLine> supportingWords,
     List<int>? white,
-    bool deskew,
-  ) {
+    bool deskew, {
+    bool extendDeliveryBand = false,
+  }) {
     final frames = <String>[];
     for (var i = 0; i < 10; i++) {
-      final region = _region(table, i);
+      final region = _region(table, i, extendDeliveryBand: extendDeliveryBand);
       if (region.width <= 0 ||
           region.height <= 0 ||
           region.x < 0 ||
