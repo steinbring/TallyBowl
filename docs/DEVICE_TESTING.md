@@ -4,9 +4,29 @@ Latest Flip 7 update: **0.1.20 (23)** installed in place on November 13,
 2026, with startup/Settings checks and database integrity/count retention.
 See [final build 23 evidence](NOV13_FLIP7_BUILD23.md) for scope and limitations.
 
-The Samsung Galaxy Z Fold 8 (SM-F971U1) has owner build **0.1.21 (22)**; the Galaxy Z Flip 7 (SM-F766U) has **0.1.20 (23)**. Build 22 was used for two different owner APKs: 0.1.20 (22) on the Flip 7, superseded by 23, and 0.1.21 (22) on the Fold 8. The last directly verified local Mac/iPad installations are **0.1.7 (8)**; TestFlight distribution status is recorded separately in [TESTFLIGHT.md](TESTFLIGHT.md). A physical Apple TestFlight installation has not been verified. Repeat this checklist on each distribution-signed candidate and record its exact version.
+The Samsung Galaxy Z Fold 8 (SM-F971U1) has owner build **0.1.22 (24)**; the Galaxy Z Flip 7 (SM-F766U) has **0.1.20 (23)**. Build 22 was used for two different owner APKs: 0.1.20 (22) on the Flip 7, superseded by 23, and 0.1.21 (22) on the Fold 8. The last directly verified local Mac/iPad installations are **0.1.7 (8)**; TestFlight distribution status is recorded separately in [TESTFLIGHT.md](TESTFLIGHT.md). A physical Apple TestFlight installation has not been verified. Repeat this checklist on each distribution-signed candidate and record its exact version.
 
 Start with the Samsung Galaxy Z Fold 8, then repeat the camera, import, sharing, and accessibility checks on a physical iPad and a supported Mac. Current automated checks are described in [development status](DEVELOPMENT.md). The Samsung was installed with build 0.1.4 (5) and supplied the first real-photo regression. This checklist separates further hardware checks from automated evidence.
+
+## Verified Fold 8 update to 0.1.22 (24) — November 14, 2026
+
+Updated the attached Galaxy Z Fold 8 (SM-F971U1, Android 17) in place from
+**0.1.21 (22)** to **0.1.22 (24)** with the normal `lib/main.dart` owner debug APK
+built from source **04f834a**: the November 14 recognition fixes, the retake
+prompt and the native/pixel conflict fix, all on `main`, with analysis and all
+339 Flutter tests passing. The new and installed signing certificates match. The
+APK SHA-256 is `8f6fc174913e230ffcd3a6b6f5a154f7ce8a72f1ce7daa115a6787b60cae4489`.
+
+Before installing, the app was stopped and its complete private data copied off
+the phone. All **12 persistent app-data files** have identical hashes before and
+after `adb install -r`; the original October 24 install time is unchanged. After
+a cold launch (1.0 s) the same process stayed alive for 15 seconds with no fatal
+or unhandled Flutter error, and no crash or ANR exit was recorded. The journal
+passes SQLite integrity checks and its complete logical dump is unchanged,
+preserving **3 alleys, 3 balls, 9 sessions and 27 games**. No uninstall, data
+clearing, score-photo import, share or TestFlight upload was performed; the
+retake prompt was not exercised on the phone. Evidence and the data copy are
+under ignored `build/owner-updates/0.1.22/fold8/`.
 
 ## Verified Fold 8 update — November 14, 2026
 

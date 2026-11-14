@@ -1,5 +1,10 @@
 # TallyBowl! development status
 
+November 14 Android owner build **0.1.22 (24)** is installed on the Fold 8 in
+place over 0.1.21 (22), with all 12 app-data files and the full journal (27 games,
+9 sessions, 3 balls) verified unchanged and a clean startup. It carries every
+November 14 change on `main`. See [device evidence](DEVICE_TESTING.md).
+
 November 14 follow-up: a dismissible [retake prompt](PHOTO_QUALITY.md) explains
 calibrated photo problems when nothing imports automatically. Seven new public
 r/Bowling monitor photos exposed a pre-existing ML Kit wrong automatic import
