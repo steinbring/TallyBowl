@@ -1,5 +1,10 @@
 # TallyBowl! development status
 
+November 13: [public store packets and launch gates](LAUNCH-READINESS.md)
+prepared; [Flip 7 updated to Android owner build 22](NOV13_FLIP7_BUILD22.md).
+Analysis and 303 tests passed again. Apple beta remains build 21; no new
+TallyBowl TestFlight upload was requested or performed.
+
 November 10 release **0.1.20 (21)**: optional **Cover material** and
 **Cover type** fields are editable in the ball form and shown in My Bag. The
 71-entry offline specification table covers all 63 retained Brunswick/Radical
@@ -19,7 +24,7 @@ The Fold 8 was subsequently updated in place to the normal Android owner build
 **0.1.20 (21)** on November 10. Signing, permissions and all 12 persistent
 app-data files are preserved; startup succeeds and the journal remains
 identical, with 24 games across 8 sessions plus profile and draft settings.
-The Flip 7 remains on build 19. See [device evidence](DEVICE_TESTING.md).
+The Flip 7 at that checkpoint retained build 19; the November 13 update is recorded above. See [device evidence](DEVICE_TESTING.md).
 
 Included in build 21: ball labels now include model and weight,
 with an optional nickname kept separate from the catalog model. Matching labels
