@@ -68,9 +68,8 @@ abstract final class FrameGlyphReader {
           .buffer
           .asUint8List();
       final output = <RecognizedLine>[];
-      List<RecognizedLine> wordsFor(List<RecognizedLine> source) => recovery
-          ? recoveryNameWords(_distinctWords(source), profile)
-          : _distinctWords(source);
+      List<RecognizedLine> wordsFor(List<RecognizedLine> source) =>
+          nameAnchorWords(_distinctWords(source), profile);
       final wordReadings = sources.map(wordsFor).toList();
       final aliases = [profile.name, ...profile.aliases].map(_name).toSet();
       final imageWidth = image.width, imageHeight = image.height;
@@ -84,6 +83,7 @@ abstract final class FrameGlyphReader {
                       !aliases.contains(_name(word.text)) &&
                       !(extendDeliveryBand &&
                           scoreAttachedAlias(word.text, aliases)) &&
+                      !_partOfName(word, table.name) &&
                       (word.centerX - table.name.centerX).abs() <
                           table.name.width * .5 &&
                       (word.centerY - table.name.centerY).abs() <
@@ -382,6 +382,25 @@ abstract final class FrameGlyphReader {
     }
   }
 
+  /// A word of a joined name anchor ("JOE" in "JOE S"), or the native word
+  /// that glued the alias to following score marks, is the anchor itself and
+  /// cannot be a conflicting bowler name at that position.
+  static bool _partOfName(RecognizedLine word, RecognizedLine name) {
+    final text = _name(word.text), anchor = _name(name.text);
+    if (text == anchor ||
+        word.x < name.x - name.height * .5 ||
+        (word.centerY - name.centerY).abs() > name.height * .5) {
+      return false;
+    }
+    if (word.x + word.width <= name.x + name.width + name.height * .5 &&
+        anchor.contains(text)) {
+      return true;
+    }
+    return (word.x - name.x).abs() < name.height * .5 &&
+        text.startsWith(anchor) &&
+        RegExp(r'^[0-9X]+$').hasMatch(text.substring(anchor.length));
+  }
+
   /// Last bounded native retry when text alone cannot locate delivery cells.
   static Future<List<RecognitionRegion>> regions(
     Uint8List bytes,
@@ -505,9 +524,7 @@ abstract final class FrameGlyphReader {
     bool compact = false,
     List<RecognizedLine> headerSupport = const [],
   }) {
-    final words = recovery
-        ? recoveryNameWords(_distinctWords(lines), profile)
-        : _distinctWords(lines);
+    final words = nameAnchorWords(_distinctWords(lines), profile);
     final aliases = [
       profile.name,
       ...profile.aliases,

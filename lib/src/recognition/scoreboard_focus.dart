@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import '../domain/models.dart';
 import 'recognized_text.dart';
+import 'recovery_layout.dart';
 import 'scoreboard_grid.dart';
 import 'scoreboard_name.dart';
 
@@ -20,9 +21,10 @@ abstract final class ScoreboardFocus {
     final candidates = <(RecognizedLine, RecognitionRegion, int)>[];
     for (final lines in readings) {
       final words = lines.expand(ScoreboardGrid.words).toList();
-      for (final name in words.where(
-        (w) => aliases.contains(normalized(w.text)) && w.height > 0,
-      )) {
+      for (final name in nameAnchorWords(
+        words,
+        profile,
+      ).where((w) => aliases.contains(normalized(w.text)) && w.height > 0)) {
         final numbers = words.where((w) {
           final n = int.tryParse(w.text);
           return n != null &&

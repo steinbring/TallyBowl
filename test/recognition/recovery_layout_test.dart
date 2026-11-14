@@ -225,16 +225,13 @@ void main() {
     final first = word('Sunny', .01, .25, .09);
     final last = word('Delight', .01, .295, .1);
     const profile = BowlerProfile(name: 'Sunny Delight');
+    expect(nameAnchorWords([first, last], profile).last.text, 'Sunny Delight');
     expect(
-      recoveryNameWords([first, last], profile).last.text,
-      'Sunny Delight',
-    );
-    expect(
-      recoveryNameWords([first, word('Different', .01, .295, .1)], profile),
+      nameAnchorWords([first, word('Different', .01, .295, .1)], profile),
       hasLength(2),
     );
     expect(
-      recoveryNameWords([first, word('Delight', .01, .5, .1)], profile),
+      nameAnchorWords([first, word('Delight', .01, .5, .1)], profile),
       hasLength(2),
     );
   });

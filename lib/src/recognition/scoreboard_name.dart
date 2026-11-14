@@ -31,10 +31,45 @@ String normalizedBowlerName(String text) {
   return text
       .toUpperCase()
       .split('')
-      .map((c) => lookalikes[c] ?? c)
+      .map((c) => lookalikes[c] ?? _latinFolds[c] ?? c)
       .join()
       .replaceAll(RegExp(r'[^A-Z0-9]'), '');
 }
+
+/// Saved names may carry accents that a scoreboard or OCR omits ("José" and
+/// "JOSE"). Fold them to their base letters instead of deleting the letter.
+final Map<String, String> _latinFolds = () {
+  const groups = {
+    'A': 'ÀÁÂÃÄÅĀĂĄǍ',
+    'C': 'ÇĆĈĊČ',
+    'D': 'ĎĐÐ',
+    'E': 'ÈÉÊËĒĔĖĘĚ',
+    'G': 'ĜĞĠĢ',
+    'H': 'ĤĦ',
+    'I': 'ÌÍÎÏĨĪĬĮİǏ',
+    'J': 'Ĵ',
+    'K': 'Ķ',
+    'L': 'ĹĻĽĿŁ',
+    'N': 'ÑŃŅŇ',
+    'O': 'ÒÓÔÕÖØŌŎŐǑ',
+    'R': 'ŔŖŘ',
+    'S': 'ŚŜŞŠȘ',
+    'T': 'ŢŤŦȚ',
+    'U': 'ÙÚÛÜŨŪŬŮŰŲǓ',
+    'W': 'Ŵ',
+    'Y': 'ÝŶŸ',
+    'Z': 'ŹŻŽ',
+  };
+  return {
+    for (final entry in groups.entries)
+      for (final c in entry.value.split('')) c: entry.key,
+    'Æ': 'AE',
+    'Œ': 'OE',
+    'Þ': 'TH',
+    'ß': 'SS',
+    'ẞ': 'SS',
+  };
+}();
 
 /// Keep multi-letter names (including F/X) separate from scoring metadata.
 bool isBowlerNameCandidate(String text) {

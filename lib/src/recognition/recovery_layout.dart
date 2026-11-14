@@ -322,9 +322,12 @@ class RecoveryScoreBand {
   }
 }
 
-/// Join only observed adjacent name words that exactly spell a saved alias.
-/// This never changes delivery text or guesses a missing letter.
-List<RecognizedLine> recoveryNameWords(
+/// Name anchors built only from observed words: a single word, two or three
+/// horizontally adjacent words (or a two-line pair) whose letters exactly
+/// spell a saved alias such as "JOE S", or an alias a native engine joined to
+/// following score marks across a measured gap between its character boxes.
+/// Delivery text is never changed and no missing letter is guessed.
+List<RecognizedLine> nameAnchorWords(
   List<RecognizedLine> words,
   BowlerProfile profile,
 ) {
@@ -333,46 +336,93 @@ List<RecognizedLine> recoveryNameWords(
     ...profile.aliases,
   ].map(normalizedBowlerName).where((n) => n.isNotEmpty).toSet();
   final output = [...words];
+  void add(List<RecognizedLine> parts, {List<RecognizedLine>? symbols}) {
+    final text = parts.map((p) => p.text).join(symbols == null ? ' ' : '');
+    final left = parts.map((p) => p.x).reduce(math.min);
+    final top = parts.map((p) => p.y).reduce(math.min);
+    if (output.any(
+      (w) =>
+          normalizedBowlerName(w.text) == normalizedBowlerName(text) &&
+          (w.x - left).abs() < .001 &&
+          (w.y - top).abs() < .001,
+    )) {
+      return;
+    }
+    output.add(
+      RecognizedLine(
+        text: text,
+        x: left,
+        y: top,
+        width: parts.map((p) => p.x + p.width).reduce(math.max) - left,
+        height: parts.map((p) => p.y + p.height).reduce(math.max) - top,
+        elements: symbols ?? const [],
+      ),
+    );
+  }
+
+  bool spells(List<RecognizedLine> parts) => aliases.contains(
+    normalizedBowlerName(parts.map((p) => p.text).join(' ')),
+  );
+  bool beside(RecognizedLine a, RecognizedLine b) =>
+      (a.centerY - b.centerY).abs() < math.min(a.height, b.height) * .5 &&
+      b.x >= a.x + a.width * .8 &&
+      b.x - a.x - a.width < math.max(a.height, b.height);
+  bool below(RecognizedLine a, RecognizedLine b) =>
+      (a.x - b.x).abs() < math.max(a.width, b.width) * .3 &&
+      b.y >= a.y + a.height * .7 &&
+      b.y - a.y - a.height < math.max(a.height, b.height) * .7;
   final text = words
-      .where((w) => RegExp(r'^[\p{L} ]+$', unicode: true).hasMatch(w.text))
+      .where(
+        (w) =>
+            RegExp(r"^[\p{L} .'’\-]+$", unicode: true).hasMatch(w.text) &&
+            RegExp(r'\p{L}', unicode: true).hasMatch(w.text),
+      )
       .toList();
   for (final a in text) {
     for (final b in text) {
       if (identical(a, b)) continue;
-      final vertical =
-          (a.x - b.x).abs() < math.max(a.width, b.width) * .3 &&
-          b.y >= a.y + a.height * .7 &&
-          b.y - a.y - a.height < math.max(a.height, b.height) * .7;
-      final horizontal =
-          (a.centerY - b.centerY).abs() < math.min(a.height, b.height) * .5 &&
-          b.x >= a.x + a.width * .8 &&
-          b.x - a.x - a.width < math.max(a.height, b.height);
-      if ((!vertical && !horizontal) ||
-          !aliases.contains(normalizedBowlerName('${a.text} ${b.text}'))) {
-        continue;
+      if ((below(a, b) || beside(a, b)) && spells([a, b])) add([a, b]);
+      if (!beside(a, b)) continue;
+      for (final c in text) {
+        if (identical(c, a) || identical(c, b)) continue;
+        if (beside(b, c) && spells([a, b, c])) add([a, b, c]);
       }
-      final left = math.min(a.x, b.x), top = math.min(a.y, b.y);
-      if (output.any(
-        (w) =>
-            normalizedBowlerName(w.text) ==
-                normalizedBowlerName('${a.text} ${b.text}') &&
-            (w.x - left).abs() < .001 &&
-            (w.y - top).abs() < .001,
-      )) {
-        continue;
-      }
-      output.add(
-        RecognizedLine(
-          text: '${a.text} ${b.text}',
-          x: left,
-          y: top,
-          width: math.max(a.x + a.width, b.x + b.width) - left,
-          height: math.max(a.y + a.height, b.y + b.height) - top,
-        ),
-      );
     }
   }
+  for (final word in words) {
+    final symbols = aliasBeforeMarks(word, aliases);
+    if (symbols != null) add(symbols, symbols: symbols);
+  }
   return output;
+}
+
+/// ML Kit can return a name and the first frame's marks as one word, such as
+/// "AX" for alias "A" and a strike. Separate the alias only from real native
+/// character boxes: every following character must be a score mark, and the
+/// boundary must be a visible gap of at least .3 of the median character
+/// height. Synthesized boxes, letters and fuzzy spellings never qualify.
+List<RecognizedLine>? aliasBeforeMarks(
+  RecognizedLine word,
+  Set<String> aliases,
+) {
+  final symbols = word.elements;
+  if (symbols.length < 2 || symbols.any((s) => s.text.length != 1)) {
+    return null;
+  }
+  final mark = RegExp(r'^[0-9XF/\-]$', caseSensitive: false);
+  final heights = symbols.map((s) => s.height).toList()..sort();
+  final median = heights[heights.length ~/ 2];
+  var spelled = '';
+  for (var i = 0; i + 1 < symbols.length; i++) {
+    spelled += normalizedBowlerName(symbols[i].text);
+    if (!aliases.contains(spelled) ||
+        !symbols.skip(i + 1).every((s) => mark.hasMatch(s.text)) ||
+        symbols[i + 1].x - symbols[i].x - symbols[i].width < median * .3) {
+      continue;
+    }
+    return symbols.take(i + 1).toList();
+  }
+  return null;
 }
 
 /// Recover merged numbered headers only from actual native character boxes.
