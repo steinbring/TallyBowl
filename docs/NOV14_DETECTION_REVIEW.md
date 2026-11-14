@@ -45,10 +45,18 @@ negative rows unselected, zero incorrect automatic candidates.
 - **Second-ball marks in Vision cell crops.** On the October 20 league photo,
   Vision read only the first delivery in most single-cell crops (`5` for `5-`,
   `8` for `8/`). The glyph fallback recovers every other frame, but frame 8's `3`
-  ranks .71 against `8` at .66, under the .06 lead. A hole-count tie-break
-  could separate 3 from 8, but a broken 8 could then read as 3 in a spare
-  frame where totals cannot tell them apart. Evaluate it with the held-out
-  glyph gate before considering it.
+  ranks .71 against `8` at .66, under the .06 lead, so the row stays in review.
+- **3-vs-8 tie-break (tried, not shipped).** Three near-tie rules were measured
+  with the production classifier on 48,816 synthetic cells: 36 local typefaces,
+  all 12 score characters, five glyph heights, blur, stroke weight, slant,
+  hairline cuts and erased patches. Counting closed loops recovered 158
+  rejected glyphs but newly accepted 37 wrong ones, mostly an 8 whose left waist
+  was erased (25 read as 3); closing larger gaps made it worse by filling real
+  counters. Requiring the runner-up's distinguishing pixels to be empty gained
+  only 2 glyphs at a safe limit, and combining both still added one wrong glyph
+  for 5 gains. An `8/` read as `3/` after an open frame keeps every checkpoint
+  and the total, so score validation cannot catch it. The zero-wrong-glyph rule
+  stands; this photo needs native OCR of the 3 or manual review.
 - **ML Kit cell merges.** ML Kit can merge a checkpoint and total into one
   token (`2935134`), leaving no observed total; Vision separates them.
 - **Non-Latin names.** Vision is limited to `en-US` and ML Kit uses only its
