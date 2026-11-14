@@ -24,7 +24,7 @@ class RecognizedLine {
   double get centerX => x + width / 2;
   double get centerY => y + height / 2;
   factory RecognizedLine.fromJson(Map<dynamic, dynamic> j) => RecognizedLine(
-    text: j['text'] as String,
+    text: normalizeScoreLookalikes(j['text'] as String),
     x: (j['x'] as num).toDouble(),
     y: (j['y'] as num).toDouble(),
     width: (j['width'] as num).toDouble(),
@@ -37,6 +37,27 @@ class RecognizedLine {
     ],
   );
 }
+
+/// Apple Vision's multilingual decoder can label a photographed 3 or X with a
+/// Cyrillic/Greek code point (`З`, `Х`, `Χ`) even with English requested.
+/// ML Kit's Latin model does not. Only a whole token made of score characters
+/// plus these lookalikes is converted, so the same ink reads the same on both
+/// engines. Names and words containing any other letter are left unchanged.
+String normalizeScoreLookalikes(String text) {
+  if (!_lookalike.hasMatch(text)) return text;
+  return text.replaceAllMapped(RegExp(r'\S+'), (match) {
+    final token = match.group(0)!;
+    if (!_lookalike.hasMatch(token) || !_scoreToken.hasMatch(token)) {
+      return token;
+    }
+    return token
+        .replaceAll(RegExp('[ХхΧχ]'), 'X')
+        .replaceAll(RegExp('[Зз]'), '3');
+  });
+}
+
+final _lookalike = RegExp('[ХхΧχЗз]');
+final _scoreToken = RegExp('^[0-9XF/\\-×–—ХхΧχЗз]+\$');
 
 class ScoreRow {
   const ScoreRow({
