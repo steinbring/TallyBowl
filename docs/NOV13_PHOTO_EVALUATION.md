@@ -114,5 +114,8 @@ response by case/call number alone.
 Measurements execute production PhotoService, reader, parser and scorer using
 macOS Vision with the shared iPad/Mac helper, and bundled ML Kit on a disposable
 Android emulator. They do not replace physical iPadOS or Samsung camera/gallery
-acceptance. No new TestFlight release or device installation is part of this
-source correction. The installed/distributed release remains build 21.
+acceptance. The photo evaluation itself did not include a new TestFlight release
+or device installation. The subsequent November 14 owner update installed
+**0.1.21 (22)** on the Fold 8 and verified startup/data preservation; see
+[device evidence](DEVICE_TESTING.md). It did not repeat physical-photo recognition
+or upload a new TestFlight build.

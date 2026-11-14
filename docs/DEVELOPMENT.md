@@ -1,5 +1,14 @@
 # TallyBowl! development status
 
+November 14 Android owner build **0.1.21 (22)** is installed and launched on the
+attached Fold 8. It includes the recognition correction below, uses the same
+installed development signer and permissions, and preserves all 12 app-data
+files during installation. Post-launch integrity and complete logical-journal
+comparisons preserve **27 games, 9 sessions, 3 balls**, profile and draft settings.
+The installed APK and running kernel match the verified normal-entry-point
+artifact; the Tonight screen was visually checked. This step makes no TestFlight
+upload or physical recognition-accuracy claim. See [device evidence](DEVICE_TESTING.md).
+
 November 14 source correction for the November 10/13 photos: both native
 engines now recover all ten frames and scratch totals in **8/8 finished views**,
 covering **6/6 unique games**. The six-frame view remains in Review. The final
