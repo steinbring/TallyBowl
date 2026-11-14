@@ -1,12 +1,26 @@
 # Device testing and owner installations
 
-Latest Flip 7 update: **0.1.20 (23)** installed in place on November 13,
-2026, with startup/Settings checks and database integrity/count retention.
-See [final build 23 evidence](NOV13_FLIP7_BUILD23.md) for scope and limitations.
+Latest Flip 7 update: **0.1.22 (24)** installed in place on November 14,
+2026; see the section below. The earlier [final build 23 evidence](NOV13_FLIP7_BUILD23.md)
+remains for that build.
 
-The Samsung Galaxy Z Fold 8 (SM-F971U1) has owner build **0.1.22 (24)**; the Galaxy Z Flip 7 (SM-F766U) has **0.1.20 (23)**. Build 22 was used for two different owner APKs: 0.1.20 (22) on the Flip 7, superseded by 23, and 0.1.21 (22) on the Fold 8. The last directly verified local Mac/iPad installations are **0.1.7 (8)**; TestFlight distribution status is recorded separately in [TESTFLIGHT.md](TESTFLIGHT.md). A physical Apple TestFlight installation has not been verified. Repeat this checklist on each distribution-signed candidate and record its exact version.
+The Samsung Galaxy Z Fold 8 (SM-F971U1) has owner build **0.1.22 (24)**; the Galaxy Z Flip 7 (SM-F766U) has **0.1.22 (24)**. Build 22 was used for two different owner APKs: 0.1.20 (22) on the Flip 7, superseded by 23, and 0.1.21 (22) on the Fold 8. The last directly verified local Mac/iPad installations are **0.1.7 (8)**; TestFlight distribution status is recorded separately in [TESTFLIGHT.md](TESTFLIGHT.md). A physical Apple TestFlight installation has not been verified. Repeat this checklist on each distribution-signed candidate and record its exact version.
 
 Start with the Samsung Galaxy Z Fold 8, then repeat the camera, import, sharing, and accessibility checks on a physical iPad and a supported Mac. Current automated checks are described in [development status](DEVELOPMENT.md). The Samsung was installed with build 0.1.4 (5) and supplied the first real-photo regression. This checklist separates further hardware checks from automated evidence.
+
+## Verified Flip 7 update to 0.1.22 (24) — November 14, 2026
+
+Updated the attached Galaxy Z Flip 7 (SM-F766U, Android 17) in place from
+**0.1.20 (23)** to **0.1.22 (24)** with the same owner debug APK installed on the
+Fold 8 (SHA-256 re-verified before installing; signing certificate matches the
+installed build). The app was stopped and its private data copied off first. All
+**8 persistent app-data files** are identical before and after `adb install -r`,
+and the original November 6 install time is unchanged. This phone's journal is
+empty (no alleys, balls, sessions or games); it passes SQLite integrity checks
+and its logical dump is unchanged after startup. A cold launch (1.0 s) stayed
+alive for 15 seconds with no fatal or unhandled Flutter error and no crash or ANR
+exit. No uninstall, data clearing, score-photo import or share was performed.
+Evidence is under ignored `build/owner-updates/0.1.22/flip7/`.
 
 ## Verified Fold 8 update to 0.1.22 (24) — November 14, 2026
 
