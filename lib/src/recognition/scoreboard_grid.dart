@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import '../domain/models.dart';
 import '../domain/scoring.dart';
 import 'recognized_text.dart';
+import 'recovery_layout.dart';
 import 'scoreboard_name.dart';
 
 /// Associates the delivery band with the bowler's cumulative-score band.
@@ -32,6 +33,13 @@ abstract final class ScoreboardGrid {
     List<(ScoreRow, List<RecognitionRegion>)>? proposals,
   ) {
     final words = [for (final line in lines) ..._words(line)];
+    final aliases = [
+      profile.name,
+      ...profile.aliases,
+    ].map(_name).where((v) => v.isNotEmpty).toSet();
+    // Joined/split alias anchors add name candidates only; marks and
+    // cumulative numbers are still read from the original native words.
+    final nameSource = nameAnchorWords(words, profile);
     final numbers = words.where((w) => _number(w.text) != null).toList();
     final bands = <List<RecognizedLine>>[];
     for (final word
@@ -81,7 +89,7 @@ abstract final class ScoreboardGrid {
         final heights = cells.map((c) => c.height).toList()..sort();
         final height = heights[5];
         final left = right - pitch * .86;
-        final names = words
+        final names = nameSource
             .where(
               (w) =>
                   w.x + w.width < left &&
@@ -105,7 +113,10 @@ abstract final class ScoreboardGrid {
                 )
                 .toList()
               ..sort((a, b) => a.x.compareTo(b.x));
-        final name = nameWords.map((w) => w.text).join(' ');
+        final aliasWord = nameWords
+            .where((w) => aliases.contains(_name(w.text)))
+            .firstOrNull;
+        final name = aliasWord?.text ?? nameWords.map((w) => w.text).join(' ');
         final frames = List.filled(10, '');
         final markWords = words;
         for (var i = 0; i < 10; i++) {
@@ -140,15 +151,13 @@ abstract final class ScoreboardGrid {
           final parsed = TenPinScorer.parseFrame(marks, tenth: i == 9);
           frames[i] = parsed.error == null ? parsed.notation : '';
         }
-        final aliases = [
-          profile.name,
-          ...profile.aliases,
-        ].map(_name).where((v) => v.isNotEmpty);
-        final suggested = aliases.any(
-          (a) =>
-              _name(name) == a ||
-              name.split(RegExp(r'\s+')).map(_name).contains(a),
-        );
+        final suggested =
+            aliasWord != null ||
+            aliases.any(
+              (a) =>
+                  _name(name) == a ||
+                  name.split(RegExp(r'\s+')).map(_name).contains(a),
+            );
         final extraTotal = band
             .skip(start + 10)
             .where((w) => w.x > cells.last.x + cells.last.width)

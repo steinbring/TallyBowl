@@ -77,14 +77,23 @@ abstract final class ScoreSheetParser {
       final hasName = text.split(RegExp(r'\s+')).any(isBowlerNameCandidate);
       if (!hasName && extraction.$1 == null) continue;
       final words = text.split(RegExp(r'\s+')).map(_normalized).toList();
+      // A scoreboard name such as "JOE S" is read as separate words, often
+      // after a lane or position number. Only consecutive words that exactly
+      // spell a saved alias match; no letter is guessed or substituted.
+      final joined = <String>{
+        for (var start = 0; start < words.length; start++)
+          for (var end = start + 2; end <= start + 3; end++)
+            if (end <= words.length) words.sublist(start, end).join(),
+      };
       final suggested = aliases.any(
         (alias) =>
             words.contains(alias) ||
             (alias.length > 2 &&
-                List.generate(
-                  words.length,
-                  (i) => words.take(i + 1).join(),
-                ).contains(alias)),
+                (joined.contains(alias) ||
+                    List.generate(
+                      words.length,
+                      (i) => words.take(i + 1).join(),
+                    ).contains(alias))),
       );
       result.add(
         ScoreRow(
