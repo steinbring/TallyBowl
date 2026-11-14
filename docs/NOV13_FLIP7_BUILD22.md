@@ -1,5 +1,7 @@
 # Galaxy Z Flip 7 owner build 22 — November 13, 2026
 
+Superseded later the same day by [final build 23](NOV13_FLIP7_BUILD23.md), which preserves the privacy-policy changes from main.
+
 Updated the connected **SM-F766U** from **0.1.18 (19)** to **0.1.20 (22)**
 in place, without uninstalling or clearing data. Build 22 uses latest application
 source `f13bfbb` (the same runtime changes as Apple build 21) plus launch-packet

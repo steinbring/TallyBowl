@@ -1,7 +1,7 @@
 {
-  "source": "f13bfbb042fdc1e3983b0347920b358d328a521c",
+  "source": "b637a73478d13ca8825021616f15b27441fc8e28",
   "version": "1.0.0",
-  "build": 22,
+  "build": 23,
   "packageId": "app.jws.tallybowl",
   "checks": {
     "releaseBuilds": "passed",
@@ -16,26 +16,26 @@
   },
   "artifacts": [
     {
-      "sha256": "28e78bd631cf592b7273b522ce1c1641008af484e61e4696a5c3219faa15d4d2",
-      "bytes": 71983567,
+      "sha256": "103a05654c4a1a74a655c3f15d6dd7c34444ba6b200e3b5113657c835eb5c397",
+      "bytes": 71983878,
       "signingPurpose": "upload",
       "certificateSha256": "e4d0ffff3e3cce3c6b4ac559c88eed5293b8e766eebd026a25f83aac37a5ad5f",
       "nativeAlignment": {
         "librariesChecked": 8,
         "incompatible16kSegments": []
       },
-      "fileName": "tallybowl-1.0.0-22-play-upload.aab"
+      "fileName": "tallybowl-1.0.0-23-play-upload.aab"
     },
     {
-      "sha256": "9fbd9618bf7143283a17f5989c629b90b3ee3f11f64cf14ab1396a39fc61034f",
-      "bytes": 70207318,
+      "sha256": "1f74eba894f5b5fea1c4a1d23834279c126aff149e4026b48b74d573776642f0",
+      "bytes": 70207630,
       "signingPurpose": "app-signing",
       "certificateSha256": "8ab5c3fb3c1d700634e7148a71abc34007bd9f25d84fcc113ecd123ecd4f9790",
       "nativeAlignment": {
         "librariesChecked": 6,
         "incompatible16kSegments": []
       },
-      "fileName": "tallybowl-1.0.0-22-galaxy.apk"
+      "fileName": "tallybowl-1.0.0-23-galaxy.apk"
     }
   ],
   "storeUploadPerformed": false,

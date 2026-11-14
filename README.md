@@ -2,7 +2,7 @@
 
 **How you bowled, tonight.** A Flutter bowling journal for native macOS, iPadOS, and Android. Website: [tallybowl.jws.app](https://tallybowl.jws.app).
 
-The latest application source is **0.1.20**, with Apple beta **build 21** and the Flip 7 Android owner **build 22**, developed and published by **Joe Steinbring**. [Contact Joe for support](https://jws.dev/contact). Public launch preparation targets March 1, 2027; account, signing-recovery, privacy and final-review gates remain open. See [launch readiness](docs/LAUNCH-READINESS.md) and the [TestFlight runbook](docs/TESTFLIGHT.md). Recognition remains an aid to review: unfamiliar scoreboards can require manual correction. See [measured results](docs/ONLINE_PHOTO_EVALUATION.md).
+The latest application source is **0.1.20**, with Apple beta **build 21** and the Flip 7 Android owner **build 23**, developed and published by **Joe Steinbring**. [Contact Joe for support](https://jws.dev/contact). Public launch preparation targets March 1, 2027; account, signing-recovery, privacy and final-review gates remain open. See [launch readiness](docs/LAUNCH-READINESS.md) and the [TestFlight runbook](docs/TESTFLIGHT.md). Recognition remains an aid to review: unfamiliar scoreboards can require manual correction. See [measured results](docs/ONLINE_PHOTO_EVALUATION.md).
 
 ## What works
 

@@ -1,7 +1,7 @@
 # TallyBowl! development status
 
 November 13: [public store packets and launch gates](LAUNCH-READINESS.md)
-prepared; [Flip 7 updated to Android owner build 22](NOV13_FLIP7_BUILD22.md).
+prepared; [Flip 7 updated to final Android owner build 23](NOV13_FLIP7_BUILD23.md).
 Analysis and 303 tests passed again. Apple beta remains build 21; no new
 TallyBowl TestFlight upload was requested or performed.
 
