@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../app_controller.dart';
 import '../domain/models.dart';
+import '../recognition/photo_quality.dart';
 import '../recognition/photo_service.dart';
 import '../recognition/score_parser.dart';
 import '../ui/common.dart';
@@ -77,6 +78,37 @@ Future<void> importScorePhoto(
   String? recoveredPath,
   bool resumePendingReview = false,
 }) async {
+  // A dismissible quality prompt can ask for another photo. The previous
+  // photo and its pending review are discarded before the new one is chosen.
+  bool? retake = await _importScorePhotoOnce(
+    context,
+    controller,
+    session,
+    camera: camera,
+    recoveredPath: recoveredPath,
+    resumePendingReview: resumePendingReview,
+  );
+  while (retake != null) {
+    if (!context.mounted) return;
+    retake = await _importScorePhotoOnce(
+      context,
+      controller,
+      session,
+      camera: retake,
+    );
+  }
+}
+
+/// Returns whether to take another photo with the camera (true) or the
+/// library (false), or null when this import is finished.
+Future<bool?> _importScorePhotoOnce(
+  BuildContext context,
+  BowlController controller,
+  BowlingSession session, {
+  bool camera = false,
+  String? recoveredPath,
+  bool resumePendingReview = false,
+}) async {
   final draft = controller.data.draft;
   final resuming =
       resumePendingReview &&
@@ -89,7 +121,7 @@ Future<void> importScorePhoto(
       context,
       'Save or discard your unfinished game before importing another photo.',
     );
-    return;
+    return null;
   }
   String? path;
   try {
@@ -99,7 +131,7 @@ Future<void> importScorePhoto(
       );
       try {
         path = recoveredPath ?? await PhotoService.pick(camera: camera);
-        if (path == null || !context.mounted) return;
+        if (path == null || !context.mounted) return null;
         // Attach before releasing acquisition so finish/restore cannot race the
         // transition from an external picker to a persisted review draft.
         await controller.beginPhotoReview(session.id, path);
@@ -109,7 +141,7 @@ Future<void> importScorePhoto(
     } else {
       path = recoveredPath;
     }
-    if (!context.mounted) return;
+    if (!context.mounted) return null;
     final selection = await Navigator.of(context).push<PhotoSelection>(
       MaterialPageRoute(
         builder: (_) => PhotoReviewPage(
@@ -120,14 +152,14 @@ Future<void> importScorePhoto(
       ),
     );
     if (!context.mounted) {
-      return; // Keep the pending review for the next launch.
+      return null; // Keep the pending review for the next launch.
     }
-    if (selection == null) {
+    if (selection == null || selection.retakeWithCamera != null) {
       if (controller.data.draft?['sourcePath'] == path &&
           controller.data.draft?['pendingPhotoReview'] == true) {
         await controller.discardDraft();
       }
-      return;
+      return selection?.retakeWithCamera;
     }
     if (context.mounted) {
       final row = selection.row;
@@ -139,7 +171,7 @@ Future<void> importScorePhoto(
         'displayedTotal': row?.displayedTotal,
         'sourceCumulative': row?.cumulativeTotals,
       });
-      if (!context.mounted) return;
+      if (!context.mounted) return null;
       await Navigator.of(context).push<void>(
         MaterialPageRoute(
           builder: (_) => GameEditor(
@@ -165,6 +197,7 @@ Future<void> importScorePhoto(
       }
     }
   }
+  return null;
 }
 
 class PhotoCaptureActions extends StatefulWidget {
@@ -218,8 +251,14 @@ class _PhotoCaptureActionsState extends State<PhotoCaptureActions> {
 }
 
 class PhotoSelection {
-  const PhotoSelection(this.row);
+  const PhotoSelection(this.row) : retakeWithCamera = null;
+
+  /// Discard this photo and choose another, from the camera or the library.
+  const PhotoSelection.retake({required bool camera})
+    : row = null,
+      retakeWithCamera = camera;
   final ScoreRow? row;
+  final bool? retakeWithCamera;
 }
 
 class PhotoReviewPage extends StatefulWidget {
@@ -237,37 +276,54 @@ class PhotoReviewPage extends StatefulWidget {
 }
 
 class _PhotoReviewPageState extends State<PhotoReviewPage> {
-  late Future<List<ScoreRow>> _rows;
+  late Future<(List<ScoreRow>, PhotoQualityReport?)> _rows;
   ScoreRow? _selected;
   bool _leaving = false;
+  bool _qualityDismissed = false;
   @override
   void initState() {
     super.initState();
-    _rows =
-        PhotoService.recognize(
-          widget.path,
-          profile: widget.controller.data.profile,
-        ).then((lines) {
-          final rows = ScoreSheetParser.rows(
-            lines,
-            widget.controller.data.profile,
-          );
-          final automatic = ScoreSheetParser.automaticRow(rows);
-          if (automatic != null) {
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              if (mounted && ModalRoute.of(context)?.isCurrent == true) {
-                _review(automatic);
-              }
-            });
+    final profile = widget.controller.data.profile;
+    _rows = PhotoService.recognize(widget.path, profile: profile).then((
+      lines,
+    ) async {
+      final rows = ScoreSheetParser.rows(lines, profile);
+      final automatic = ScoreSheetParser.automaticRow(rows);
+      if (automatic != null) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted && ModalRoute.of(context)?.isCurrent == true) {
+            _review(automatic);
           }
-          return rows;
         });
+        return (rows, null);
+      }
+      // Only a photo that cannot be imported automatically is assessed. The
+      // report explains likely causes; it never changes the recognized rows.
+      PhotoQualityReport? quality;
+      try {
+        quality = await PhotoService.assessQuality(
+          widget.path,
+          lines,
+          rows,
+          profile,
+        );
+      } catch (_) {
+        // Manual review stays available without a quality report.
+      }
+      return (rows, quality);
+    });
   }
 
   void _review(ScoreRow? row) {
     if (_leaving) return;
     _leaving = true;
     Navigator.pop(context, PhotoSelection(row));
+  }
+
+  void _retake({required bool camera}) {
+    if (_leaving) return;
+    _leaving = true;
+    Navigator.pop(context, PhotoSelection.retake(camera: camera));
   }
 
   @override
@@ -290,7 +346,7 @@ class _PhotoReviewPageState extends State<PhotoReviewPage> {
               ),
               ScorePhotoPreview(path: widget.path),
               const SizedBox(height: 24),
-              FutureBuilder<List<ScoreRow>>(
+              FutureBuilder<(List<ScoreRow>, PhotoQualityReport?)>(
                 future: _rows,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState != ConnectionState.done) {
@@ -318,10 +374,21 @@ class _PhotoReviewPageState extends State<PhotoReviewPage> {
                       ),
                     );
                   }
-                  final rows = snapshot.data!;
+                  final (rows, quality) = snapshot.data!;
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      if (quality != null &&
+                          quality.suggestsRetake &&
+                          !_qualityDismissed)
+                        RetakePrompt(
+                          issues: quality.issues,
+                          bowlerName: widget.controller.data.profile.name,
+                          onCamera: () => _retake(camera: true),
+                          onLibrary: () => _retake(camera: false),
+                          onDismiss: () =>
+                              setState(() => _qualityDismissed = true),
+                        ),
                       if (rows.isEmpty)
                         const Text(
                           'No clear bowler rows were found. You can still enter your frames with the photo open.',
@@ -393,4 +460,107 @@ class _PhotoReviewPageState extends State<PhotoReviewPage> {
       ),
     ),
   );
+}
+
+/// Explains why a photo that could not be imported may read better if
+/// retaken. Always dismissible: the photo, row choice and manual entry remain.
+class RetakePrompt extends StatelessWidget {
+  const RetakePrompt({
+    super.key,
+    required this.issues,
+    required this.bowlerName,
+    required this.onCamera,
+    required this.onLibrary,
+    required this.onDismiss,
+  });
+  final List<PhotoIssue> issues;
+  final String bowlerName;
+  final VoidCallback onCamera, onLibrary, onDismiss;
+
+  static String advice(PhotoIssue issue, String bowlerName) => switch (issue) {
+    PhotoIssue.noText => 'No scoreboard text was found. Fit the whole scoreboard in the frame, hold steady and tap it to focus.',
+    PhotoIssue.smallText => 'The scores are small in this photo. Move closer so the scoreboard fills the frame.',
+    PhotoIssue.blurry =>
+      'The photo looks blurry. Hold steady and tap the scoreboard to focus.',
+    PhotoIssue.underexposed => 'The scores look dim. Avoid bright lights behind the screen and let the camera adjust.',
+    PhotoIssue.nameMissing =>
+      bowlerName.trim().isEmpty
+          ? 'Your scoreboard name wasn’t found. Add it in Settings, then include your row.'
+          : 'Your name wasn’t found. Include your row, or add the exact name shown on the scoreboard in Settings.',
+  };
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: Card(
+        color: scheme.secondaryContainer,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(20, 12, 8, 16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Icon(
+                    Icons.photo_camera_back_outlined,
+                    color: scheme.onSecondaryContainer,
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      'Another photo may read better',
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: scheme.onSecondaryContainer,
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    tooltip: 'Dismiss',
+                    onPressed: onDismiss,
+                    icon: const Icon(Icons.close_rounded),
+                  ),
+                ],
+              ),
+              for (final issue in issues)
+                Padding(
+                  padding: const EdgeInsets.only(top: 6, right: 12),
+                  child: Text(
+                    '• ${advice(issue, bowlerName)}',
+                    style: TextStyle(
+                      color: scheme.onSecondaryContainer,
+                      height: 1.4,
+                    ),
+                  ),
+                ),
+              const SizedBox(height: 12),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  FilledButton.icon(
+                    onPressed: onCamera,
+                    icon: const Icon(Icons.photo_camera_outlined),
+                    label: const Text('Take another photo'),
+                  ),
+                  OutlinedButton.icon(
+                    onPressed: onLibrary,
+                    icon: const Icon(Icons.photo_library_outlined),
+                    label: const Text('Choose another'),
+                  ),
+                  TextButton(
+                    onPressed: onDismiss,
+                    child: const Text('Use this photo anyway'),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }
