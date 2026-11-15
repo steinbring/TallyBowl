@@ -55,6 +55,11 @@ Future<Uint8List> board(List<String> ink) async {
         canvas.drawRect(ui.Rect.fromLTWH(x + 3, top + 15, 12, 8), white);
         continue;
       }
+      if (mark == '#') {
+        // Digit-sized ink that matches no template.
+        canvas.drawRect(ui.Rect.fromLTWH(x, top, 19, 38), white);
+        continue;
+      }
       final glyph =
           variants.lastWhere((v) => v['text'] == mark)['mask'] as String;
       for (var y = 0; y < 32; y++) {
@@ -108,6 +113,69 @@ void main() {
   test('agreeing native marks leave the pixel reading unchanged', () async {
     final rows = await read(await board(frames), [...layout(), marks('8/', 0)]);
     expect(rows.single.frames, frames);
+  });
+
+  group('recovery (band) pass', () {
+    // The band fit needs three observed delivery words; these agree with ink.
+    List<RecognizedLine> agreeing() => [
+      ...layout(),
+      for (final i in [1, 2, 3]) marks(frames[i], i),
+    ];
+
+    test('reads the row when native marks agree', () async {
+      final rows = await read(await board(frames), agreeing(), recovery: true);
+      expect(rows.single.frames, frames);
+    });
+
+    test(
+      'F09-2: native cannot win over a complete, different pixel reading',
+      () async {
+        final rows = await read(await board(frames), [
+          ...agreeing(),
+          marks('3/', 0),
+        ], recovery: true);
+        expect(rows, isEmpty);
+      },
+    );
+
+    test(
+      'F09-3: a cell-crop character is never written as a delivery',
+      () async {
+        // '#' is ink no template can read. A secondary per-cell OCR crop says 3
+        // there; it must not become the delivery, even though 3/ fits the row.
+        final unreadable = ['#/', ...frames.skip(1)];
+        final crop = [box('3', .12, .235, .02, .065)];
+        expect(
+          await read(
+            await board(unreadable),
+            agreeing(),
+            supplemental: crop,
+            recovery: true,
+          ),
+          isEmpty,
+        );
+        // The same character observed by this pass itself is primary and fills
+        // ink the templates cannot read, as documented.
+        final rows = await read(await board(unreadable), [
+          ...agreeing(),
+          ...crop,
+        ], recovery: true);
+        expect(rows.single.frames, ['3/', ...frames.skip(1)]);
+      },
+    );
+
+    test(
+      'a cell-crop character can still blank a glyph it contradicts',
+      () async {
+        final rows = await read(
+          await board(frames),
+          agreeing(),
+          supplemental: [box('3', .12, .235, .02, .065)],
+          recovery: true,
+        );
+        expect(rows, isEmpty);
+      },
+    );
   });
 
   test(

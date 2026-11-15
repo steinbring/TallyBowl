@@ -1167,6 +1167,12 @@ abstract final class FrameGlyphReader {
             .replaceAll('–', '-')
             .replaceAll('—', '-');
         final conflict = _ReadingConflict();
+        List<RecognizedLine> single(List<RecognizedLine> input) => input
+            .where(
+              (w) =>
+                  RegExp(r'^[0-9XF/×]$', caseSensitive: false).hasMatch(w.text),
+            )
+            .toList();
         String readInk(Uint8List pixels) => _classify(
           pixels,
           w,
@@ -1176,24 +1182,25 @@ abstract final class FrameGlyphReader {
           deskew: deskew,
           maxGlyphWidth: .85,
           conflict: conflict,
-          observed: (l, t, r, b) => _inside(
-            (deskew ? words : supportingWords)
-                .where(
-                  (w) => RegExp(
-                    r'^[0-9XF/×]$',
-                    caseSensitive: false,
-                  ).hasMatch(w.text),
-                )
-                .toList(),
-            imageWidth,
-            imageHeight,
-            x,
-            y,
-            l,
-            t,
-            r,
-            b,
-          ),
+          // Only this pass's own words are primary and may fill a glyph the
+          // templates cannot read. Cell-crop and other passes' characters are
+          // secondary: they may blank a confident pixel glyph they contradict,
+          // or corroborate a matching one, but never supply the delivery.
+          observed: (l, t, r, b) =>
+              _inside(single(words), imageWidth, imageHeight, x, y, l, t, r, b),
+          vetoing: deskew
+              ? null
+              : (l, t, r, b) => _inside(
+                  single(supportingWords),
+                  imageWidth,
+                  imageHeight,
+                  x,
+                  y,
+                  l,
+                  t,
+                  r,
+                  b,
+                ),
           supporting: (l, t, r, b) =>
               _inside(supporting, imageWidth, imageHeight, x, y, l, t, r, b),
         );
@@ -1806,6 +1813,7 @@ abstract final class FrameGlyphReader {
     double maxGlyphWidth = .65,
     Set<String> Function(int, int, int, int)? observed,
     Set<String> Function(int, int, int, int)? supporting,
+    Set<String> Function(int, int, int, int)? vetoing,
     _ReadingConflict? conflict,
   }) {
     final seen = Uint8List(mask.length), components = <_Component>[];
@@ -1941,6 +1949,19 @@ abstract final class FrameGlyphReader {
         }
         result.write(known.single);
         continue;
+      }
+      // A secondary character that contradicts a confident pixel winner makes
+      // the glyph uncertain. Unlike a primary one it is never written.
+      if (known.isEmpty &&
+          best.value >= .68 &&
+          best.value - ranked[1].value >= .06) {
+        final others = (vetoing?.call(c.l, c.t, c.r, c.b) ?? <String>{})
+            .where((s) => RegExp(r'^[0-9XF/]$').hasMatch(s))
+            .toSet();
+        if (others.any((s) => s != best.key)) {
+          conflict?.seen = true;
+          return '';
+        }
       }
       // Native OCR occasionally emits lookalike Cyrillic letters in a numeric
       // cell. Use this only as independent corroboration of the pixel winner,
