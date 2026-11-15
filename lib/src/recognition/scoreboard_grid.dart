@@ -140,16 +140,14 @@ abstract final class ScoreboardGrid {
               }
             }
           }
-          symbols.sort((a, b) => a.x.compareTo(b.x));
-          final marks = symbols
-              .map((s) => s.text)
-              .join()
-              .toUpperCase()
-              .replaceAll('×', 'X')
-              .replaceAll('–', '-')
-              .replaceAll('—', '-');
-          final parsed = TenPinScorer.parseFrame(marks, tenth: i == 9);
-          frames[i] = parsed.error == null ? parsed.notation : '';
+          // Two different readings of the same ink leave the frame blank.
+          final marks = cellMarks(symbols);
+          final parsed = marks == null
+              ? null
+              : TenPinScorer.parseFrame(marks, tenth: i == 9);
+          frames[i] = parsed != null && parsed.error == null
+              ? parsed.notation
+              : '';
         }
         final suggested =
             aliasWord != null ||
@@ -248,6 +246,39 @@ abstract final class ScoreboardGrid {
       results.addAll(candidates);
     }
     return results;
+  }
+
+  /// Delivery marks observed in one cell, left to right, or null when two
+  /// observations of the same ink disagree. Separate deliveries sit side by
+  /// side; boxes that mostly overlap are one glyph read twice, so identical
+  /// text counts once and different text is a conflict, never a second ball.
+  /// Morphological stroke detections are a different kind of evidence and
+  /// are not compared with OCR characters.
+  static String? cellMarks(Iterable<RecognizedLine> symbols) {
+    String mark(RecognizedLine s) => s.text
+        .toUpperCase()
+        .replaceAll('×', 'X')
+        .replaceAll('–', '-')
+        .replaceAll('—', '-');
+    bool sameInk(RecognizedLine a, RecognizedLine b) {
+      if (a.isStroke || b.isStroke) return false;
+      final areaA = a.width * a.height, areaB = b.width * b.height;
+      if (areaA <= 0 || areaB <= 0) return false;
+      final w = math.min(a.x + a.width, b.x + b.width) - math.max(a.x, b.x);
+      final h = math.min(a.y + a.height, b.y + b.height) - math.max(a.y, b.y);
+      return w > 0 && h > 0 && w * h > math.min(areaA, areaB) * .5;
+    }
+
+    final kept = <RecognizedLine>[];
+    for (final symbol in symbols.toList()..sort((a, b) => a.x.compareTo(b.x))) {
+      final twin = kept.where((k) => sameInk(k, symbol)).firstOrNull;
+      if (twin == null) {
+        kept.add(symbol);
+      } else if (mark(twin) != mark(symbol)) {
+        return null;
+      }
+    }
+    return kept.map(mark).join();
   }
 
   static int? _number(String text) {

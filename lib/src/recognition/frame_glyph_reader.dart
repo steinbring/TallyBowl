@@ -1139,13 +1139,9 @@ abstract final class FrameGlyphReader {
               )
               .toList()
             ..sort((a, b) => a.x.compareTo(b.x));
-      final nativeFrame = nativeMarks
-          .map((s) => s.text)
-          .join()
-          .toUpperCase()
-          .replaceAll('×', 'X')
-          .replaceAll('–', '-')
-          .replaceAll('—', '-');
+      // Two different native readings of one glyph are not a frame: such
+      // marks neither stand in for the pixels nor constrain them.
+      final nativeFrame = ScoreboardGrid.cellMarks(nativeMarks) ?? '';
       if (table.band != null) {
         final primary = [
           for (final word in words)
@@ -1159,13 +1155,7 @@ abstract final class FrameGlyphReader {
                 ).hasMatch(s.text),
               ),
         ]..sort((a, b) => a.x.compareTo(b.x));
-        final confirmed = primary
-            .map((s) => s.text)
-            .join()
-            .toUpperCase()
-            .replaceAll('×', 'X')
-            .replaceAll('–', '-')
-            .replaceAll('—', '-');
+        final confirmed = ScoreboardGrid.cellMarks(primary) ?? '';
         final conflict = _ReadingConflict();
         List<RecognizedLine> single(List<RecognizedLine> input) => input
             .where(
