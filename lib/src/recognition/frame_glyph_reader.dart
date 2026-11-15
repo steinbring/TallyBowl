@@ -1139,13 +1139,9 @@ abstract final class FrameGlyphReader {
               )
               .toList()
             ..sort((a, b) => a.x.compareTo(b.x));
-      final nativeFrame = nativeMarks
-          .map((s) => s.text)
-          .join()
-          .toUpperCase()
-          .replaceAll('×', 'X')
-          .replaceAll('–', '-')
-          .replaceAll('—', '-');
+      // Two different native readings of one glyph are not a frame: such
+      // marks neither stand in for the pixels nor constrain them.
+      final nativeFrame = ScoreboardGrid.cellMarks(nativeMarks) ?? '';
       if (table.band != null) {
         final primary = [
           for (final word in words)
@@ -1159,13 +1155,14 @@ abstract final class FrameGlyphReader {
                 ).hasMatch(s.text),
               ),
         ]..sort((a, b) => a.x.compareTo(b.x));
-        final confirmed = primary
-            .map((s) => s.text)
-            .join()
-            .toUpperCase()
-            .replaceAll('×', 'X')
-            .replaceAll('–', '-')
-            .replaceAll('—', '-');
+        final confirmed = ScoreboardGrid.cellMarks(primary) ?? '';
+        final conflict = _ReadingConflict();
+        List<RecognizedLine> single(List<RecognizedLine> input) => input
+            .where(
+              (w) =>
+                  RegExp(r'^[0-9XF/×]$', caseSensitive: false).hasMatch(w.text),
+            )
+            .toList();
         String readInk(Uint8List pixels) => _classify(
           pixels,
           w,
@@ -1174,24 +1171,26 @@ abstract final class FrameGlyphReader {
           outlined: true,
           deskew: deskew,
           maxGlyphWidth: .85,
-          observed: (l, t, r, b) => _inside(
-            (deskew ? words : supportingWords)
-                .where(
-                  (w) => RegExp(
-                    r'^[0-9XF/×]$',
-                    caseSensitive: false,
-                  ).hasMatch(w.text),
-                )
-                .toList(),
-            imageWidth,
-            imageHeight,
-            x,
-            y,
-            l,
-            t,
-            r,
-            b,
-          ),
+          conflict: conflict,
+          // Only this pass's own words are primary and may fill a glyph the
+          // templates cannot read. Cell-crop and other passes' characters are
+          // secondary: they may blank a confident pixel glyph they contradict,
+          // or corroborate a matching one, but never supply the delivery.
+          observed: (l, t, r, b) =>
+              _inside(single(words), imageWidth, imageHeight, x, y, l, t, r, b),
+          vetoing: deskew
+              ? null
+              : (l, t, r, b) => _inside(
+                  single(supportingWords),
+                  imageWidth,
+                  imageHeight,
+                  x,
+                  y,
+                  l,
+                  t,
+                  r,
+                  b,
+                ),
           supporting: (l, t, r, b) =>
               _inside(supporting, imageWidth, imageHeight, x, y, l, t, r, b),
         );
@@ -1211,6 +1210,7 @@ abstract final class FrameGlyphReader {
             calibratedMasks: deskew && white != null
                 ? _castMasks(rgba, imageWidth, x, y, w, h, white)
                 : const [],
+            conflict: conflict,
           ),
         );
         continue;
@@ -1218,6 +1218,11 @@ abstract final class FrameGlyphReader {
       // Determine delivery order from photographed components. Word-level
       // OCR can spread a merged token across frame boundaries and reverse a
       // miss and digit while preserving the same cumulative and final score.
+      // A blank from disagreeing readings must stay blank. Without this a
+      // stricter mask that weakens the glyph, or the native frame itself,
+      // would put the contradicted value straight back (an 8/ read as 3/
+      // keeps every checkpoint and the total).
+      final conflict = _ReadingConflict();
       String classify(Uint8List pixels) => _classify(
         pixels,
         w,
@@ -1228,6 +1233,7 @@ abstract final class FrameGlyphReader {
             _inside(observations, imageWidth, imageHeight, x, y, l, t, r, b),
         supporting: (l, t, r, b) =>
             _inside(supporting, imageWidth, imageHeight, x, y, l, t, r, b),
+        conflict: conflict,
       );
       String? corrected;
       if (white != null) {
@@ -1298,8 +1304,10 @@ abstract final class FrameGlyphReader {
       // reading can still preserve ink obscured by a monitor graphic when the
       // raster classifier cannot complete the cell.
       frames.add(
-        TenPinScorer.parseFrame(physical, tenth: i == 9).complete ||
-                !TenPinScorer.parseFrame(nativeFrame, tenth: i == 9).complete
+        conflict.seen
+            ? ''
+            : TenPinScorer.parseFrame(physical, tenth: i == 9).complete ||
+                  !TenPinScorer.parseFrame(nativeFrame, tenth: i == 9).complete
             ? physical
             : nativeFrame,
       );
@@ -1351,6 +1359,7 @@ abstract final class FrameGlyphReader {
     bool ignoreInvalidNative = false,
     Iterable<Uint8List> calibratedMasks = const [],
     bool numeric = false,
+    _ReadingConflict? conflict,
   }) {
     final luminance = Uint8List(w * h);
     final histogram = List.filled(256, 0);
@@ -1400,10 +1409,17 @@ abstract final class FrameGlyphReader {
       return parsed.complete && parsed.error == null;
     }
 
+    // A complete, legal pixel reading that lacks the native marks is a second
+    // reading of the same ink, not noise: it cannot be used, and it also means
+    // the native frame is contradicted and cannot be used either.
+    var contradicted = false;
     void consider(Uint8List mask) {
       final value = classify(mask);
-      if (valid(value) && agrees(value)) {
+      if (!valid(value)) return;
+      if (agrees(value)) {
         readings.add(value);
+      } else {
+        contradicted = true;
       }
     }
 
@@ -1442,9 +1458,10 @@ abstract final class FrameGlyphReader {
         }
       }
     }
+    if (conflict?.seen ?? false) return '';
     if (readings.length == 1) return readings.single;
     if (readings.length > 1) return '';
-    return valid(native) ? native : '';
+    return valid(native) && !contradicted ? native : '';
   }
 
   /// Per-isolate memo for [_rankGlyph]; bounded and keyed by exact pixels.
@@ -1786,6 +1803,8 @@ abstract final class FrameGlyphReader {
     double maxGlyphWidth = .65,
     Set<String> Function(int, int, int, int)? observed,
     Set<String> Function(int, int, int, int)? supporting,
+    Set<String> Function(int, int, int, int)? vetoing,
+    _ReadingConflict? conflict,
   }) {
     final seen = Uint8List(mask.length), components = <_Component>[];
     for (var seed = 0; seed < mask.length; seed++) {
@@ -1915,10 +1934,24 @@ abstract final class FrameGlyphReader {
         if (known.single != best.key &&
             best.value >= .68 &&
             best.value - ranked[1].value >= .06) {
+          conflict?.seen = true;
           return '';
         }
         result.write(known.single);
         continue;
+      }
+      // A secondary character that contradicts a confident pixel winner makes
+      // the glyph uncertain. Unlike a primary one it is never written.
+      if (known.isEmpty &&
+          best.value >= .68 &&
+          best.value - ranked[1].value >= .06) {
+        final others = (vetoing?.call(c.l, c.t, c.r, c.b) ?? <String>{})
+            .where((s) => RegExp(r'^[0-9XF/]$').hasMatch(s))
+            .toSet();
+        if (others.any((s) => s != best.key)) {
+          conflict?.seen = true;
+          return '';
+        }
       }
       // Native OCR occasionally emits lookalike Cyrillic letters in a numeric
       // cell. Use this only as independent corroboration of the pixel winner,
@@ -1950,6 +1983,8 @@ abstract final class FrameGlyphReader {
       if (known.length > 1 ||
           best.value < .68 ||
           best.value - ranked[1].value < .06) {
+        // Two different native characters on one glyph are also a conflict.
+        if (known.length > 1) conflict?.seen = true;
         return '';
       }
       result.write(best.key);
@@ -1991,6 +2026,12 @@ class _GlyphKey {
     }
     return true;
   }
+}
+
+/// Set when two readings of one photographed glyph disagree. The cell then
+/// stays blank for review whatever any later mask or native frame says.
+class _ReadingConflict {
+  bool seen = false;
 }
 
 class _Raster {
