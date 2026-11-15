@@ -1166,6 +1166,7 @@ abstract final class FrameGlyphReader {
             .replaceAll('×', 'X')
             .replaceAll('–', '-')
             .replaceAll('—', '-');
+        final conflict = _ReadingConflict();
         String readInk(Uint8List pixels) => _classify(
           pixels,
           w,
@@ -1174,6 +1175,7 @@ abstract final class FrameGlyphReader {
           outlined: true,
           deskew: deskew,
           maxGlyphWidth: .85,
+          conflict: conflict,
           observed: (l, t, r, b) => _inside(
             (deskew ? words : supportingWords)
                 .where(
@@ -1211,6 +1213,7 @@ abstract final class FrameGlyphReader {
             calibratedMasks: deskew && white != null
                 ? _castMasks(rgba, imageWidth, x, y, w, h, white)
                 : const [],
+            conflict: conflict,
           ),
         );
         continue;
@@ -1359,6 +1362,7 @@ abstract final class FrameGlyphReader {
     bool ignoreInvalidNative = false,
     Iterable<Uint8List> calibratedMasks = const [],
     bool numeric = false,
+    _ReadingConflict? conflict,
   }) {
     final luminance = Uint8List(w * h);
     final histogram = List.filled(256, 0);
@@ -1408,10 +1412,17 @@ abstract final class FrameGlyphReader {
       return parsed.complete && parsed.error == null;
     }
 
+    // A complete, legal pixel reading that lacks the native marks is a second
+    // reading of the same ink, not noise: it cannot be used, and it also means
+    // the native frame is contradicted and cannot be used either.
+    var contradicted = false;
     void consider(Uint8List mask) {
       final value = classify(mask);
-      if (valid(value) && agrees(value)) {
+      if (!valid(value)) return;
+      if (agrees(value)) {
         readings.add(value);
+      } else {
+        contradicted = true;
       }
     }
 
@@ -1450,9 +1461,10 @@ abstract final class FrameGlyphReader {
         }
       }
     }
+    if (conflict?.seen ?? false) return '';
     if (readings.length == 1) return readings.single;
     if (readings.length > 1) return '';
-    return valid(native) ? native : '';
+    return valid(native) && !contradicted ? native : '';
   }
 
   /// Per-isolate memo for [_rankGlyph]; bounded and keyed by exact pixels.
